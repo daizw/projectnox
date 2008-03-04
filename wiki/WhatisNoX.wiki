@@ -1,0 +1,23 @@
+#summary One-sentence summary of this page.
+#labels Phase-Design,Phase-QA
+NoX is a P2P instant messaging system based on JXTA.
+
+= Introduction =
+
+In Project NoX an IM system (I call it NoX) will be implemented.
+Nox is based on JXTA, and will be developed in Java.
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
+
+As a P2P IM system, *NoX* will make you feel free to do these things:
+1. *chat* with your friends(_send/receive text/picture-contained/mixed-up messages to/from your friends_);
+2. chat with some friends in a _chatroom_;
+3. *share* files with your friends;
+4. play online *games*(exp. _chess/chinese cheess/tic-tac-toe_, etc) with your friends.
+
+*Besides these*, if anyone has any great ideas, please just let me know and let's talk about it!
