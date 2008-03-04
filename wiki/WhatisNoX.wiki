@@ -1,6 +1,5 @@
-#summary One-sentence summary of this page.
+#summary NoX is a P2P instant messaging system based on JXTA.
 #labels Phase-Design,Phase-QA
-NoX is a P2P instant messaging system based on JXTA.
 
 = Introduction =
 
