@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class FilteredJList extends JList {
 
     /**
-	 * 
+	 * SWING HACK
 	 */
 	private static final long serialVersionUID = 1L;
 	private FilterField filterField;

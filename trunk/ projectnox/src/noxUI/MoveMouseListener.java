@@ -6,7 +6,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 
 public class MoveMouseListener implements MouseListener, MouseMotionListener{
 	JComponent target;
