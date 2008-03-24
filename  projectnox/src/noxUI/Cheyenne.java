@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -11,6 +13,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.MatteBorder;
+import javax.swing.plaf.metal.MetalBorders;
 
 public class Cheyenne extends JFrame{
 	/**
@@ -82,6 +88,7 @@ public class Cheyenne extends JFrame{
 		
         Container contentPane = getContentPane();
         Cheyenne.this.setBounds(500,80,WIDTH,HEIGHT);
+        Cheyenne.this.setSize(new Dimension(WIDTH, HEIGHT));
         Cheyenne.this.setPreferredSize(new Dimension(WIDTH_PREF, HEIGHT_PREF));
         Cheyenne.this.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
         Cheyenne.this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
@@ -125,7 +132,11 @@ public class Cheyenne extends JFrame{
 			}
 		});
 		
-		//lab_title = new JLabel("NoX");
+		/*lab_title = new JLabel("NoX");
+		//Font font = new Font("宋体-方正超大字符集", Font.BOLD, 24);
+		Font font = new Font("Times New Roman", Font.BOLD, 24);
+		lab_title.setForeground(Color.WHITE);
+		lab_title.setFont(font);*/
 		lab_title = new JLabel(new ImageIcon("resrc\\nox.png"));
 		
 		/*btitle = new JButton(new ImageIcon("resrc\\nox.png"));
@@ -199,31 +210,59 @@ public class Cheyenne extends JFrame{
 		myPortrait.setPreferredSize(new Dimension(50,50));
 		myPortrait.setMaximumSize(new Dimension(50,50));
 		myPortrait.setMinimumSize(new Dimension(50,50));
-		//myPortrait.setBorderPainted(false);
+		//myPortrait.setBorderPainted(true);
+		
+		/*myPortrait.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, 
+				Color.RED, Color.BLUE));*/
 		myPortrait.setContentAreaFilled(false);
 		myPortrait.setOpaque(false);
 		
-		miniProfilePane = new JPanel(); 
+		miniProfilePane = new JPanel();
+		JPanel nickAndStat = new JPanel();
+		JLabel nick = new JLabel("Shinysky");
+		nick.setForeground(Color.WHITE);
 		myStatus = new JComboBox();
+		//myStatus.setOpaque(false);
 		mySign = new JTextField("Hello, everyone~");
+		mySign.setOpaque(false);
+		mySign.setForeground(Color.WHITE);
 		myStatus.addItem("Online");
 		myStatus.addItem("Busy");
 		myStatus.addItem("Hide");
 		myStatus.addItem("Offline");
-		myStatus.setSize(new Dimension(100,25));
-		myStatus.setPreferredSize(new Dimension(100,25));
-		myStatus.setMaximumSize(new Dimension(1000,25));
-		myStatus.setMinimumSize(new Dimension(100,25));
+		myStatus.setSize(new Dimension(50,20));
+		myStatus.setPreferredSize(new Dimension(50,20));
+		myStatus.setMaximumSize(new Dimension(70,20));
+		myStatus.setMinimumSize(new Dimension(50,20));
+		nickAndStat.setOpaque(false);
+		//nickAndStat.setBackground(new Color(0, 255, 0));
+		nickAndStat.setSize(new Dimension(150,20));
+		nickAndStat.setPreferredSize(new Dimension(150,20));
+		nickAndStat.setMaximumSize(new Dimension(1000,20));
+		nickAndStat.setMinimumSize(new Dimension(150,20));
+		//nickAndStat.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+		nickAndStat.setLayout(new BoxLayout(nickAndStat, BoxLayout.X_AXIS));
+		nickAndStat.add(nick);
+		nickAndStat.add(Box.createHorizontalStrut(10));
+		nickAndStat.add(myStatus);
 		
+		mySign.setSize(new Dimension(WIDTH,20));
+		mySign.setPreferredSize(new Dimension(WIDTH_PREF,20));
+		mySign.setMaximumSize(new Dimension(WIDTH_MAX,20));
+		mySign.setMinimumSize(new Dimension(WIDTH_MIN,20));
+		
+		//miniProfilePane.setAlignmentX(JComponent.TOP_ALIGNMENT);
 		miniProfilePane.setLayout(new BoxLayout(miniProfilePane, BoxLayout.Y_AXIS));
-		miniProfilePane.add(myStatus);
+		miniProfilePane.add(nickAndStat);
 		miniProfilePane.add(mySign);
+		miniProfilePane.setOpaque(false);
 		
 		profile.setLayout(new BoxLayout(profile, BoxLayout.X_AXIS));
 		profile.add(myPortrait);
+		profile.add(Box.createHorizontalStrut(5));
 		profile.add(miniProfilePane);
-		//profile.setOpaque(false);
-		profile.setBackground(new Color(0, 255, 0));
+		profile.setOpaque(false);
+		//profile.setBackground(new Color(0, 255, 0));
 		profile.setSize(new Dimension(WIDTH, 50));
 		profile.setPreferredSize(new Dimension(WIDTH_PREF, 50));
 		profile.setMaximumSize(new Dimension(WIDTH_MAX, 50));
@@ -257,13 +296,11 @@ public class Cheyenne extends JFrame{
 		tabs.setTabPlacement(JTabbedPane.LEFT);
 		tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);//滚动标签(一行)
 		//tabs.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);//多行标签
-		tabs.setBackground(new Color(110, 110, 110));
+		tabs.setBackground(Color.BLACK);
+		tabs.setForeground(Color.WHITE);
 		tabs.addTab("", new ImageIcon("resrc\\chat.png"), flp);
 		tabs.addTab("", new ImageIcon("resrc\\chatroom.png"), grplist);
-		tabs.addTab("", new ImageIcon("resrc\\chat.png"), blklist);
-		/*tabs.addTab("f", frdlist);
-		tabs.addTab("g", grplist);
-		tabs.addTab("b", blklist);*/
+		tabs.addTab("", new ImageIcon("resrc\\blacklist.png"), blklist);
 		tabs.setOpaque(false);
 		
 		/*JPanel a = new JPanel();
@@ -299,11 +336,35 @@ public class Cheyenne extends JFrame{
 		footpane.setMinimumSize(new Dimension(WIDTH_MIN,15));
 		footpane.setOpaque(false);
 		
+		/*ImageBorder image_border = new ImageBorder(
+	            new ImageIcon("resrc/upper_left.png").getImage(),
+	            new ImageIcon("resrc/upper.png").getImage(),
+	            new ImageIcon("resrc/upper_right.png").getImage(),
+
+	            new ImageIcon("resrc/left_center.png").getImage(),
+	            new ImageIcon("resrc/right_center.png").getImage(),
+
+	            new ImageIcon("resrc/bottom_left.png").getImage(),
+	            new ImageIcon("resrc/bottom_center.png").getImage(),
+	            new ImageIcon("resrc/bottom_right.png").getImage()
+	            );*/
+		JPanel fakeFace = new JPanel();
+		MatteBorder paneEdge = BorderFactory.createMatteBorder(2,2,2,2, Color.BLACK);
+		fakeFace.setBorder(paneEdge);
+		
 		rootpane.setLayout(new BoxLayout(rootpane, BoxLayout.Y_AXIS));
 		rootpane.add(titlebar);
 		rootpane.add(profile);
 		rootpane.add(tabs);
 		rootpane.add(footpane);
-		contentPane.add(rootpane);
+		rootpane.setSize(new Dimension(WIDTH, HEIGHT));
+		rootpane.setPreferredSize(new Dimension(WIDTH_PREF, HEIGHT_PREF));
+		rootpane.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
+		rootpane.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
+        
+		fakeFace.setLayout(new BoxLayout(fakeFace, BoxLayout.Y_AXIS));
+		fakeFace.add(rootpane);
+
+		contentPane.add(fakeFace);
     }
 }
