@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -26,14 +27,14 @@ public class Cheyenne extends JFrame{
 	/**
 	 * 默认尺寸常量
 	 */
-	public int WIDTH = 300;
-	public int WIDTH_PREF = 300;
-	public int WIDTH_MAX = 2000;
-	public int WIDTH_MIN = 200;
-	public int HEIGHT = 600;
-	public int HEIGHT_PREF = 600;
-	public int HEIGHT_MAX = 2000;
-	public int HEIGHT_MIN = 300;
+	public static final int WIDTH = 300;
+	public static final int WIDTH_PREF = 300;
+	public static final int WIDTH_MAX = 2000;
+	public static final int WIDTH_MIN = 200;
+	public static final int HEIGHT = 600;
+	public static final int HEIGHT_PREF = 600;
+	public static final int HEIGHT_MAX = 2000;
+	public static final int HEIGHT_MIN = 300;
 	/**
 	 * 用来获取图片
 	 */
@@ -47,9 +48,12 @@ public class Cheyenne extends JFrame{
 	private JPanel titlebar;
 	private JPanel profile;
 	private JTabbedPane tabs;
-	private FriendListPane frdlist;
-	private JPanel grplist;
-	private JPanel blklist;
+	private JPanel frdlistpane;
+	private JPanel grplistpane;
+	private JPanel blklistpane;
+	private JScrollPane frdListScrPane;
+	private JScrollPane grpListScrPane;
+	private JScrollPane blkListScrPane;
 	private JPanel footpane;
 	
 	JButton blogo;
@@ -65,6 +69,8 @@ public class Cheyenne extends JFrame{
 	JTextField mySign;
 	
 	JButton resizeButn;
+	
+	//public static int counter = 0; 
 	
 	public static void main(String args[])
 	{
@@ -94,18 +100,11 @@ public class Cheyenne extends JFrame{
         Cheyenne.this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
 		//Cheyenne.this.setResizable(false);
 		Cheyenne.this.setUndecorated(true); //不显示标题栏和边框
-		JLabel test3 = new JLabel("what?");
-		JLabel test4 = new JLabel("what?");
-		JLabel test5 = new JLabel("what?");
 		
 		rootpane = new JMapPanel(background);
 		
 		titlebar = new JPanel();
 		profile = new JPanel();
-		tabs = new JTabbedPane();
-		frdlist = new FriendListPane();
-		grplist = new JPanel();
-		blklist = new JPanel();
 		
 		blogo = new JButton(new ImageIcon(img_icon));
 		blogo.setSize(new Dimension(20,20));
@@ -268,39 +267,98 @@ public class Cheyenne extends JFrame{
 		profile.setMaximumSize(new Dimension(WIDTH_MAX, 50));
 		profile.setMinimumSize(new Dimension(WIDTH_MIN, 50));
 		
-		grplist.add(test4);
-		blklist.add(test5);
-		
+		tabs = new JTabbedPane();
+		frdlistpane = new JPanel();
+		grplistpane = new JPanel();
+		blklistpane = new JPanel();
 		/**
 		 * 好友列表
-		 */
-		JPanel flp = new JPanel();
-		String[] listItems = {
+		 */		
+		String[] flistItems = {
 	            "Chris", "Joshua", "Daniel", "Michael",
 	            "Don", "Kimi", "Kelly", "Keagan", "夏", "商", "周", "张三", "张四", "张五", "张三丰"
-	        };
-	        flp.setLayout (new BorderLayout());
-	        // populate list
-	        FilteredJList list = new FilteredJList();
-	        for (int i=0; i<listItems.length; i++)
-	            list.addItem (listItems[i]);
-	        // add to gui
-	        JScrollPane pane =
-	            new JScrollPane (list,
+	            };
+		
+		// populate list
+		//FilteredJList list = new FilteredJList();
+	        
+		FriendItem[] friends = new FriendItem[flistItems.length];
+		//ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
+
+		for (int i = 0; i<flistItems.length; i++)
+		{
+			friends[i] = new FriendItem(new ImageIcon("resrc\\portrait\\user.png"),
+					flistItems[i], "(Hi, 我是"+flistItems[i]+')');
+		}
+		FriendList flist = new FriendList(friends);
+		/**
+		 * 组列表
+		 */		
+		String[] glistItems = {
+	            "group1", "group2", "group3", "group4", "三年二班", "三年三班"
+	            };
+	        
+		FriendItem[] groups = new FriendItem[glistItems.length];
+
+		for (int i = 0; i<glistItems.length; i++)
+		{
+			groups[i] = new FriendItem(new ImageIcon("resrc\\chatroom.png"),
+					glistItems[i], "(Hi, 这是"+glistItems[i]+"的聊天室)");
+		}
+		FriendList glist = new FriendList(groups);
+		/**
+		 * 黑名单
+		 */		
+		String[] blistItems = {
+	            "Ben", "Laden", "Hitler", "Bush","陈水扁"
+	            };
+		
+		// populate list
+		//FilteredJList list = new FilteredJList();
+	        
+		FriendItem[] badguys = new FriendItem[blistItems.length];
+		//ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
+
+		for (int i = 0; i<blistItems.length; i++)
+		{
+			badguys[i] = new FriendItem(new ImageIcon("resrc\\blacklist.png"),
+					blistItems[i], "(Hi, 我是"+blistItems[i]+')');
+		}
+		FriendList blist = new FriendList(badguys);
+	        
+		// add to gui
+		frdListScrPane =
+	            new JScrollPane (flist,
 	                             ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 	                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-	        flp.add (pane, BorderLayout.CENTER);
-	        flp.add (list.getFilterField(), BorderLayout.NORTH);
+		grpListScrPane =
+            new JScrollPane (glist,
+                             ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		blkListScrPane =
+            new JScrollPane (blist,
+                             ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		frdlistpane.setLayout (new BorderLayout());
+		frdlistpane.add (frdListScrPane, BorderLayout.CENTER);
+		frdlistpane.add(flist.getFilterField(), BorderLayout.NORTH);
+		
+		grplistpane.setLayout (new BorderLayout());
+		grplistpane.add (grpListScrPane, BorderLayout.CENTER);
+		grplistpane.add(glist.getFilterField(), BorderLayout.NORTH);
+		
+		blklistpane.setLayout (new BorderLayout());
+		blklistpane.add (blkListScrPane, BorderLayout.CENTER);
+		blklistpane.add(blist.getFilterField(), BorderLayout.NORTH);
 
-	        
 		tabs.setTabPlacement(JTabbedPane.LEFT);
 		tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);//滚动标签(一行)
 		//tabs.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);//多行标签
 		tabs.setBackground(Color.BLACK);
 		tabs.setForeground(Color.WHITE);
-		tabs.addTab("", new ImageIcon("resrc\\chat.png"), flp);
-		tabs.addTab("", new ImageIcon("resrc\\chatroom.png"), grplist);
-		tabs.addTab("", new ImageIcon("resrc\\blacklist.png"), blklist);
+		tabs.addTab(null, new ImageIcon("resrc\\chat.png"), frdlistpane);
+		tabs.addTab(null, new ImageIcon("resrc\\chatroom.png"), grplistpane);
+		tabs.addTab(null, new ImageIcon("resrc\\blacklist.png"), blklistpane);
 		tabs.setOpaque(false);
 		
 		/*JPanel a = new JPanel();
