@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -19,7 +20,7 @@ import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import javax.swing.plaf.metal.MetalBorders;
 
-public class Cheyenne extends JFrame{
+public class Cheyenne extends JFrame {
 	/**
 	 * 
 	 */
@@ -55,129 +56,136 @@ public class Cheyenne extends JFrame{
 	private JScrollPane grpListScrPane;
 	private JScrollPane blkListScrPane;
 	private JPanel footpane;
-	
+
 	JButton blogo;
-	//JButton btitle;
+	// JButton btitle;
 	JLabel lab_title;
 	JButton bminimize;
-	//JButton bmaximize;
+	// JButton bmaximize;
 	JButton bclose;
-	
+
+	// JMapPanel myPortraitPane;
 	JButton myPortrait;
+	Image myportrImg;
 	JPanel miniProfilePane;
 	JComboBox myStatus;
 	JTextField mySign;
-	
+
 	JButton resizeButn;
-	
-	//public static int counter = 0; 
-	
-	public static void main(String args[])
-	{
+
+	// public static int counter = 0;
+
+	public static void main(String args[]) {
 		Cheyenne chyn = new Cheyenne();
 		MoveMouseListener mml = new MoveMouseListener(chyn.getRootPane(), chyn);
 		chyn.getRootPane().addMouseListener(mml);
 		chyn.getRootPane().addMouseMotionListener(mml);
 		chyn.setVisible(true);
 	}
-	Cheyenne()
-    {
-        super("NoX -- a IM system");
-        
-        tk = Toolkit.getDefaultToolkit();
+
+	Cheyenne() {
+		super("NoX -- a IM system");
+
+		tk = Toolkit.getDefaultToolkit();
 		background = tk.getImage("resrc\\bkgrd.png");
 		img_icon = tk.getImage("resrc\\NoXlogo_20.png");
+		myportrImg = tk.getImage("resrc\\portrait\\portrait.png");
 		Cheyenne.this.setIconImage(img_icon);
 
-		//准备图片
+		// 准备图片
 		this.prepareImage(background, rootpane);
-		
-        Container contentPane = getContentPane();
-        Cheyenne.this.setBounds(500,80,WIDTH,HEIGHT);
-        Cheyenne.this.setSize(new Dimension(WIDTH, HEIGHT));
-        Cheyenne.this.setPreferredSize(new Dimension(WIDTH_PREF, HEIGHT_PREF));
-        Cheyenne.this.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
-        Cheyenne.this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
-		//Cheyenne.this.setResizable(false);
-		Cheyenne.this.setUndecorated(true); //不显示标题栏和边框
-		
+
+		Container contentPane = getContentPane();
+		Cheyenne.this.setBounds(500, 80, WIDTH, HEIGHT);
+		Cheyenne.this.setSize(new Dimension(WIDTH, HEIGHT));
+		Cheyenne.this.setPreferredSize(new Dimension(WIDTH_PREF, HEIGHT_PREF));
+		Cheyenne.this.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
+		Cheyenne.this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
+		// Cheyenne.this.setResizable(false);
+		Cheyenne.this.setUndecorated(true); // 不显示标题栏和边框
+
 		rootpane = new JMapPanel(background);
-		
+
 		titlebar = new JPanel();
 		profile = new JPanel();
-		
+
 		blogo = new JButton(new ImageIcon(img_icon));
-		blogo.setSize(new Dimension(20,20));
-		blogo.setPreferredSize(new Dimension(20,20));
-		blogo.setMaximumSize(new Dimension(20,20));
-		blogo.setMinimumSize(new Dimension(20,20));
+		blogo.setSize(new Dimension(20, 20));
+		blogo.setPreferredSize(new Dimension(20, 20));
+		blogo.setMaximumSize(new Dimension(20, 20));
+		blogo.setMinimumSize(new Dimension(20, 20));
 		blogo.setBorderPainted(false);
 		blogo.setContentAreaFilled(false);
 		blogo.setOpaque(false);
 		blogo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//JOptionPane.showMessageDialog(null, "Hello, I am DaiZW, welcome to the NoX world!");
+				// JOptionPane.showMessageDialog(null, "Hello, I am DaiZW,
+				// welcome to the NoX world!");
 				AboutDialog about = new AboutDialog();
-			    DialogEarthquakeCenter dec = new DialogEarthquakeCenter (about);
-			    about.pack();
-			    about.setModal (false);
-			    about.setSize(new Dimension(500,350));
-			    about.setPreferredSize(new Dimension(500,350));
-				/*this.setMaximumSize(new Dimension(400,500));
-				this.setMinimumSize(new Dimension(400,500));*/
-			    about.setLocation(new Point(300, 150));
-			    about.setVisible(true);
-			    dec.startShake();//对话框必须setModal (false)才可以抖动, 否则不行
+				DialogEarthquakeCenter dec = new DialogEarthquakeCenter(about);
+				about.pack();
+				about.setModal(false);
+				about.setSize(new Dimension(500, 350));
+				about.setPreferredSize(new Dimension(500, 350));
+				/*
+				 * this.setMaximumSize(new Dimension(400,500));
+				 * this.setMinimumSize(new Dimension(400,500));
+				 */
+				about.setLocation(new Point(300, 150));
+				about.setVisible(true);
+				dec.startShake();// 对话框必须setModal (false)才可以抖动, 否则不行
 			}
 		});
-		
-		/*lab_title = new JLabel("NoX");
-		//Font font = new Font("宋体-方正超大字符集", Font.BOLD, 24);
-		Font font = new Font("Times New Roman", Font.BOLD, 24);
-		lab_title.setForeground(Color.WHITE);
-		lab_title.setFont(font);*/
+
+		/*
+		 * lab_title = new JLabel("NoX"); //Font font = new Font("宋体-方正超大字符集",
+		 * Font.BOLD, 24); Font font = new Font("Times New Roman", Font.BOLD,
+		 * 24); lab_title.setForeground(Color.WHITE); lab_title.setFont(font);
+		 */
 		lab_title = new JLabel(new ImageIcon("resrc\\nox.png"));
-		
-		/*btitle = new JButton(new ImageIcon("resrc\\nox.png"));
-		btitle.setSize(new Dimension(60,20));
-		btitle.setPreferredSize(new Dimension(60,20));
-		btitle.setMaximumSize(new Dimension(60,20));
-		btitle.setMinimumSize(new Dimension(60,20));
-		btitle.setBorderPainted(false);
-		btitle.setContentAreaFilled(false);
-		btitle.setOpaque(false);*/
-		
+
+		/*
+		 * btitle = new JButton(new ImageIcon("resrc\\nox.png"));
+		 * btitle.setSize(new Dimension(60,20)); btitle.setPreferredSize(new
+		 * Dimension(60,20)); btitle.setMaximumSize(new Dimension(60,20));
+		 * btitle.setMinimumSize(new Dimension(60,20));
+		 * btitle.setBorderPainted(false); btitle.setContentAreaFilled(false);
+		 * btitle.setOpaque(false);
+		 */
+
 		bminimize = new JButton(new ImageIcon("resrc\\minimize.png"));
-		bminimize.setRolloverIcon(new ImageIcon("resrc\\minimize_rollover.png"));
-		bminimize.setSize(new Dimension(20,20));
-		bminimize.setPreferredSize(new Dimension(20,20));
-		bminimize.setMaximumSize(new Dimension(20,20));
-		bminimize.setMinimumSize(new Dimension(20,20));
+		bminimize
+				.setRolloverIcon(new ImageIcon("resrc\\minimize_rollover.png"));
+		bminimize.setSize(new Dimension(20, 20));
+		bminimize.setPreferredSize(new Dimension(20, 20));
+		bminimize.setMaximumSize(new Dimension(20, 20));
+		bminimize.setMinimumSize(new Dimension(20, 20));
 		bminimize.setBorderPainted(false);
 		bminimize.setContentAreaFilled(false);
 		bminimize.setOpaque(false);
 		bminimize.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-		        int state = Cheyenne.this.getExtendedState();
-		        
-		    	// 设置图标化(iconifies)位
-		        // Set the iconified bit
-		        state |= JFrame.ICONIFIED;
-		    
-		    	// 图标化Frame
-		        // Iconify the frame
-		        Cheyenne.this.setExtendedState(state);
-				//JOptionPane.showMessageDialog(null, "You just click the Minimize button~");
+				int state = Cheyenne.this.getExtendedState();
+
+				// 设置图标化(iconifies)位
+				// Set the iconified bit
+				state |= JFrame.ICONIFIED;
+
+				// 图标化Frame
+				// Iconify the frame
+				Cheyenne.this.setExtendedState(state);
+				// JOptionPane.showMessageDialog(null, "You just click the
+				// Minimize button~");
 			}
 		});
-		
-		//bmaximize = new JButton("max");
+
+		// bmaximize = new JButton("max");
 		bclose = new JButton(new ImageIcon("resrc\\close.png"));
 		bclose.setRolloverIcon(new ImageIcon("resrc\\close_rollover.png"));
-		bclose.setSize(new Dimension(20,20));
-		bclose.setPreferredSize(new Dimension(20,20));
-		bclose.setMaximumSize(new Dimension(20,20));
-		bclose.setMinimumSize(new Dimension(20,20));
+		bclose.setSize(new Dimension(20, 20));
+		bclose.setPreferredSize(new Dimension(20, 20));
+		bclose.setMaximumSize(new Dimension(20, 20));
+		bclose.setMinimumSize(new Dimension(20, 20));
 		bclose.setBorderPainted(false);
 		bclose.setContentAreaFilled(false);
 		bclose.setOpaque(false);
@@ -187,229 +195,247 @@ public class Cheyenne extends JFrame{
 				System.exit(0);
 			}
 		});
-		
+
 		titlebar.setLayout(new BoxLayout(titlebar, BoxLayout.X_AXIS));
-		titlebar.setAlignmentX(JComponent.CENTER_ALIGNMENT);//设置对齐方式
+		titlebar.setAlignmentX(JComponent.CENTER_ALIGNMENT);// 设置对齐方式
 		titlebar.add(blogo);
 		titlebar.add(Box.createHorizontalGlue());
 		titlebar.add(lab_title);
-		//titlebar.add(btitle);
+		// titlebar.add(btitle);
 		titlebar.add(Box.createHorizontalGlue());
 		titlebar.add(bminimize);
 		titlebar.add(bclose);
 		titlebar.setOpaque(false);
-		//titlebar.setBackground(new Color(200, 0, 0));
-		titlebar.setSize(new Dimension(WIDTH*2, 20));
-		titlebar.setPreferredSize(new Dimension(WIDTH_PREF*2, 20));
+		// titlebar.setBackground(new Color(200, 0, 0));
+		titlebar.setSize(new Dimension(WIDTH * 2, 20));
+		titlebar.setPreferredSize(new Dimension(WIDTH_PREF * 2, 20));
 		titlebar.setMaximumSize(new Dimension(WIDTH_MAX, 20));
 		titlebar.setMinimumSize(new Dimension(WIDTH_MIN, 20));
-		
+
 		myPortrait = new JButton(new ImageIcon("resrc\\portrait\\portrait.png"));
-		myPortrait.setSize(new Dimension(50,50));
-		myPortrait.setPreferredSize(new Dimension(50,50));
-		myPortrait.setMaximumSize(new Dimension(50,50));
-		myPortrait.setMinimumSize(new Dimension(50,50));
-		//myPortrait.setBorderPainted(true);
-		
-		/*myPortrait.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, 
-				Color.RED, Color.BLUE));*/
+		myPortrait.setSize(new Dimension(50, 50));
+		myPortrait.setPreferredSize(new Dimension(50, 50));
+		myPortrait.setMaximumSize(new Dimension(50, 50));
+		myPortrait.setMinimumSize(new Dimension(50, 50));
+		// myPortrait.setBorderPainted(true);
+
+		/*
+		 * myPortrait.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED,
+		 * Color.RED, Color.BLUE));
+		 */
 		myPortrait.setContentAreaFilled(false);
 		myPortrait.setOpaque(false);
-		
+
+		/*
+		 * JButton statSign = new JButton(new
+		 * ImageIcon("resrc\\portrait\\busy.png")); statSign.setSize(new
+		 * Dimension(50, 50)); statSign.setPreferredSize(new Dimension(50, 50));
+		 * statSign.setMaximumSize(new Dimension(50, 50));
+		 * statSign.setMinimumSize(new Dimension(50, 50));
+		 * //statSign.setBorderPainted(false);
+		 * //statSign.setContentAreaFilled(false); //statSign.setOpaque(false);
+		 * 
+		 * myPortrait.setLayout(new BoxLayout(myPortrait, BoxLayout.X_AXIS));
+		 * myPortrait.add(statSign);
+		 */
+
+		/*
+		 * myPortraitPane = new JMapPanel(myportrImg, new Point (5, 10), new
+		 * Dimension(40, 40)); myPortraitPane.setSize(new Dimension(50, 50));
+		 * myPortraitPane.setPreferredSize(new Dimension(50, 50));
+		 * myPortraitPane.setMaximumSize(new Dimension(50, 50));
+		 * myPortraitPane.setMinimumSize(new Dimension(50, 50));
+		 * myPortraitPane.add(myPortrait);
+		 */
+
 		miniProfilePane = new JPanel();
 		JPanel nickAndStat = new JPanel();
 		JLabel nick = new JLabel("Shinysky");
 		nick.setForeground(Color.WHITE);
 		myStatus = new JComboBox();
-		//myStatus.setOpaque(false);
+		// myStatus.setOpaque(false);
 		mySign = new JTextField("Hello, everyone~");
 		mySign.setOpaque(false);
 		mySign.setForeground(Color.WHITE);
 		myStatus.addItem("Online");
 		myStatus.addItem("Busy");
-		myStatus.addItem("Hide");
+		myStatus.addItem("Invisible");
 		myStatus.addItem("Offline");
-		myStatus.setSize(new Dimension(50,20));
-		myStatus.setPreferredSize(new Dimension(50,20));
-		myStatus.setMaximumSize(new Dimension(70,20));
-		myStatus.setMinimumSize(new Dimension(50,20));
+		myStatus.setSize(new Dimension(75, 20));
+		myStatus.setPreferredSize(new Dimension(75, 20));
+		myStatus.setMaximumSize(new Dimension(75, 20));
+		myStatus.setMinimumSize(new Dimension(75, 20));
+		// myStatus.setOpaque(false);
+
 		nickAndStat.setOpaque(false);
-		//nickAndStat.setBackground(new Color(0, 255, 0));
-		nickAndStat.setSize(new Dimension(150,20));
-		nickAndStat.setPreferredSize(new Dimension(150,20));
-		nickAndStat.setMaximumSize(new Dimension(1000,20));
-		nickAndStat.setMinimumSize(new Dimension(150,20));
-		//nickAndStat.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+		// nickAndStat.setBackground(new Color(0, 255, 0));
+		nickAndStat.setSize(new Dimension(150, 20));
+		nickAndStat.setPreferredSize(new Dimension(150, 20));
+		nickAndStat.setMaximumSize(new Dimension(1000, 20));
+		nickAndStat.setMinimumSize(new Dimension(150, 20));
+		// nickAndStat.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		nickAndStat.setLayout(new BoxLayout(nickAndStat, BoxLayout.X_AXIS));
 		nickAndStat.add(nick);
 		nickAndStat.add(Box.createHorizontalStrut(10));
 		nickAndStat.add(myStatus);
-		
-		mySign.setSize(new Dimension(WIDTH,20));
-		mySign.setPreferredSize(new Dimension(WIDTH_PREF,20));
-		mySign.setMaximumSize(new Dimension(WIDTH_MAX,20));
-		mySign.setMinimumSize(new Dimension(WIDTH_MIN,20));
-		
-		//miniProfilePane.setAlignmentX(JComponent.TOP_ALIGNMENT);
-		miniProfilePane.setLayout(new BoxLayout(miniProfilePane, BoxLayout.Y_AXIS));
+
+		mySign.setSize(new Dimension(WIDTH, 20));
+		mySign.setPreferredSize(new Dimension(WIDTH_PREF, 20));
+		mySign.setMaximumSize(new Dimension(WIDTH_MAX, 20));
+		mySign.setMinimumSize(new Dimension(WIDTH_MIN, 20));
+
+		// miniProfilePane.setAlignmentX(JComponent.TOP_ALIGNMENT);
+		miniProfilePane.setLayout(new BoxLayout(miniProfilePane,
+				BoxLayout.Y_AXIS));
 		miniProfilePane.add(nickAndStat);
 		miniProfilePane.add(mySign);
 		miniProfilePane.setOpaque(false);
-		
+
 		profile.setLayout(new BoxLayout(profile, BoxLayout.X_AXIS));
 		profile.add(myPortrait);
 		profile.add(Box.createHorizontalStrut(5));
 		profile.add(miniProfilePane);
 		profile.setOpaque(false);
-		//profile.setBackground(new Color(0, 255, 0));
+		// profile.setBackground(new Color(0, 255, 0));
 		profile.setSize(new Dimension(WIDTH, 50));
 		profile.setPreferredSize(new Dimension(WIDTH_PREF, 50));
 		profile.setMaximumSize(new Dimension(WIDTH_MAX, 50));
 		profile.setMinimumSize(new Dimension(WIDTH_MIN, 50));
-		
+
 		tabs = new JTabbedPane();
 		frdlistpane = new JPanel();
 		grplistpane = new JPanel();
 		blklistpane = new JPanel();
 		/**
 		 * 好友列表
-		 */		
-		String[] flistItems = {
-	            "Chris", "Joshua", "Daniel", "Michael",
-	            "Don", "Kimi", "Kelly", "Keagan", "夏", "商", "周", "张三", "张四", "张五", "张三丰"
-	            };
-		
-		// populate list
-		//FilteredJList list = new FilteredJList();
-	        
-		FriendItem[] friends = new FriendItem[flistItems.length];
-		//ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
+		 */
+		String[] flistItems = { "Chris", "Joshua", "Daniel", "Michael", "Don",
+				"Kimi", "Kelly", "Keagan", "夏", "商", "周", "张三", "张四", "张五",
+				"张三丰" };
 
-		for (int i = 0; i<flistItems.length; i++)
-		{
-			friends[i] = new FriendItem(new ImageIcon("resrc\\portrait\\user.png"),
-					flistItems[i], "(Hi, 我是"+flistItems[i]+')');
+		// populate list
+		// FilteredJList list = new FilteredJList();
+
+		FriendItem[] friends = new FriendItem[flistItems.length];
+		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
+
+		for (int i = 0; i < flistItems.length; i++) {
+			friends[i] = new FriendItem(new ImageIcon(
+					"resrc\\portrait\\user.png"), flistItems[i], "(Hi, 我是"
+					+ flistItems[i] + ')');
 		}
 		FriendList flist = new FriendList(friends);
 		/**
 		 * 组列表
-		 */		
-		String[] glistItems = {
-	            "group1", "group2", "group3", "group4", "三年二班", "三年三班"
-	            };
-	        
+		 */
+		String[] glistItems = { "group1", "group2", "group3", "group4", "三年二班",
+				"三年三班" };
+
 		FriendItem[] groups = new FriendItem[glistItems.length];
 
-		for (int i = 0; i<glistItems.length; i++)
-		{
+		for (int i = 0; i < glistItems.length; i++) {
 			groups[i] = new FriendItem(new ImageIcon("resrc\\chatroom.png"),
-					glistItems[i], "(Hi, 这是"+glistItems[i]+"的聊天室)");
+					glistItems[i], "(Hi, 这是" + glistItems[i] + "的聊天室)");
 		}
 		FriendList glist = new FriendList(groups);
 		/**
 		 * 黑名单
-		 */		
-		String[] blistItems = {
-	            "Ben", "Laden", "Hitler", "Bush","陈水扁"
-	            };
-		
-		// populate list
-		//FilteredJList list = new FilteredJList();
-	        
-		FriendItem[] badguys = new FriendItem[blistItems.length];
-		//ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
+		 */
+		String[] blistItems = { "Ben", "Laden", "Hitler", "Bush", "陈水扁" };
 
-		for (int i = 0; i<blistItems.length; i++)
-		{
+		// populate list
+		// FilteredJList list = new FilteredJList();
+
+		FriendItem[] badguys = new FriendItem[blistItems.length];
+		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
+
+		for (int i = 0; i < blistItems.length; i++) {
 			badguys[i] = new FriendItem(new ImageIcon("resrc\\blacklist.png"),
-					blistItems[i], "(Hi, 我是"+blistItems[i]+')');
+					blistItems[i], "(Hi, 我是" + blistItems[i] + ')');
 		}
 		FriendList blist = new FriendList(badguys);
-	        
+
 		// add to gui
-		frdListScrPane =
-	            new JScrollPane (flist,
-	                             ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-	                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		grpListScrPane =
-            new JScrollPane (glist,
-                             ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		blkListScrPane =
-            new JScrollPane (blist,
-                             ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		frdlistpane.setLayout (new BorderLayout());
-		frdlistpane.add (frdListScrPane, BorderLayout.CENTER);
+		frdListScrPane = new JScrollPane(flist,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		grpListScrPane = new JScrollPane(glist,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		blkListScrPane = new JScrollPane(blist,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		frdlistpane.setLayout(new BorderLayout());
+		frdlistpane.add(frdListScrPane, BorderLayout.CENTER);
 		frdlistpane.add(flist.getFilterField(), BorderLayout.NORTH);
-		
-		grplistpane.setLayout (new BorderLayout());
-		grplistpane.add (grpListScrPane, BorderLayout.CENTER);
+
+		grplistpane.setLayout(new BorderLayout());
+		grplistpane.add(grpListScrPane, BorderLayout.CENTER);
 		grplistpane.add(glist.getFilterField(), BorderLayout.NORTH);
-		
-		blklistpane.setLayout (new BorderLayout());
-		blklistpane.add (blkListScrPane, BorderLayout.CENTER);
+
+		blklistpane.setLayout(new BorderLayout());
+		blklistpane.add(blkListScrPane, BorderLayout.CENTER);
 		blklistpane.add(blist.getFilterField(), BorderLayout.NORTH);
 
 		tabs.setTabPlacement(JTabbedPane.LEFT);
-		tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);//滚动标签(一行)
-		//tabs.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);//多行标签
+		tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);// 滚动标签(一行)
+		// tabs.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);//多行标签
 		tabs.setBackground(Color.BLACK);
 		tabs.setForeground(Color.WHITE);
 		tabs.addTab(null, new ImageIcon("resrc\\chat.png"), frdlistpane);
 		tabs.addTab(null, new ImageIcon("resrc\\chatroom.png"), grplistpane);
 		tabs.addTab(null, new ImageIcon("resrc\\blacklist.png"), blklistpane);
 		tabs.setOpaque(false);
-		
-		/*JPanel a = new JPanel();
-		JPanel b = new JPanel();
-		JPanel c = new JPanel();
-		JPanel d = new JPanel();
-		
-		tabs.addTab("friends", a);
-		tabs.addTab("groups", b);
-		tabs.addTab("blacklist", c);
-		tabs.addTab("blacklist", d);*/
-		
+
+		/*
+		 * JPanel a = new JPanel(); JPanel b = new JPanel(); JPanel c = new
+		 * JPanel(); JPanel d = new JPanel();
+		 * 
+		 * tabs.addTab("friends", a); tabs.addTab("groups", b);
+		 * tabs.addTab("blacklist", c); tabs.addTab("blacklist", d);
+		 */
+
 		footpane = new JPanel();
 		resizeButn = new JButton(new AngledLinesWindowsCornerIcon());
 		resizeButn.setBorderPainted(false);
 		resizeButn.setContentAreaFilled(false);
-		resizeButn.setSize(new Dimension(15,15));
-		resizeButn.setPreferredSize(new Dimension(15,15));
-		resizeButn.setMaximumSize(new Dimension(15,15));
-		resizeButn.setMinimumSize(new Dimension(15,15));
-		//resizeButn.setOpaque(false);
-		
+		resizeButn.setSize(new Dimension(15, 15));
+		resizeButn.setPreferredSize(new Dimension(15, 15));
+		resizeButn.setMaximumSize(new Dimension(15, 15));
+		resizeButn.setMinimumSize(new Dimension(15, 15));
+		// resizeButn.setOpaque(false);
+
 		ResizeListener resizer = new ResizeListener(Cheyenne.this, resizeButn);
 		resizeButn.addMouseListener(resizer);
 		resizeButn.addMouseMotionListener(resizer);
-		
+
 		footpane.setLayout(new BoxLayout(footpane, BoxLayout.X_AXIS));
 		footpane.add(Box.createHorizontalGlue());
 		footpane.add(resizeButn);
-		footpane.setSize(new Dimension(WIDTH,15));
-		footpane.setPreferredSize(new Dimension(WIDTH_PREF,15));
-		footpane.setMaximumSize(new Dimension(WIDTH_MAX,15));
-		footpane.setMinimumSize(new Dimension(WIDTH_MIN,15));
+		footpane.setSize(new Dimension(WIDTH, 15));
+		footpane.setPreferredSize(new Dimension(WIDTH_PREF, 15));
+		footpane.setMaximumSize(new Dimension(WIDTH_MAX, 15));
+		footpane.setMinimumSize(new Dimension(WIDTH_MIN, 15));
 		footpane.setOpaque(false);
-		
-		/*ImageBorder image_border = new ImageBorder(
-	            new ImageIcon("resrc/upper_left.png").getImage(),
-	            new ImageIcon("resrc/upper.png").getImage(),
-	            new ImageIcon("resrc/upper_right.png").getImage(),
 
-	            new ImageIcon("resrc/left_center.png").getImage(),
-	            new ImageIcon("resrc/right_center.png").getImage(),
-
-	            new ImageIcon("resrc/bottom_left.png").getImage(),
-	            new ImageIcon("resrc/bottom_center.png").getImage(),
-	            new ImageIcon("resrc/bottom_right.png").getImage()
-	            );*/
+		/*
+		 * ImageBorder image_border = new ImageBorder( new
+		 * ImageIcon("resrc/upper_left.png").getImage(), new
+		 * ImageIcon("resrc/upper.png").getImage(), new
+		 * ImageIcon("resrc/upper_right.png").getImage(),
+		 * 
+		 * new ImageIcon("resrc/left_center.png").getImage(), new
+		 * ImageIcon("resrc/right_center.png").getImage(),
+		 * 
+		 * new ImageIcon("resrc/bottom_left.png").getImage(), new
+		 * ImageIcon("resrc/bottom_center.png").getImage(), new
+		 * ImageIcon("resrc/bottom_right.png").getImage() );
+		 */
 		JPanel fakeFace = new JPanel();
-		MatteBorder paneEdge = BorderFactory.createMatteBorder(2,2,2,2, Color.BLACK);
+		MatteBorder paneEdge = BorderFactory.createMatteBorder(2, 2, 2, 2,
+				Color.BLACK);
 		fakeFace.setBorder(paneEdge);
-		
+
 		rootpane.setLayout(new BoxLayout(rootpane, BoxLayout.Y_AXIS));
 		rootpane.add(titlebar);
 		rootpane.add(profile);
@@ -419,10 +445,10 @@ public class Cheyenne extends JFrame{
 		rootpane.setPreferredSize(new Dimension(WIDTH_PREF, HEIGHT_PREF));
 		rootpane.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
 		rootpane.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
-        
+
 		fakeFace.setLayout(new BoxLayout(fakeFace, BoxLayout.Y_AXIS));
 		fakeFace.add(rootpane);
 
 		contentPane.add(fakeFace);
-    }
+	}
 }
