@@ -9,27 +9,28 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.JButton;
 
-public class ResizeListener implements MouseListener, MouseMotionListener{
+public class ResizeListener implements MouseListener, MouseMotionListener {
 	Cheyenne frame;
 	JButton butt;
 	Point start_drag;
-	//Cursor defaultCursor;
-	
-	public ResizeListener(Cheyenne cheyenne, JButton resizeButn)
-	{
+
+	// Cursor defaultCursor;
+
+	public ResizeListener(Cheyenne cheyenne, JButton resizeButn) {
 		this.frame = cheyenne;
 		this.butt = resizeButn;
 	}
+
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		//defaultCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+		// defaultCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 		Cursor cur = Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
 		frame.setCursor(cur);
 	}
@@ -42,7 +43,7 @@ public class ResizeListener implements MouseListener, MouseMotionListener{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		start_drag = new Point((int)e.getX(), (int)e.getY());
+		start_drag = new Point((int) e.getX(), (int) e.getY());
 	}
 
 	@Override
@@ -54,17 +55,18 @@ public class ResizeListener implements MouseListener, MouseMotionListener{
 		Point frameLoc = frame.getLocationOnScreen();
 		Point buttLoc = butt.getLocationOnScreen();
 		Dimension newSize = new Dimension(
-				(int)(e.getX() + buttLoc.getX() - frameLoc.getX()), 
-				(int)(e.getY() + (int)buttLoc.getY() - frameLoc.getY())
-				);
+				(int) (e.getX() + buttLoc.getX() - frameLoc.getX()), (int) (e
+						.getY()
+						+ (int) buttLoc.getY() - frameLoc.getY()));
 		frame.setSize(newSize);
-		/*System.out.println("e: " + (int)e.getX() + "  :  " + (int)e.getY() 
-				+ "  :  " + (int)buttLoc.getX()
-				+ "  :  " + (int)buttLoc.getY()
-				);*/
+		/*
+		 * System.out.println("e: " + (int)e.getX() + " : " + (int)e.getY() + " : " +
+		 * (int)buttLoc.getX() + " : " + (int)buttLoc.getY() );
+		 */
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent arg0) {}
+	public void mouseMoved(MouseEvent arg0) {
+	}
 
 }
