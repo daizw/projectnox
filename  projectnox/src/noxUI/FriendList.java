@@ -28,10 +28,18 @@ public class FriendList extends JList {
 	private FilterField filterField;
 	private int DEFAULT_FIELD_WIDTH = 20;
 
+	/**
+	 * 如果变量为render类内部变量,
+	 * 则会出现列表元素被添加到同一行, 并且该行重复N次的情况
+	 */
 	JLabel portrait;
 	JLabel nick;
 	JLabel sign;
 
+	/**
+	 * 具有自定义列表元素和过滤功能的列表
+	 * @param objs 列表元素(FriendItem类型)数组
+	 */
 	FriendList(Object[] objs) {
 		// super(objs);
 
@@ -171,6 +179,7 @@ public class FriendList extends JList {
 
 		public FilterField(int width) {
 			super(width);
+			this.setToolTipText("输入关键字以搜索列表");
 			getDocument().addDocumentListener(this);
 		}
 

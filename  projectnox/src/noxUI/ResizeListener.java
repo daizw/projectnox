@@ -8,16 +8,17 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 
 public class ResizeListener implements MouseListener, MouseMotionListener {
-	Cheyenne frame;
+	JFrame frame;
 	JButton butt;
 	Point start_drag;
 
 	// Cursor defaultCursor;
 
-	public ResizeListener(Cheyenne cheyenne, JButton resizeButn) {
-		this.frame = cheyenne;
+	public ResizeListener(JFrame parent, JButton resizeButn) {
+		this.frame = parent;
 		this.butt = resizeButn;
 	}
 
