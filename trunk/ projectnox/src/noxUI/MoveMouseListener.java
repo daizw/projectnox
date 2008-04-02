@@ -6,22 +6,51 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 
 public class MoveMouseListener implements MouseListener, MouseMotionListener {
 	JComponent target;
-	Cheyenne frame;
+	NoxFrame frame;
 	Point start_drag;
 	Point start_loc;
 
-	public MoveMouseListener(JComponent target, Cheyenne frame) {
+	public MoveMouseListener(JComponent target, NoxFrame frm) {
 		this.target = target;
-		this.frame = frame;
+		this.frame = frm;
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent arg0) {
+	public void mouseClicked(MouseEvent me) {
 		// TODO Auto-generated method stub
+		if(me.getClickCount() == 2)//双击
+		{
+			int state = frame.getExtendedState();
 
+			// 设置图标化(iconifies)位
+			// Set the iconified bit
+			System.out.println("window state: " + state);
+			switch (state) {
+			// 如果当前是最大状态, 则正常化
+			case JFrame.MAXIMIZED_BOTH:
+				state &= JFrame.NORMAL;// '&', not '|'
+				System.out.println("max->normal");
+				frame.resetMaximizeIcon();
+				break;
+			// 如果当前不是最大状态, 则最大化
+			default:
+				state |= JFrame.MAXIMIZED_BOTH;
+				System.out.println("normal->max");
+				frame.resetNormalizeIcon();
+				//Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+				//parent.setBounds(0, 0, dim.width, dim.height );
+				break;
+			}
+			System.out.println("window state: " + state);
+			//System.out.println("system: " + 
+			//Toolkit.getDefaultToolkit().isFrameStateSupported(JFrame.MAXIMIZED_BOTH) );
+			// 设置窗口状态
+			frame.setExtendedState(state);
+		}		
 	}
 
 	@Override
@@ -43,7 +72,7 @@ public class MoveMouseListener implements MouseListener, MouseMotionListener {
 
 	}
 
-	private Cheyenne getFrame(JComponent target2) {
+	private JFrame getFrame(JComponent target2) {
 		// TODO Auto-generated method stub
 		return frame;
 	}
@@ -68,7 +97,7 @@ public class MoveMouseListener implements MouseListener, MouseMotionListener {
 				(int) current.getX() - (int) start_drag.getX(), (int) current
 						.getY()
 						- (int) start_drag.getY());
-		Cheyenne frame = this.getFrame(target);
+		JFrame frame = this.getFrame(target);
 		Point new_location = new Point((int) (this.start_loc.getX() + offset
 				.getX()), (int) (this.start_loc.getY() + offset.getY()));
 		frame.setLocation(new_location);

@@ -15,7 +15,6 @@ public class DialogEarthquakeCenter extends Object {
 	private Point naturalLocation;
 	private long startTime;
 	private Timer shakeTimer;
-	private final double HALF_PI = Math.PI / 2.0;
 	private final double TWO_PI = Math.PI * 2.0;
 
 	public DialogEarthquakeCenter(JDialog d) {

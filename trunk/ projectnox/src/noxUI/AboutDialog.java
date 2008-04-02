@@ -1,9 +1,6 @@
 package noxUI;
 
-import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Point;
 import java.io.IOException;
 
 import javax.swing.JDialog;

@@ -22,7 +22,7 @@ import javax.swing.JPanel;
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
-class JMapPanel extends JPanel {
+class JImgPanel extends JPanel {
 	/**
 	 * 
 	 */
@@ -34,11 +34,11 @@ class JMapPanel extends JPanel {
 	 * @param img
 	 *            ±³¾°Í¼Æ¬
 	 */
-	public JMapPanel(Image img) {
+	public JImgPanel(Image img) {
 		modal = false;
 		img_mp = img;
 	}
-	public JMapPanel(Image img, Point ori, Dimension dim) {
+	public JImgPanel(Image img, Point ori, Dimension dim) {
 		modal = true;
 		img_mp = img;
 		origin = ori;
@@ -86,8 +86,8 @@ class JMapPanel extends JPanel {
 	 * 
 	 */
 	private void getImageSizeAndSet() {
-		img_width = img_mp.getWidth(JMapPanel.this);
-		img_height = img_mp.getHeight(JMapPanel.this);
+		img_width = img_mp.getWidth(JImgPanel.this);
+		img_height = img_mp.getHeight(JImgPanel.this);
 
 		System.out.println("In getImageSizeAndSet():" + img_width + " * "
 				+ img_height);

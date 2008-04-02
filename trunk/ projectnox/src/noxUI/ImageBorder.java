@@ -53,19 +53,15 @@ public class ImageBorder extends AbstractBorder {
 
 		int tlw = top_left.getWidth(null);
 		int tlh = top_left.getHeight(null);
-		int tcw = top_center.getWidth(null);
 		int tch = top_center.getHeight(null);
 		int trw = top_right.getWidth(null);
 		int trh = top_right.getHeight(null);
 
 		int lcw = left_center.getWidth(null);
-		int lch = left_center.getHeight(null);
 		int rcw = right_center.getWidth(null);
-		int rch = right_center.getHeight(null);
 
 		int blw = bottom_left.getWidth(null);
 		int blh = bottom_left.getHeight(null);
-		int bcw = bottom_center.getWidth(null);
 		int bch = bottom_center.getHeight(null);
 		int brw = bottom_right.getWidth(null);
 		int brh = bottom_right.getHeight(null);
