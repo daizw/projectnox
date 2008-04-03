@@ -12,6 +12,11 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 
+/**
+ * 
+ * @author shinysky
+ *
+ */
 public class NoxFrame extends JFrame {
 	/**
 	 * 
@@ -175,7 +180,6 @@ public class NoxFrame extends JFrame {
 	public void resetNormalizeIcon(){
 		titlebar.resetNormalizeIcon();
 	}
-
 }
 
 class Titlebar extends JPanel {

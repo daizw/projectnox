@@ -1,0 +1,661 @@
+package noxUI;
+
+import java.applet.Applet;
+import java.applet.AudioClip;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextPane;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+
+/*
+ * Created on 2006-9-9
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+
+/**
+ * 更加"完美"的聊天窗口: 可以选择字体及颜色; 可以插入图片
+ * 
+ * @author shinysky
+ * 
+ * TODO To change the template for this generated type comment go to Window -
+ * Preferences - Java - Code Style - Code Templates
+ * 
+ * (要时刻准备着从服务器接收信息) 信息格式: 第一部分:who sayTo who at time 第二部分:the message
+ * 将消息添加到消息记录, 然后通过检查发信人和noDisturb变量来决定是否添加该信息到历史消息窗口
+ */
+public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseListener
+{
+	/**
+	 * we don't know more about it
+	 */
+	private static final long serialVersionUID = -1915394855935441419L;
+
+	// private PrintWriter pw;
+	/***************************************************************************
+	 * //
+	 */
+	/**
+	 * 字体清晰设置(通过重载paintComponent()) (以下三段代码) ...But CPU占用率达到100% !Faint! 宣告失败;
+	 * 
+	 * 在一些可能导致屏幕刷新的按钮响应或键盘响应中添加 setRenderingHints(hints); 会解决部分问题 但不是根本的方法,
+	 * 甚至用户的选择文本操作也可以轻易使清晰属性"丢失" 另外,如果文本中包含动态图片,也会使属性丢失
+	 */
+	/*
+	 * public void paintComponent(Graphics g) { super.paintComponent(g);
+	 * Graphics2D g2 = (Graphics2D)g; g2.setRenderingHints(hints); //
+	 * RenderingHints hints_in = new RenderingHints(null); //
+	 * hints_in.put(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON); //
+	 * ChatRoomPane.this.setRenderingHints(hints_in); }
+	 * 
+	 *//**
+		 * 设置字体清晰并重绘组件
+		 * 
+		 * @param h
+		 *            RenderingHints
+		 */
+	/*
+	 * public void setRenderingHints(RenderingHints h) { hints = h; repaint(); }
+	 * private RenderingHints hints = new RenderingHints(null);
+	 */
+	// ********************************************************
+	/**
+	 * ....目前的聊天室有个缺陷: 群聊和私聊的消息显示在同一个窗口中,显得有点乱 目标:私聊窗口能够独立出来
+	 * (或者私聊时用户可以选择屏蔽群聊消息--备选)
+	 */
+	JFrame parent;
+	/**
+	 * JSplitPane
+	 * @param par 父组件, 用于使窗口par振动
+	 */
+	public ChatRoomPane(JFrame par/* String username, String[] onlineUser */) {
+		super(JSplitPane.VERTICAL_SPLIT);
+		// pw = cpw;
+		parent = par;
+		System.out
+				.println("public ChatRoomPane(String username, String[] onlineUser)");// /////////////
+		// for (int i = 0; i < onlineUser.length; ++i)
+		// {
+		// System.out.print(onlineUser[i]);///////////tjj///////////////
+		// }//////////////////////////////////////////
+
+		sayHello = new String(
+				"------====  Welcome to the Chat Room  ====------\n"
+						+ "  ------====     What do U wanna say ?   ====------\n");
+		strLength = sayHello.length();
+		position = 0;
+		// currentUsername = username;
+		/**
+		 * 历史消息窗口
+		 */
+		tp_hmsg = new JTextPane();// 竟然忘掉了初始化!
+		hmsg_save = new String();
+		hmsg_save += sayHello;
+		styledDoc = tp_hmsg.getStyledDocument();
+		/**
+		 * 新建风格
+		 */
+		normal = styledDoc.addStyle("normal", null);
+		StyleConstants.setFontFamily(normal, "SansSerif");
+
+		blue = styledDoc.addStyle("blue", normal);
+		StyleConstants.setForeground(blue, Color.blue);
+
+		red = styledDoc.addStyle("red", normal);
+		StyleConstants.setForeground(red, Color.red);
+
+		bold = styledDoc.addStyle("bold", normal);
+		StyleConstants.setBold(bold, true);
+
+		italic = styledDoc.addStyle("italic", normal);
+		StyleConstants.setItalic(italic, true);
+
+		bigSize = styledDoc.addStyle("bigSize", normal);
+		StyleConstants.setFontSize(bigSize, 24);
+		/**
+		 * 添加风格化文本(欢迎消息)
+		 */
+		styledDoc.setLogicalStyle(0, red);
+
+		tp_hmsg.replaceSelection(sayHello);
+
+		tp_hmsg.setToolTipText("History Messages");
+		tp_hmsg.setBackground(new Color(180, 250, 250));
+		tp_hmsg.setSelectionColor(Color.YELLOW);
+		/**
+		 * 如果设置为可编辑:用户则可以自由编辑 如果设置为不可编辑:程序无法向其中添加文本.怎么办??
+		 * 
+		 * ...已解决(不知是否足够安全): 通常情况下设为不可编辑 当向其中添加文本时,临时设为可编辑;
+		 * 并重新设置插入符位置(保证插入符位置在文本尾)
+		 * (如果不校正插入符位置,用户尽管不能编辑,但还是可以改变插入符位置)
+		 * 添加文本后,重新设置为不可编辑. 搞定!^-^ 详见appendToHMsg();
+		 */
+		tp_hmsg.setEditable(false);
+		sp_hmsg = new JScrollPane(tp_hmsg);
+		sp_hmsg.setAutoscrolls(true);
+		sp_hmsg.setPreferredSize(new Dimension(300, 200));
+
+		p_msgAndButtons = new JPanel();
+
+		/**
+		 * 消息输入窗口
+		 */
+		tp_msg = new JTextPane();
+		// tp_msg.setText(sayHello);
+		tp_msg
+				.setToolTipText("Input your message and press \"Send\" or type Ctrl+Enter");
+
+		/**
+		 * 键盘事件监听器/事件处理
+		 */
+		tp_msg.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent event) {
+				int keyCode = event.getKeyCode();
+				/**
+				 * 如果按键为Ctrl+Enter则发送信息
+				 */
+				if (keyCode == KeyEvent.VK_ENTER && event.isControlDown()) {
+					System.out.println("You press the combo-key : Ctrl+Enter");
+					appendMyMsg2HMsg();
+				}
+			}
+
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+			}
+
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+			}
+		});
+		sp_msg = new JScrollPane(tp_msg);
+		sp_msg.setPreferredSize(new Dimension(200, 100));
+
+		/**
+		 * 插入表情按钮 及 发送按钮
+		 */
+		p_buttons = new JPanel();
+		
+		Dimension buttonSize = new Dimension(26, 26);
+
+		b_InsertImg = new JButton(new ImageIcon(path_icon + "insertimg.png"));
+		b_InsertImg.setToolTipText("Insert a image to the message");
+		b_InsertImg.setActionCommand("InsertImage");
+		b_InsertImg.addActionListener(this);
+		//b_InsertImg.setContentAreaFilled(false);
+		b_InsertImg.setSize(buttonSize);
+		b_InsertImg.setPreferredSize(buttonSize);
+		b_InsertImg.setMaximumSize(buttonSize);
+		b_InsertImg.setMinimumSize(buttonSize);
+
+		/**
+		 * 如果不阻塞其他窗口的话, 会出现无法获取已选择的表情的情况.
+		 */
+		selFace = new FaceDialog("Insert a face", true, path_faces);
+		// 和FaceDialog.setDefaultLookAndFeelDecorated(true);不能同时使用
+		selFace.setBounds(450, 350, FaceDialog.FACECELLWIDTH
+				* FaceDialog.FACECOLUMNS, FaceDialog.FACECELLHEIGHT
+				* FaceDialog.FACEROWS + 30);// 30为b_cr_cancel的高度
+		selFace.pack();
+
+		JButton b_shake = new JButton(new ImageIcon(path_icon + "shake.png"));
+		b_shake.setToolTipText("Rock and Roll !");
+		b_shake.setActionCommand("Shake");
+		b_shake.addActionListener(this);
+		b_shake.setSize(buttonSize);
+		b_shake.setPreferredSize(buttonSize);
+		b_shake.setMaximumSize(buttonSize);
+		b_shake.setMinimumSize(buttonSize);
+		
+		//b_send = new JButton("Send");
+		b_send = new JButton(new ImageIcon(path_icon + "send.png"));
+		b_send.setMnemonic('S');
+		// b_send.setPreferredSize(new Dimension(100,40));
+		b_send.setActionCommand("Send");
+		b_send.addActionListener(this);
+		//b_send.setContentAreaFilled(false);
+		b_send.setSize(buttonSize);
+		b_send.setPreferredSize(buttonSize);
+		b_send.setMaximumSize(buttonSize);
+		b_send.setMinimumSize(buttonSize);
+
+		p_buttons.setOpaque(false);
+		p_buttons.setLayout(new BoxLayout(p_buttons, BoxLayout.X_AXIS));
+		p_buttons.add(b_InsertImg);
+		p_buttons.add(b_shake);
+		p_buttons.add(Box.createHorizontalGlue());
+		p_buttons.add(b_send);
+		// p_buttons.add(p_side, BorderLayout.CENTER);
+		// p_buttons.add(b_send, BorderLayout.WEST);
+
+		p_msgAndButtons.setOpaque(false);
+		//p_msgAndButtons.setBackground(Color.blue);
+		p_msgAndButtons.setLayout(new BorderLayout());
+		p_msgAndButtons.add(p_buttons, BorderLayout.NORTH);
+		p_msgAndButtons.add(sp_msg, BorderLayout.CENTER);
+		
+		/*msgPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, sp_hmsg, p_msgAndButtons);
+		msgPane.setOneTouchExpandable(true);
+		msgPane.setOpaque(false);*/
+		//msgPane.setContinuousLayout(true);
+
+		this.setOneTouchExpandable(true);
+		this.add(sp_hmsg);
+		this.add(p_msgAndButtons);
+		//this.setLayout(new BorderLayout());
+		//this.add(msgPane, BorderLayout.CENTER);
+		//this.setOpaque(false);//在当前使用的背景下, 设为透明似乎不太好看...
+	}
+
+	/**
+	 * 显示系统消息
+	 * 
+	 * @param msg
+	 *            系统消息
+	 */
+	public void showMsgDialog(String msg) {
+		JOptionPane.showMessageDialog((Component) null, msg,
+				"Message form the Server", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	/**
+	 * 用于外部程序调用,以显示消息
+	 * 
+	 * @param strs
+	 *            1:sender;2:receiver;3:time;4:msg
+	 */
+	public void receiveMsgAndAccess(String[] strs) {// 1:sender;2:receiver;3:time;4:msg
+		System.out.println("playAudio()...");
+		// System.out.println("public void receiveMsgAndAccess(String[] strs)");
+		// System.out.println("currentUsername :" + currentUsername);
+
+		/**
+		 * 处理外部传来的消息字符串
+		 */
+		StringBuffer strbuf_msg = new StringBuffer(strs[4]);
+		int caretPos = -1;
+
+		for (; (caretPos = strbuf_msg.indexOf("^n", caretPos + 1)) >= 0;) {
+			// 把"^n"替换为"\n"
+			strbuf_msg.replace(caretPos, caretPos + 2, "\n");
+		}
+
+		if (strs[2].equals("ME"))// 此处要获取当前用户的用户名
+		{
+			String label = strs[1] + " say to I at " + strs[3];
+			appendToHMsg(label, strbuf_msg.toString(), true);
+			playAudio();
+		} else if (strs[0].equals("fromAll"))// 群聊消息
+		{
+			System.out.println("noDisturb " + noDisturb);
+			String label = strs[1] + " say to ALL at " + strs[2] + ":";
+			// appendToHMsg(label, strbuf_msg.toString(), !noDisturb);
+			if (noDisturb)// 且 防打扰打开
+			{
+				appendToHMsg(label, strbuf_msg.toString(), false);
+				return;
+			} else// 防打扰未打开
+			{
+				appendToHMsg(label, strbuf_msg.toString(), true);
+				playAudio();
+			}
+		} else
+			;
+	}
+
+	/**
+	 * 接收消息时播放提示音
+	 * 
+	 */
+	public void playAudio() {
+		AudioClip playsound;
+		try {
+			// AudioClip audioClip = Applet.newAudioClip(completeURL)
+			// codeBase = new URL("file:" + System.getProperty("user.dir") +
+			// "/");
+			URL url = new URL("file:\\" + System.getProperty("user.dir")
+					+ "\\resrc\\audio\\type.wav");
+			playsound = Applet.newAudioClip(url);
+			// System.out.println(url);
+			playsound.play();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(e.toString());
+		}
+	}
+
+	/**
+	 * 向历史消息窗口添加文本
+	 * 
+	 * 注意:如果ckb_nodisturb 为 true,表示防打扰模式开启, 此时从服务器传来的群聊消息只会被添加到历史消息字符串
+	 * 而不会被添加到窗口中 只有私聊对象的消息才会被添加到窗口中
+	 * 
+	 * @param msg
+	 *            要添加到消息记录的字符串
+	 * @param visible
+	 *            是否要添加到历史消息窗口中(可见)
+	 * 
+	 * 原来这个函数的功能是将消息输入框的字符串插入到历史消息窗口, 显然这是不够的.
+	 * 添加参数后,从服务器接受到的历史消息可以通过调用这个函数来插入到历史消息窗口 简言之,增强了这个函数的通用性 将消息添加到消息记录的功能从中移出,
+	 */
+	public void appendToHMsg(String label, String msg, boolean visible) {
+		StringBuffer label_buf = new StringBuffer(label);
+		StringBuffer msg_buf = new StringBuffer(msg);
+
+		// System.out.println("label_buf :" + label_buf);
+		// System.out.println("msg_buf :" + msg_buf);
+
+		/**
+		 * 将消息添加到消息记录
+		 */
+		hmsg_save += (label_buf + "\n");
+		hmsg_save += (msg_buf + "\n");
+
+		/**
+		 * if 判断是否应该添加此消息到历史消息窗口
+		 */
+		if (visible)// 应该添加此消息到历史消息窗口
+		{
+			tp_hmsg.setEditable(true);
+
+			// System.out.println("label :" + label);
+			// 消息发送人/对象/发送时间 信息
+			// 插入信息标签
+			tp_hmsg.setCaretPosition(styledDoc.getLength());
+			styledDoc.setLogicalStyle(tp_hmsg.getCaretPosition(), blue);
+			tp_hmsg.replaceSelection(label + '\n');
+			System.out.println("label :" + label);
+
+			tp_hmsg.setCaretPosition(styledDoc.getLength());// !!!
+			styledDoc.setLogicalStyle(tp_hmsg.getCaretPosition(), bold);
+			// *****************************************************
+			/**
+			 * 将字符串表情图片化,然后插入HMsg中 同时维护一个字符串HMsg.
+			 */
+			int position = 0, caretPos = 0;
+
+			// 从position开始寻找字符串"[F:",找到返回'['的位置,找不到"[F:"返回-1
+			for (; (caretPos = msg_buf.indexOf("[F:", position)) >= 0;) {
+				// System.out.println("caretPos : " + caretPos);
+				// StringBuffer msgpiece = new
+				// StringBuffer(msg_buf.substring(caretPos, caretPos + 6));
+				// System.out.println("msgpiece : " + msgpiece);
+
+				// 7: 代表表情的字符串的长度
+				if (msg_buf.substring(caretPos, caretPos + 7).matches(
+						"\\[F\\:[0-9][0-9][0-9]\\]")) {// 如果符合正则表达式
+					// 插入从position到caretPos前一个字符的子字符串
+					tp_hmsg.setCaretPosition(styledDoc.getLength());
+					tp_hmsg.replaceSelection(msg_buf.substring(position,
+							caretPos));
+					// 插入接下来的长度为7的子字符串所表示的表情图片
+					tp_hmsg.setCaretPosition(styledDoc.getLength());
+					int faceindex = Integer.parseInt(msg_buf.substring(caretPos + 3,
+							caretPos + 6));
+					if(faceindex<105)
+						tp_hmsg.insertIcon(new ImageIcon(path_faces
+							+ faceindex + ".gif"));
+					else//新表情
+					{
+						faceindex -= 105;
+						tp_hmsg.insertIcon(new ImageIcon(path_faces + "newFace\\"
+								+ faceindex + ".png"));
+					}
+						
+					// 后移position
+					position = caretPos + 7;
+				} else {// 如果不符合正则表达式
+					// 插入从position到caretPos+3前一个字符的子字符串
+					tp_hmsg.setCaretPosition(styledDoc.getLength());
+					tp_hmsg.replaceSelection(msg_buf.substring(position,
+							caretPos + 3));
+					// 后移position
+					position = caretPos + 3;
+				}
+			}
+			// 插入剩余子字符串
+			tp_hmsg.setCaretPosition(styledDoc.getLength());
+			tp_hmsg.replaceSelection(msg_buf.substring(position) + '\n');
+			// System.out.println("msg_buf.substring(position) :" +
+			// msg_buf.substring(position));
+			// *****************************************************
+			tp_hmsg.setEditable(false);// 重新设为不可编辑
+		}
+	}
+
+	/**
+	 * 添加表情图片到msg输入窗口中
+	 * 
+	 * @param selectedFace
+	 *            被选择的图片的索引
+	 */
+	private void appendFaceToMsg(int selectedFace) {
+		tp_msg.setEditable(true);
+		/**
+		 * 以插入字符串代替直接插入图片
+		 */
+		// System.out.println("fmNum.format(selectedFace) :" +
+		tp_msg.replaceSelection("[F:" + fmNum.format(selectedFace) + ']');
+	}
+	private void appendFaceToMsg(ImageIcon selectedFace) {
+		tp_msg.setEditable(true);
+		/**
+		 * 直接插入图片
+		 */
+		tp_msg.insertIcon(selectedFace);
+	}
+
+	/**
+	 * 获取历史消息
+	 * 
+	 * @return history messages
+	 */
+	public String getHistoryMsgs() {
+		// return tp_hmsg.getText();
+		return hmsg_save;// 返回所维护的版本(含有字符串化表情)
+	}
+
+	/**
+	 * 将用户输入的消息发送到历史消息窗口 (还有,要发送到服务器)
+	 */
+	private void appendMyMsg2HMsg() {
+		/**
+		 * 格式化日期
+		 */
+		Date date = new Date();
+		Format fmDate = new SimpleDateFormat("yyyy/MM/dd E HH:mm:ss");
+		String label = "I say to someone, at " + fmDate.format(date) + " :";
+
+		appendToHMsg(label, tp_msg.getText(), true);
+		/**
+		 * 向服务器发送消息
+		 */
+		StringBuffer strbuf_msg = new StringBuffer(tp_msg.getText());
+		int caretPos = -1;
+
+		// 从position开始寻找字符串"[F:",找到返回'['的位置,找不到"[F:"返回-1
+		for (; (caretPos = strbuf_msg.indexOf("\r\n", caretPos + 1)) >= 0;) {
+			// 把"\n"替换为"^n"
+			strbuf_msg.replace(caretPos, caretPos + 2, "^n");
+		}
+		System.out.println("strbuf_msg :" + strbuf_msg);
+
+		tp_msg.setText("");// 输入框清空
+	}
+
+	/**
+	 * 历史消息JScrollPane
+	 */
+	private JScrollPane sp_hmsg;
+	/**
+	 * 历史消息JTextPane
+	 */
+	private JTextPane tp_hmsg;
+	/**
+	 * 消息输入窗口及零件
+	 */
+	private JPanel p_msgAndButtons;
+	/**
+	 * 消息JScrollPane
+	 */
+	private JScrollPane sp_msg;
+	/**
+	 * 历史消息JTextPane
+	 */
+	private JTextPane tp_msg;
+	/**
+	 * 按钮JPanel, 含插入表情按钮/闪屏按钮/.../发送按钮
+	 */
+	private JPanel p_buttons;
+	/**
+	 * 插入表情JButton
+	 */
+	private JButton b_InsertImg;
+	/**
+	 * 表情表
+	 */
+	private FaceDialog selFace;
+	/**
+	 * 图片索引格式化处理
+	 */
+	public static final DecimalFormat fmNum = new DecimalFormat("000");
+	/**
+	 * 消息发送JButton
+	 */
+	private JButton b_send;
+	/**
+	 * 历史消息,用于保存操作
+	 */
+	String hmsg_save;
+	/**
+	 * 当前处于输入框中的消息, 用于保存操作
+	 */
+	String currentmsg_save;
+	/**
+	 * 文本风格模型
+	 */
+	StyledDocument styledDoc;
+	/**
+	 * 字体风格
+	 */
+	/**
+	 * 普通
+	 */
+	Style normal;
+	/**
+	 * 蓝色
+	 */
+	Style blue;
+	/**
+	 * 红色
+	 */
+	Style red;
+	/**
+	 * 黑体
+	 */
+	Style bold;
+	/**
+	 * 斜体
+	 */
+	Style italic;
+	/**
+	 * 大号
+	 */
+	Style bigSize;
+	/**
+	 * 其它变量
+	 */
+	/**
+	 * 字符串处理中间变量
+	 */
+	private int position;
+	/**
+	 * 字符串长度
+	 */
+	private int strLength;
+	/**
+	 * 欢迎消息
+	 */
+	private String sayHello;
+	/**
+	 * 防打扰
+	 */
+	private boolean noDisturb = false;
+	/**
+	 * 图标路径
+	 */
+	private String path_icon = new String("resrc\\icons\\");
+	/**
+	 * 表情图片路径
+	 */
+	private String path_faces = new String("resrc\\faces\\");
+
+	// int selectedface;
+	/**
+	 * (按钮)事件响应
+	 */
+	public void actionPerformed(ActionEvent e) {
+		JButton srcButton = (JButton) e.getSource();
+		if (srcButton.getActionCommand().equals("Send")) {
+			System.out.println("You clicked the button : Send");
+			appendMyMsg2HMsg();
+		} else if (srcButton.getActionCommand().equals("InsertImage")) {
+			/**
+			 * 插入表情:
+			 * 目前只能插入到输入框中, 插入到历史消息框中还没有实现.
+			 * 如果没有直接拷贝的方法, 那么只好用另外一个方法:
+			 * 就是把表情用字符表示,在插入到历史消息框中时进行字符过滤 不过这样比较麻烦
+			 * 
+			 * ...还不是太麻烦,已解决,用舍车保帅的办法
+			 */
+			System.out.println("You clicked the button : InsertImage");
+			// 显示表情选择窗口
+			selFace.setVisible(true);
+			int selectedfaceIndex = selFace.getSelectedFaceIndex();
+			ImageIcon selectedface = selFace.getSelectedFace();
+			if (selectedfaceIndex != -1) {
+				System.out.println("You selected the face : " + selectedfaceIndex
+						+ ".gif");
+				appendFaceToMsg(selectedfaceIndex);
+			}
+			if (selectedface != null) {
+				System.out.println("You selected the face : " + selectedfaceIndex
+						+ ".gif");
+				appendFaceToMsg(selectedface);
+			}
+		}
+		else if (srcButton.getActionCommand().equals("Shake")){
+			//AboutDialog about = new AboutDialog();
+			DialogEarthquakeCenter dec = new DialogEarthquakeCenter(parent);
+			dec.startShake();// 对话框必须setModal (false)才可以抖动, 否则不行
+		}
+	}
+}
