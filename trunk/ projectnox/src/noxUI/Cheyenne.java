@@ -15,7 +15,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-
+/**
+ * 
+ * @author shinysky
+ *
+ */
 public class Cheyenne extends NoxFrame {
 	/**
 	 * 
@@ -39,17 +43,22 @@ public class Cheyenne extends NoxFrame {
 	private ListsPane tabs;
 
 	public static void main(String args[]) {
-		Cheyenne chyn = new Cheyenne();
+		Chatroom room = new Chatroom();
+		room.pack();
+		room.setVisible(true);
+		
+		/*Cheyenne chyn = new Cheyenne();
 		chyn.pack();
-		chyn.setVisible(true);
+		chyn.setVisible(true);*/
 	}
 
 	Cheyenne() {
-		super("NoX: a IM system", "resrc\\bkgrd.png", "resrc\\NoXlogo_20.png",
-				"resrc\\nox.png", "resrc\\minimize.png",	"resrc\\minimize_rollover.png", 
-				"resrc\\maximize.png", "resrc\\maximize_rollover.png",
-				"resrc\\normalize.png", "resrc\\normalize_rollover.png",
-				"resrc\\close.png", "resrc\\close_rollover.png", true);
+		super("NoX: a IM system", "resrc\\images\\bkgrd.png", 
+				"resrc\\logo\\NoXlogo_20.png", "resrc\\logo\\nox.png",
+				"resrc\\buttons\\minimize.png", "resrc\\buttons\\minimize_rollover.png",
+				"resrc\\buttons\\maximize.png", "resrc\\buttons\\maximize_rollover.png",
+				"resrc\\buttons\\normalize.png", "resrc\\buttons\\normalize_rollover.png",
+				"resrc\\buttons\\close.png", "resrc\\buttons\\close_rollover.png", true);
 
 		JPanel contentPane = this.getContainer();
 		Cheyenne.this.setBounds(600, 80, WIDTH_DEFLT, HEIGHT_DEFLT);
@@ -57,10 +66,6 @@ public class Cheyenne extends NoxFrame {
 		Cheyenne.this.setPreferredSize(new Dimension(WIDTH_PREF, HEIGHT_PREF));
 		Cheyenne.this.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
 		Cheyenne.this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
-
-		Chatroom room = new Chatroom();
-		room.pack();
-		room.setVisible(true);
 
 		/**
 		 * mini profile 组件 含: 头像, 昵称, 状态, 签名
@@ -97,7 +102,7 @@ public class Cheyenne extends NoxFrame {
 		FriendItem[] groups = new FriendItem[glistItems.length];
 
 		for (int i = 0; i < glistItems.length; i++) {
-			groups[i] = new FriendItem(new ImageIcon("resrc\\chatroom.png"),
+			groups[i] = new FriendItem(new ImageIcon("resrc\\icons\\chatroom.png"),
 					glistItems[i], "(Hi, 这是" + glistItems[i] + "的聊天室)");
 		}
 		FriendList glist = new FriendList(groups);
@@ -110,13 +115,13 @@ public class Cheyenne extends NoxFrame {
 		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
 
 		for (int i = 0; i < blistItems.length; i++) {
-			badguys[i] = new FriendItem(new ImageIcon("resrc\\blacklist.png"),
+			badguys[i] = new FriendItem(new ImageIcon("resrc\\icons\\blacklist.png"),
 					blistItems[i], "(Hi, 我是" + blistItems[i] + ')');
 		}
 		FriendList blist = new FriendList(badguys);
 
-		tabs = new ListsPane(flist, glist, blist, "resrc\\chat.png",
-				"resrc\\chatroom.png", "resrc\\blacklist.png");
+		tabs = new ListsPane(flist, glist, blist, "resrc\\icons\\chat.png",
+				"resrc\\icons\\chatroom.png", "resrc\\icons\\blacklist.png");
 
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 		contentPane.add(profile);

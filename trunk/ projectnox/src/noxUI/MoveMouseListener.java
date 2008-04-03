@@ -1,5 +1,6 @@
 package noxUI;
 
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -69,6 +70,8 @@ public class MoveMouseListener implements MouseListener, MouseMotionListener {
 	public void mousePressed(MouseEvent e) {
 		this.start_drag = this.getScreenLocation(e);
 		this.start_loc = this.getFrame(this.target).getLocation();
+		Cursor cur = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
+		frame.setCursor(cur);
 
 	}
 
@@ -87,6 +90,8 @@ public class MoveMouseListener implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		Cursor cur = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+		frame.setCursor(cur);
 	}
 
 	@Override

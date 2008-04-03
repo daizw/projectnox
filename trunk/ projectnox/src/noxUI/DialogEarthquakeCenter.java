@@ -11,14 +11,14 @@ public class DialogEarthquakeCenter extends Object {
 	public static final int SHAKE_DURATION = 500;
 	public static final int SHAKE_UPDATE = 5;
 
-	private JDialog dialog;
+	private Window dialog;
 	private Point naturalLocation;
 	private long startTime;
 	private Timer shakeTimer;
 	private final double TWO_PI = Math.PI * 2.0;
 
-	public DialogEarthquakeCenter(JDialog d) {
-		dialog = d;
+	public DialogEarthquakeCenter(Window parent) {
+		dialog = parent;
 	}
 
 	public void startShake() {

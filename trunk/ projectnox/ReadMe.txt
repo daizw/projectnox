@@ -1,4 +1,27 @@
 ++++++++++++++++++++++++++++++++++++++++
+2008.04.03
+又添加15个表情(from fasticon.com);
+修改优化ChatroomPane, 欲使输入框实时显示表情(原来以字符串表示):
+方案:
+(含图片)		输入框		历史消息窗口
+			^		^
+			|		|
+			|		|
+			v		v
+(图片以字符串表示)	输入框消息<---->历史消息
+实际的消息以字符串形式表示/处理,
+显示与内部格式分开.
+缺点:
+维护输入框消息时获取输入框文字不方便.
+决定放弃.
+
+在http://cwq.jsp-tech.cn下到一份源码, 考虑参照修改JTabbedPane(原来的标签太长了...);
+修改窗口移动时的光标;
+
+在http://www.esus.com/docs/GetQuestionPage.jsp?uid=1283
+和http://forum.java.sun.com/thread.jspa?threadID=151127&messageID=434043
+找到使JTable透明的方法,从而实现通过显示静态图片而不是gif的方法降低CPU占用率.
+++++++++++++++++++++++++++++++++++++++++
 2008.04.02
 代码重构:
 从Cheyenne和Chatroom类抽出类NoxFrame作为二者基类;
@@ -8,6 +31,26 @@
 (未找到可接受的解决方法, 要彻底解决需要自定义很多东西, 
 所以决定暂时不解决).
 添加双击最大化/恢复窗口功能.
+
+对resrc文件夹进行了整理:
+audio: 音频
+buttons: 按钮图标
+docs: html文档之类
+dump: 暂存文件
+faces: 表情图片
+icons: 图标
+images: 大图片, 如背景
+logo: logo
+portrait: 头像
+
+在以前的ChatroomPane的基础上编写chatroom代码:
+修改表情JTabel, 可支持105(=7*15)个表情;
+试图使JTabel对父JPanel透明, 失败;
+存在同时显示105个gif图片导致CPU占用率较高的缺点;
+修改DialogEarthquakeCenter类, 使之适用于Window类实例;
+(这说明了解图形类之间的继承关系还是很有用的)
+添加闪屏振动的功能, 可用于支持发送闪屏振动;
+使用JSplitPane修改Chatroom窗口布局.
 ++++++++++++++++++++++++++++++++++++++++
 2008.04.01
 代码重构:
