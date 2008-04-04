@@ -2,6 +2,7 @@ package noxUI;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,7 +19,7 @@ import javax.swing.ListModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class FriendList extends JList {
+public class ObjectList extends JList {
 	/**
 	 * 好友列表
 	 */
@@ -40,14 +41,20 @@ public class FriendList extends JList {
 	 * 具有自定义列表元素和过滤功能的列表
 	 * @param objs 列表元素(FriendItem类型)数组
 	 */
-	FriendList(Object[] objs) {
+	ObjectList(Object[] objs) {
 		// super(objs);
 
+		if(objs == null)
+			return;
 		portrait = new JLabel();
 		nick = new JLabel();
 		sign = new JLabel();
 		this.setCellRenderer(new FriendCellRender());
 		filterField = new FilterField(DEFAULT_FIELD_WIDTH);
+		filterField.setSize(new Dimension(100, 20));
+		filterField.setPreferredSize(new Dimension(100, 20));
+		filterField.setMaximumSize(new Dimension(10000, 20));
+		filterField.setMinimumSize(new Dimension(20, 20));
 
 		fmod = new FilterModel();
 		this.setModel(fmod);
