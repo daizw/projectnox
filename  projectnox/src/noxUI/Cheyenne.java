@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -49,9 +50,9 @@ public class Cheyenne extends NoxFrame {
 	public static void main(String args[]) {	
 		System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
 		
-		/*Cheyenne chyn = new Cheyenne();
+		Cheyenne chyn = new Cheyenne();
 		chyn.pack();
-		chyn.setVisible(true);*/
+		chyn.setVisible(true);
 		
 		Chatroom room = new Chatroom();
 		room.pack();
@@ -132,6 +133,17 @@ public class Cheyenne extends NoxFrame {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 		contentPane.add(profile);
 		contentPane.add(tabs);
+	}
+	/**
+	 * 设置窗口颜色
+	 */
+	public void setBackgroudColor(Color color)
+	{
+		super.setBackgroudColor(color);
+		if(color == Color.WHITE)
+			tabs.setBackground(Color.GRAY);
+		else
+			tabs.setBackground(color);
 	}
 }
 
