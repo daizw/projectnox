@@ -29,26 +29,20 @@ public class MoveMouseListener implements MouseListener, MouseMotionListener {
 
 			// 设置图标化(iconifies)位
 			// Set the iconified bit
-			System.out.println("window state: " + state);
 			switch (state) {
 			// 如果当前是最大状态, 则正常化
 			case JFrame.MAXIMIZED_BOTH:
 				state &= JFrame.NORMAL;// '&', not '|'
-				System.out.println("max->normal");
 				frame.resetMaximizeIcon();
 				break;
 			// 如果当前不是最大状态, 则最大化
 			default:
 				state |= JFrame.MAXIMIZED_BOTH;
-				System.out.println("normal->max");
 				frame.resetNormalizeIcon();
 				//Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 				//parent.setBounds(0, 0, dim.width, dim.height );
 				break;
 			}
-			System.out.println("window state: " + state);
-			//System.out.println("system: " + 
-			//Toolkit.getDefaultToolkit().isFrameStateSupported(JFrame.MAXIMIZED_BOTH) );
 			// 设置窗口状态
 			frame.setExtendedState(state);
 		}		

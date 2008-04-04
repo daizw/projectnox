@@ -47,7 +47,7 @@ class JImgPanel extends JPanel {
 
 	public void setBackImage(Image img) {
 		img_mp = img;
-		System.out.println("setting BackImage");
+		//System.out.println("setting BackImage");
 	}
 
 	/**
@@ -76,8 +76,7 @@ class JImgPanel extends JPanel {
 		if (firstInvoked) {
 			firstInvoked = false;
 			getImageSizeAndSet();
-			System.out
-					.println("image size : " + img_width + " * " + img_height);
+			//System.out.println("image size : " + img_width + " * " + img_height);
 		}
 	}
 
@@ -89,20 +88,18 @@ class JImgPanel extends JPanel {
 		img_width = img_mp.getWidth(JImgPanel.this);
 		img_height = img_mp.getHeight(JImgPanel.this);
 
-		System.out.println("In getImageSizeAndSet():" + img_width + " * "
-				+ img_height);
+		//System.out.println("In getImageSizeAndSet():" + img_width + " * " + img_height);
 		/**
 		 * 希望通过 if 判断来消除第一次载入图像时的闪烁 当然是在"闪烁是因为未得到图片正确尺寸"这个判断正确的前提下;
 		 * But...有时还是有闪烁; 其实是因为绘图的原因,可以通过提前绘图来解决这个问题.
 		 */
 		if (img_width == -1 || img_height == -1) {
 			this.setPreferredSize(new Dimension(800, 600));
-			System.out.println("Exception at getting size of image");
+			//System.out.println("Exception at getting size of image");
 
 		} else
 			this.setPreferredSize(new Dimension(img_width, img_height));
-		System.out.println("After setPreferredSize():" + img_width + " * "
-				+ img_height);
+		//System.out.println("After setPreferredSize():" + img_width + " * "	+ img_height);
 	}
 
 	/**

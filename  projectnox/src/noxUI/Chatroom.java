@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 /**
  * 
  * @author shinysky
@@ -27,11 +29,18 @@ public class Chatroom extends NoxFrame{
 	public static final int HEIGHT_MAX = 2000;
 	public static final int HEIGHT_MIN = 200;
 	
+	public static final String RESOURCES_PATH = "resrc/";
+	public static final String ICON_PREFIX = "/";
+	public static final String ICON_SUFFIX_REGEX = "[^\\/]+\\.gif";
+	public static final String ICON_RESOURCES_PATH = RESOURCES_PATH.concat("faces/");
+	
+	JSplitPane rootpane;
+	JPanel LeftPane;
 	ChatRoomPane crp;
 	
 	Chatroom(){
-		super("Nox Chatroom", "resrc\\images\\bkgrd.png",
-				"resrc\\logo\\NoXlogo_20.png", "resrc\\logo\\nox.png",
+		super("NoX Chatroom", "resrc\\images\\bkgrd.png",
+				"resrc\\icons\\chat2.png", "resrc\\logo\\nox.png",
 				"resrc\\buttons\\minimize.png", "resrc\\buttons\\minimize_rollover.png",
 				"resrc\\buttons\\maximize.png", "resrc\\buttons\\maximize_rollover.png",
 				"resrc\\buttons\\normalize.png", "resrc\\buttons\\normalize_rollover.png",
@@ -44,9 +53,15 @@ public class Chatroom extends NoxFrame{
 		this.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
 		this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
 		
+		LeftPane = new JPanel();
 		crp = new ChatRoomPane(this);
 		//crp.setLayout(new FlowLayout());
+		rootpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, LeftPane, crp);
+		rootpane.setOneTouchExpandable(true);
+		rootpane.setDividerLocation(0f);
+		rootpane.setDividerSize(8);
+		
 		this.getContainer().setLayout(new BorderLayout());
-		this.getContainer().add (crp, BorderLayout.CENTER);
+		this.getContainer().add (rootpane, BorderLayout.CENTER);
 	}
 }

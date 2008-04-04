@@ -26,7 +26,7 @@ public class AboutDialog extends JDialog {
 			+ System.getProperty("file.separator"));
 
 	AboutDialog() {
-		this.setTitle("Welcome to the NoX world!");
+		this.setTitle("Welcome to NoX's world!");
 		Container contentPane = getContentPane();
 
 		aboutDoc = new JEditorPane();
