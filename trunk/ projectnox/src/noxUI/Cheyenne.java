@@ -3,18 +3,22 @@ package noxUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+
+import com.sun.jna.examples.WindowUtils;
 /**
  * 
  * @author shinysky
@@ -42,14 +46,16 @@ public class Cheyenne extends NoxFrame {
 	private MiniProfilePane profile;
 	private ListsPane tabs;
 
-	public static void main(String args[]) {
-		Chatroom room = new Chatroom();
-		room.pack();
-		room.setVisible(true);
+	public static void main(String args[]) {	
+		System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
 		
-		/*Cheyenne chyn = new Cheyenne();
+		Cheyenne chyn = new Cheyenne();
 		chyn.pack();
-		chyn.setVisible(true);*/
+		chyn.setVisible(true);
+		
+		/*Chatroom room = new Chatroom();
+		room.pack();
+		room.setVisible(true);*/
 	}
 
 	Cheyenne() {

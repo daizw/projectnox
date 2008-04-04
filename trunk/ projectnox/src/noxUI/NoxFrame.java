@@ -1,21 +1,25 @@
 package noxUI;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import com.sun.jna.examples.WindowUtils;
 
 /**
  * 
- * @author shinysky
- *
+ * @author shinysky <a href="mailto: shinysky1986@gmail.com"/>
+ * 
  */
 public class NoxFrame extends JFrame {
 	/**
@@ -37,10 +41,10 @@ public class NoxFrame extends JFrame {
 	 * 各JPanel
 	 */
 	private JImgPanel rootpane;
+	private JPanel fakeFace;
 	private Titlebar titlebar;
 	private JPanel container;
 	private FootPane footpane;
-	private JPanel fakeFace;
 
 	/**
 	 * NoxFrame 基类, 具有标题栏和状态栏; 内置窗口移动/最小化/关闭/窗口缩放功能
@@ -75,22 +79,26 @@ public class NoxFrame extends JFrame {
 	 * @see Titlebar
 	 * @see JFrame
 	 */
-	NoxFrame(String title, String path_background,
-			String path_logo, String path_title,
-			String path_minimize, String path_minimize_rollover,
-			String path_maximize, String path_maximize_rollover,
-			String path_normalize, String path_normalize_rollover,
-			String path_close, String path_close_rollover,
-			final boolean IAmBase) {
+	NoxFrame(String title, String path_background, String path_logo,
+			String path_title, String path_minimize,
+			String path_minimize_rollover, String path_maximize,
+			String path_maximize_rollover, String path_normalize,
+			String path_normalize_rollover, String path_close,
+			String path_close_rollover, final boolean IAmBase) {
 		super(title);
+		/*
+		 * try{
+		 * UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		 * }catch(Exception e) { System.out.println(e.toString()); }
+		 */
+
 		this.setUndecorated(true);
 
-		/*try {
-            UIManager.setLookAndFeel(new SubstanceLookAndFeel());
-        } catch (UnsupportedLookAndFeelException ex) {
-            ex.printStackTrace();
-        }*/
-        
+		/*
+		 * try { UIManager.setLookAndFeel(new SubstanceLookAndFeel()); } catch
+		 * (UnsupportedLookAndFeelException ex) { ex.printStackTrace(); }
+		 */
+
 		tk = Toolkit.getDefaultToolkit();
 		background = tk.getImage(path_background);
 		img_logo = tk.getImage(path_logo);
@@ -99,7 +107,7 @@ public class NoxFrame extends JFrame {
 		// 准备图片
 		this.prepareImage(background, rootpane);
 
-		Container contentPane = getContentPane();
+		// Container contentPane = getContentPane();
 
 		this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
 		/**
@@ -125,9 +133,12 @@ public class NoxFrame extends JFrame {
 		 */
 		rootpane = new JImgPanel(background);
 		rootpane.setLayout(new BoxLayout(rootpane, BoxLayout.Y_AXIS));
+		rootpane.setDoubleBuffered(true);
 		rootpane.add(titlebar);
 		rootpane.add(container);
 		rootpane.add(footpane);
+		// rootpane.setBackground(Color.BLACK);
+		rootpane.setOpaque(false);
 
 		/*
 		 * 设置图片边框代码 ImageBorder image_border = new ImageBorder( new
@@ -145,39 +156,52 @@ public class NoxFrame extends JFrame {
 		/**
 		 * 处于最底层的JPanel, 含宽度为2的黑色边框 其上是rootpane
 		 */
-		fakeFace = new JPanel();
+
 		MatteBorder paneEdge = BorderFactory.createMatteBorder(2, 2, 2, 2,
 				Color.BLACK);// 颜色考虑作为参数设置
+		fakeFace = new JPanel();
 		fakeFace.setBorder(paneEdge);
 		fakeFace.setLayout(new BoxLayout(fakeFace, BoxLayout.Y_AXIS));
 		fakeFace.add(rootpane);
+		fakeFace.setBackground(Color.BLACK);
 
-		contentPane.add(fakeFace);
-
+		// rootpane.setBorder(paneEdge);
+		this.setContentPane(fakeFace);
 		/**
 		 * 添加鼠标移动监听器以实现窗口移动
 		 */
-		MoveMouseListener mml = new MoveMouseListener(this.getRootPane(),
-				this);
+		MoveMouseListener mml = new MoveMouseListener(this.getRootPane(), this);
 		this.getRootPane().addMouseListener(mml);
 		this.getRootPane().addMouseMotionListener(mml);
-		
+
 		/**
 		 * 设置默认窗口操作(ALT+F4)
 		 */
-		if(IAmBase)
+		if (IAmBase)
 			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		else
 			this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 
+	/**
+	 * 将JFrame设为圆角 如果每次resize都重设则会增加CPU占用率; 目前没找到较好的解决方法, 所以该方法暂时闲置.
+	 */
+	public void setFrameMask() {
+		// 圆角Mask
+		RoundRectangle2D.Float mask = new RoundRectangle2D.Float(0, 0, this
+				.getWidth(), this.getHeight(), 5, 5);
+		WindowUtils.setWindowMask(this, mask);
+	}
+
 	public JPanel getContainer() {
 		return container;
 	}
-	public void resetMaximizeIcon(){
+
+	public void resetMaximizeIcon() {
 		titlebar.resetMaximizeIcon();
 	}
-	public void resetNormalizeIcon(){
+
+	public void resetNormalizeIcon() {
 		titlebar.resetNormalizeIcon();
 	}
 }
@@ -189,10 +213,12 @@ class Titlebar extends JPanel {
 	private static final long serialVersionUID = -538877811148092522L;
 	JButton blogo;
 	JLabel lab_title;
+	JButton bconfig;
+	JSlider slider;
 	JButton bminimize;
 	JButton bmaximize;
 	JButton bclose;
-	
+
 	String path_max;
 	String path_max_rollover;
 	String path_norm;
@@ -228,18 +254,15 @@ class Titlebar extends JPanel {
 	 * @param IAmBase
 	 *            true: 是根窗口, 关闭按钮推出整个系统; false: 不是根窗口, 关闭按钮只关闭本窗口
 	 */
-	Titlebar(final JFrame parent, String path_logo, String path_title,
+	Titlebar(final NoxFrame parent, String path_logo, String path_title,
 			String path_minimize, String path_minimize_rollover,
 			final String path_maximize, final String path_maximize_rollover,
 			final String path_normalize, final String path_normalize_rollover,
 			String path_close, String path_close_rollover, final boolean IAmBase) {
-		// windowStateIsMax = false;
-		
 		path_max = path_maximize;
 		path_max_rollover = path_maximize_rollover;
 		path_norm = path_normalize;
 		path_norm_rollover = path_normalize_rollover;
-
 
 		blogo = new JButton(new ImageIcon(path_logo));
 		blogo.setSize(new Dimension(20, 20));
@@ -284,6 +307,39 @@ class Titlebar extends JPanel {
 		 * btitle.setBorderPainted(false); btitle.setContentAreaFilled(false);
 		 * btitle.setOpaque(false);
 		 */
+		if (IAmBase) {
+			slider = new JSlider(20, 100);
+			slider.setValue(100);
+
+			slider.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent e) {
+					float value = slider.getValue();
+					if (WindowUtils.isWindowAlphaSupported())
+						WindowUtils.setWindowAlpha(parent, value * 0.01f);
+					else
+						System.out
+								.println("Sorry, WindowAlpha is not Supported");// ///
+				}
+			});
+
+			bconfig = new JButton(new ImageIcon("resrc\\buttons\\config.png"));
+			bconfig.setRolloverIcon(new ImageIcon(
+					"resrc\\buttons\\config_rollover.png"));
+			bconfig.setSize(new Dimension(20, 20));
+			bconfig.setPreferredSize(new Dimension(20, 20));
+			bconfig.setMaximumSize(new Dimension(20, 20));
+			bconfig.setMinimumSize(new Dimension(20, 20));
+			bconfig.setBorderPainted(false);
+			bconfig.setContentAreaFilled(false);
+			bconfig.setOpaque(false);
+			bconfig.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					System.out.println("You just clicked the config button");
+					// parent.setBackground(Color.BLUE);
+					slider.setValue(100);
+				}
+			});
+		}
 
 		bminimize = new JButton(new ImageIcon(path_minimize));
 		bminimize.setRolloverIcon(new ImageIcon(path_minimize_rollover));
@@ -297,7 +353,6 @@ class Titlebar extends JPanel {
 		bminimize.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int state = parent.getExtendedState();
-
 				// 设置图标化(iconifies)位
 				// Set the iconified bit
 				state |= JFrame.ICONIFIED;
@@ -323,26 +378,28 @@ class Titlebar extends JPanel {
 
 				// 设置图标化(iconifies)位
 				// Set the iconified bit
-				System.out.println("window state: " + state);
+				// System.out.println("window state: " + state);
 				switch (state) {
 				// 如果当前是最大状态, 则正常化
 				case JFrame.MAXIMIZED_BOTH:
 					state &= JFrame.NORMAL;// '&', not '|'
-					System.out.println("max->normal");
+					// System.out.println("max->normal");
 					resetMaximizeIcon();
 					break;
 				// 如果当前不是最大状态, 则最大化
 				default:
 					state |= JFrame.MAXIMIZED_BOTH;
-					System.out.println("normal->max");
+					// System.out.println("normal->max");
 					resetNormalizeIcon();
-					//Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-					//parent.setBounds(0, 0, dim.width, dim.height );
+					// Dimension dim =
+					// Toolkit.getDefaultToolkit().getScreenSize();
+					// parent.setBounds(0, 0, dim.width, dim.height );
 					break;
 				}
-				System.out.println("window state: " + state);
-				//System.out.println("system: " + 
-				//Toolkit.getDefaultToolkit().isFrameStateSupported(JFrame.MAXIMIZED_BOTH) );
+				// System.out.println("window state: " + state);
+				// System.out.println("system: " +
+				// Toolkit.getDefaultToolkit().isFrameStateSupported(JFrame.MAXIMIZED_BOTH)
+				// );
 				// 设置窗口状态
 				parent.setExtendedState(state);
 			}
@@ -372,17 +429,22 @@ class Titlebar extends JPanel {
 		this.add(lab_title);
 		// this.add(btitle);
 		this.add(Box.createHorizontalGlue());
+		if (IAmBase) {
+			this.add(bconfig);
+			this.add(slider);
+		}
 		this.add(bminimize);
 		this.add(bmaximize);
 		this.add(bclose);
 		this.setOpaque(false);
 	}
-	
-	public void resetMaximizeIcon(){
+
+	public void resetMaximizeIcon() {
 		bmaximize.setIcon(new ImageIcon(path_max));
 		bmaximize.setRolloverIcon(new ImageIcon(path_max_rollover));
 	}
-	public void resetNormalizeIcon(){
+
+	public void resetNormalizeIcon() {
 		bmaximize.setIcon(new ImageIcon(path_norm));
 		bmaximize.setRolloverIcon(new ImageIcon(path_norm_rollover));
 	}

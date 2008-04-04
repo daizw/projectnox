@@ -34,8 +34,7 @@ import javax.swing.table.TableCellRenderer;
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
-class FaceDialog extends JDialog implements ActionListener, MouseListener,
-		FocusListener {
+class FaceDialog extends JDialog implements ActionListener, MouseListener {
 	/**
 	 * 
 	 */
@@ -70,48 +69,18 @@ class FaceDialog extends JDialog implements ActionListener, MouseListener,
 
 		Container contentPane = getContentPane();
 
-		String[] columns = { "", "", "", "", "", "", "", "", "", "", "", "",
-				"", "", "" };
+		String[] columns = new String[FACECOLUMNS];
+		for(int i = 0; i < FACECOLUMNS; i++){
+			columns[i] = "";
+		}
 
 		Object[][] data = new Object[FACEROWS][FACECOLUMNS];
-		int i = 0, j = 0;
 		/**
-		 * 动态图片开始时显示不出来 怀疑是组件"刷新率"的问题 ...当选择改变时,对话框才会刷新一次 还不知道怎么解决
-		 * ...已经解决,通过强制绘图
+		 * 不需要将表情图片实际插入到表格中
 		 */
-		for (i = 0; i < FACEROWS - 1; i++) {
-			for (j = 0; j < FACECOLUMNS; j++) {
-				/**
-				 * 强制绘图 不过仍然有着很高的CPU占用率(或许这是必然的) ...我是被逼的
-				 * 
-				 * 如果可以将JTable的单元格也设为透明, 就可以通过使用JImgPanel达到减少CPU占用率问题,
-				 * 即通过绘制一幅静态图片而不是多幅gif图片来实现. 目前还未找到方法...(08.04.02)
-				 */
-				this.prepareImage(tk.getImage(path_faces
-				// + ChatRoomPane.fmNum.format((int) (i * FACECOLUMNS + j))
-						+ (int) (i * FACECOLUMNS + j) + ".ggif"), this);
-
-				data[i][j] = new ImageIcon(path_faces
-				// + ChatRoomPane.fmNum.format((int) (i * FACECOLUMNS + j))
-						+ (int) (i * FACECOLUMNS + j) + ".ggif");
-				// + "testface.png");
-			}
-		}
-		/**
-		 * 插入newFace文件夹下的表情
-		 */
-		for (j = 0; j < FACECOLUMNS; j++) {
-			this.prepareImage(tk.getImage(path_faces + "newFace\\" + (int) (j)
-					+ ".gpng"), this);
-
-			data[i][j] = new ImageIcon(path_faces + "newFace\\" + (int) (j)
-					+ ".gpng");
-		}
-
-		// tb_cr_faces = new JTable();
 		tb_cr_faces = new JTable(new MyModel(data, columns)) {
 			/**
-			 * 
+			 * 自定义JTable Cell Renderer
 			 */
 			private static final long serialVersionUID = -212708255423640437L;
 
@@ -120,6 +89,7 @@ class FaceDialog extends JDialog implements ActionListener, MouseListener,
 				Component c = super.prepareRenderer(renderer, row, column);
 				// We want renderer component to be transparent so background
 				// image is visible
+				// 设置单元格表现形式为透明
 				if (c instanceof JComponent)
 					((JComponent) c).setOpaque(false);
 				return c;
@@ -127,20 +97,7 @@ class FaceDialog extends JDialog implements ActionListener, MouseListener,
 		};
 		// 设置表格为透明
 		tb_cr_faces.setOpaque(false);
-
-		// 设置单元格表现形式为透明
-		// DefaultTableCellRenderer render = new DefaultTableCellRenderer();
-		// render.setOpaque(false);
-		// tb_cr_faces.setDefaultRenderer(data.getClass(), render);
-		// tb_cr_faces.setDefaultRenderer(Object.class, render);
-		// tb_cr_faces.setDefaultRenderer(data.getClass(), new
-		// TransparentRenderer());
-
-		// tb_cr_faces.setGridColor(Color.CYAN);
-		/*tb_cr_faces.setShowHorizontalLines(true);
-		tb_cr_faces.setShowVerticalLines(true);
-		tb_cr_faces.setBounds(10, 10, FACECELLWIDTH * FACECOLUMNS,
-				FACECELLHEIGHT * FACEROWS);*/
+		
 		tb_cr_faces.setRowHeight(FACECELLHEIGHT);
 		tb_cr_faces.setSize(new Dimension(FACECELLWIDTH * FACECOLUMNS,
 				FACECELLHEIGHT * FACEROWS));
@@ -283,10 +240,10 @@ class FaceDialog extends JDialog implements ActionListener, MouseListener,
 		/**
 		 * 获得列类
 		 */
-		public Class getColumnClass(int column) {
-			Vector v = (Vector) dataVector.elementAt(0);
-			return v.elementAt(column).getClass();
-		}
+		/*
+		 * public Class getColumnClass(int column) { Vector v = (Vector)
+		 * dataVector.elementAt(0); return v.elementAt(column).getClass(); }
+		 */
 	}
 
 	/**
@@ -402,19 +359,5 @@ class FaceDialog extends JDialog implements ActionListener, MouseListener,
 	public void mouseExited(MouseEvent e) {
 		// TODO Auto-generated method stub
 		// this.setVisible(false);
-	}
-
-	@Override
-	public void focusGained(FocusEvent e) {
-		// TODO Auto-generated method stub
-		System.out.println("gain focus");
-	}
-
-	@Override
-	public void focusLost(FocusEvent e) {
-		// TODO Auto-generated method stub
-		System.out.println("dispose");
-		// this.dispose();
-		this.setVisible(false);
 	}
 }
