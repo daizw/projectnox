@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 /**
@@ -54,11 +55,33 @@ public class Chatroom extends NoxFrame{
 		this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
 		
 		LeftPane = new JPanel();
+		SingleChatRoomSidePane portraits = new SingleChatRoomSidePane(
+				new ImageIcon("resrc\\portrait\\portrait.png"),
+				new ImageIcon("resrc\\portrait\\portrait.png"));
+		
+		/**
+		 * 好友列表
+		 */
+		String[] flistItems = { "Chris", "Joshua", "Daniel", "Michael", "Don",
+				"Kimi", "Kelly", "Keagan", "夏", "张三", "张四", "张五", "张三丰" };
+
+		FriendItem[] friends = new FriendItem[flistItems.length];
+		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
+
+		for (int i = 0; i < flistItems.length; i++) {
+			friends[i] = new FriendItem(new ImageIcon(
+					"resrc\\portrait\\user.png"), flistItems[i], "(Hi, 我是"
+					+ flistItems[i] + ')');
+		}
+		MultiChatRoomSidePane groupmembers = new MultiChatRoomSidePane(
+				"Hello, everyone, happy everyday!", friends
+				);
+		
 		crp = new ChatRoomPane(this);
 		//crp.setLayout(new FlowLayout());
-		rootpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, LeftPane, crp);
+		rootpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, groupmembers, crp);
 		rootpane.setOneTouchExpandable(true);
-		rootpane.setDividerLocation(0f);
+		rootpane.setDividerLocation(0.3f);
 		rootpane.setDividerSize(8);
 		
 		this.getContainer().setLayout(new BorderLayout());

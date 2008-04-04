@@ -1,12 +1,15 @@
 package noxUI;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.*;
@@ -31,6 +34,9 @@ public class NoxFrame extends JFrame {
 	 */
 	public static final int WIDTH_MIN = 120;
 	public static final int HEIGHT_MIN = 60;
+	
+	public Color backgrdColor = Color.BLACK;
+	private MatteBorder paneEdge;
 	/**
 	 * 用来获取图片
 	 */
@@ -153,17 +159,17 @@ public class NoxFrame extends JFrame {
 		 * ImageIcon("resrc/bottom_center.png").getImage(), new
 		 * ImageIcon("resrc/bottom_right.png").getImage() );
 		 */
+		
+		paneEdge = BorderFactory.createMatteBorder(2, 2, 2, 2,
+				Color.BLACK);// 颜色考虑作为参数设置
 		/**
 		 * 处于最底层的JPanel, 含宽度为2的黑色边框 其上是rootpane
 		 */
-
-		MatteBorder paneEdge = BorderFactory.createMatteBorder(2, 2, 2, 2,
-				Color.BLACK);// 颜色考虑作为参数设置
 		fakeFace = new JPanel();
 		fakeFace.setBorder(paneEdge);
 		fakeFace.setLayout(new BoxLayout(fakeFace, BoxLayout.Y_AXIS));
 		fakeFace.add(rootpane);
-		fakeFace.setBackground(Color.BLACK);
+		fakeFace.setBackground(backgrdColor);
 
 		// rootpane.setBorder(paneEdge);
 		this.setContentPane(fakeFace);
@@ -181,6 +187,16 @@ public class NoxFrame extends JFrame {
 			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		else
 			this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	}
+	/**
+	 * 设置窗口颜色
+	 */
+	public void setBackgroudColor(Color color)
+	{
+		fakeFace.setBackground(color);
+		paneEdge = BorderFactory.createMatteBorder(2, 2, 2, 2,
+				color);// 颜色考虑作为参数设置
+		fakeFace.setBorder(paneEdge);
 	}
 
 	/**
@@ -214,11 +230,13 @@ class Titlebar extends JPanel {
 	JButton blogo;
 	JLabel lab_title;
 	JButton bconfig;
-	JSlider slider;
+	//JSlider slider;
 	JButton bminimize;
 	JButton bmaximize;
 	JButton bclose;
 
+	FrameConfigDialog fconfig;
+	
 	String path_max;
 	String path_max_rollover;
 	String path_norm;
@@ -307,21 +325,8 @@ class Titlebar extends JPanel {
 		 * btitle.setBorderPainted(false); btitle.setContentAreaFilled(false);
 		 * btitle.setOpaque(false);
 		 */
-		if (IAmBase) {
-			slider = new JSlider(20, 100);
-			slider.setValue(100);
-
-			slider.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent e) {
-					float value = slider.getValue();
-					if (WindowUtils.isWindowAlphaSupported())
-						WindowUtils.setWindowAlpha(parent, value * 0.01f);
-					else
-						System.out
-								.println("Sorry, WindowAlpha is not Supported");// ///
-				}
-			});
-
+		fconfig = new FrameConfigDialog(parent);
+		if (IAmBase) {			
 			bconfig = new JButton(new ImageIcon("resrc\\buttons\\config.png"));
 			bconfig.setRolloverIcon(new ImageIcon(
 					"resrc\\buttons\\config_rollover.png"));
@@ -336,7 +341,30 @@ class Titlebar extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 					System.out.println("You just clicked the config button");
 					// parent.setBackground(Color.BLUE);
-					slider.setValue(100);
+					//slider.setValue(100);
+					final JPopupMenu m = new JPopupMenu();
+	                // use a heavyweight popup to avoid having it clipped
+	                // by the window mask
+	                m.add(new AbstractAction("Set Window's Color") {
+	                    public void actionPerformed(ActionEvent e) {
+	                    	Color color = JColorChooser.showDialog(parent,
+	            					"Select a color for the GUI", Color.orange);
+	                    	if (color != null) {
+	                    		parent.setBackgroudColor(color);
+	            			}
+	                    }
+	                });
+	                m.add(new AbstractAction("Set Window's Transparency") {
+	                    public void actionPerformed(ActionEvent e) {
+	                    	fconfig.setLocation(bconfig.getLocation().x,
+	                    			bconfig.getLocation().y+20);
+	                    	fconfig.setVisible(true);
+	                    }
+	                });
+	                m.pack();
+	                m.show((Component)e.getSource(),
+	                		((JButton)e.getSource()).getLocation().x,
+	                		((JButton)e.getSource()).getLocation().y+20);
 				}
 			});
 		}
@@ -431,7 +459,7 @@ class Titlebar extends JPanel {
 		this.add(Box.createHorizontalGlue());
 		if (IAmBase) {
 			this.add(bconfig);
-			this.add(slider);
+			//this.add(slider);
 		}
 		this.add(bminimize);
 		this.add(bmaximize);
@@ -483,5 +511,85 @@ class FootPane extends JPanel {
 		this.add(Box.createHorizontalGlue());
 		this.add(resizeButn);
 		this.setOpaque(false);
+	}
+}
+
+class FrameConfigDialog extends JDialog{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5405688695983281310L;
+	NoxFrame parent;
+	JLabel transparent;
+	JLabel opaque;
+	JSlider slider;
+	JButton close;
+	
+	FrameConfigDialog(NoxFrame nf){
+		//super(nf, "", true);
+		parent = nf;
+		this.setUndecorated(true);
+		transparent = new JLabel("Transparent");
+		opaque = new JLabel("Opaque");
+		
+		slider = new JSlider(20, 100);
+		slider.setValue(100);
+		slider.requestFocus();
+		slider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				float value = slider.getValue();
+				if (WindowUtils.isWindowAlphaSupported())
+					WindowUtils.setWindowAlpha(parent, value * 0.01f);
+				else
+					System.out
+							.println("Sorry, WindowAlpha is not Supported");// ///
+			}
+		});
+		close = new JButton(new ImageIcon("resrc\\buttons\\close.png"));
+		close.setPressedIcon(new ImageIcon("resrc\\buttons\\close_rollover.png"));
+		Dimension bnsize = new Dimension(20, 20);
+		close.setSize(bnsize);
+		close.setPreferredSize(bnsize);
+		close.setMaximumSize(bnsize);
+		close.setMinimumSize(bnsize);
+		close.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				((JDialog)FrameConfigDialog.this).setVisible(false);
+			}
+		});
+		
+		JPanel root = new JPanel();
+		root.setLayout(new BoxLayout(root, BoxLayout.X_AXIS));
+		root.add(transparent);
+		root.add(slider);
+		root.add(opaque);
+		root.add(close);
+		
+		//this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		/*this.getContentPane().add(transparent);
+		this.getContentPane().add(slider);
+		this.getContentPane().add(opaque);*/
+		this.getContentPane().add(root);
+		Dimension size = new Dimension(250, 20);
+		this.setSize(size);
+		this.setPreferredSize(size);
+		this.setMaximumSize(size);
+		this.setMinimumSize(size);
+		slider.addFocusListener(new FocusListener(){
+
+			@Override
+			public void focusGained(FocusEvent e) {
+				// TODO Auto-generated method stub
+				System.out.println("slider get focusssssssssss");
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				// TODO Auto-generated method stub
+				System.out.println("slider lost focusssssssssss");
+				FrameConfigDialog.this.setVisible(false);
+			}
+		});
+		
 	}
 }

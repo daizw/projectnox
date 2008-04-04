@@ -49,13 +49,13 @@ public class Cheyenne extends NoxFrame {
 	public static void main(String args[]) {	
 		System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
 		
-		Cheyenne chyn = new Cheyenne();
+		/*Cheyenne chyn = new Cheyenne();
 		chyn.pack();
-		chyn.setVisible(true);
+		chyn.setVisible(true);*/
 		
-		/*Chatroom room = new Chatroom();
+		Chatroom room = new Chatroom();
 		room.pack();
-		room.setVisible(true);*/
+		room.setVisible(true);
 	}
 
 	Cheyenne() {
@@ -98,7 +98,7 @@ public class Cheyenne extends NoxFrame {
 					"resrc\\portrait\\user.png"), flistItems[i], "(Hi, 我是"
 					+ flistItems[i] + ')');
 		}
-		FriendList flist = new FriendList(friends);
+		ObjectList flist = new ObjectList(friends);
 		/**
 		 * 组列表
 		 */
@@ -111,7 +111,7 @@ public class Cheyenne extends NoxFrame {
 			groups[i] = new FriendItem(new ImageIcon("resrc\\icons\\chatroom.png"),
 					glistItems[i], "(Hi, 这是" + glistItems[i] + "的聊天室)");
 		}
-		FriendList glist = new FriendList(groups);
+		ObjectList glist = new ObjectList(groups);
 		/**
 		 * 黑名单
 		 */
@@ -124,7 +124,7 @@ public class Cheyenne extends NoxFrame {
 			badguys[i] = new FriendItem(new ImageIcon("resrc\\icons\\blacklist.png"),
 					blistItems[i], "(Hi, 我是" + blistItems[i] + ')');
 		}
-		FriendList blist = new FriendList(badguys);
+		ObjectList blist = new ObjectList(badguys);
 
 		tabs = new ListsPane(flist, glist, blist, "resrc\\icons\\chat.png",
 				"resrc\\icons\\chatroom.png", "resrc\\icons\\blacklist.png");
@@ -257,7 +257,7 @@ class ListsPane extends JTabbedPane {
 	private JScrollPane grpListScrPane;
 	private JScrollPane blkListScrPane;
 
-	ListsPane(FriendList flist, FriendList glist, FriendList blist,
+	ListsPane(ObjectList flist, ObjectList glist, ObjectList blist,
 			String path_flist, String path_glist, String path_blist) {
 		frdlistpane = new JPanel();
 		grplistpane = new JPanel();
