@@ -3,6 +3,7 @@ package noxUI;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -34,8 +35,20 @@ public class NoxFrame extends JFrame {
 	 */
 	public static final int WIDTH_MIN = 120;
 	public static final int HEIGHT_MIN = 60;
-	
-	public Color backgrdColor = Color.BLACK;
+
+	/**
+	 * 前景背景颜色
+	 */
+	private Color foregrdColor = Color.WHITE;
+	private Color backgrdColor = Color.BLACK;
+
+	/**
+	 * 窗口透明度
+	 */
+	private float opacity = 100;
+	/**
+	 * 边框
+	 */
 	private MatteBorder paneEdge;
 	/**
 	 * 用来获取图片
@@ -159,9 +172,8 @@ public class NoxFrame extends JFrame {
 		 * ImageIcon("resrc/bottom_center.png").getImage(), new
 		 * ImageIcon("resrc/bottom_right.png").getImage() );
 		 */
-		
-		paneEdge = BorderFactory.createMatteBorder(2, 2, 2, 2,
-				Color.BLACK);// 颜色考虑作为参数设置
+
+		paneEdge = BorderFactory.createMatteBorder(2, 2, 2, 2, backgrdColor);// 颜色考虑作为参数设置
 		/**
 		 * 处于最底层的JPanel, 含宽度为2的黑色边框 其上是rootpane
 		 */
@@ -188,15 +200,77 @@ public class NoxFrame extends JFrame {
 		else
 			this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
+
 	/**
-	 * 设置窗口颜色
+	 * 设置窗口前景颜色
 	 */
-	public void setBackgroudColor(Color color)
-	{
+	public void setForegroundColor() {
+		if ((float) (backgrdColor.getRed() * 0.3f + backgrdColor.getGreen()
+				* 0.59f + backgrdColor.getBlue() * 0.11f) < 128)
+			foregrdColor = Color.WHITE;
+		else
+			foregrdColor = Color.BLACK;
+		// 似乎只有标题栏需要更新
+		titlebar.setForegroundColor(foregrdColor == Color.WHITE);
+	}
+
+	/**
+	 * 获取窗口前景颜色
+	 * 
+	 * @return 前景色
+	 */
+	public Color getForegroundColor() {
+		return foregrdColor;
+	}
+
+	/**
+	 * 设置窗口背景颜色, 然后根据背景色设置前景色
+	 * 
+	 * @param color
+	 *            背景色
+	 */
+	public void setBackgroundColor(Color color) {
 		fakeFace.setBackground(color);
-		paneEdge = BorderFactory.createMatteBorder(2, 2, 2, 2,
-				color);// 颜色考虑作为参数设置
+		paneEdge = BorderFactory.createMatteBorder(2, 2, 2, 2, color);// 颜色考虑作为参数设置
 		fakeFace.setBorder(paneEdge);
+		backgrdColor = color;
+		// 同时更新前景色
+		setForegroundColor();
+	}
+
+	/**
+	 * 获取窗口背景颜色
+	 * 
+	 * @return 背景色
+	 */
+	public Color getBackgroundColor() {
+		return backgrdColor;
+	}
+
+	/**
+	 * 设置不透明度
+	 * 
+	 * @return 是否设置成功
+	 */
+	public boolean setOpacity(float alpha) {
+		if (WindowUtils.isWindowAlphaSupported()) {
+			WindowUtils.setWindowAlpha(this, alpha);
+			opacity = alpha;
+			return true;
+		} else
+		{
+			System.out.println("Sorry, WindowAlpha is not Supported");
+			return false;
+		}
+	}
+
+	/**
+	 * 获取不透明度
+	 * 
+	 * @return 不透明度值
+	 */
+	public float getOpacity() {
+		return opacity;
 	}
 
 	/**
@@ -214,14 +288,20 @@ public class NoxFrame extends JFrame {
 	}
 
 	public void resetMaximizeIcon() {
-		titlebar.resetMaximizeIcon();
+		titlebar.setToMaximizeIcon();
 	}
 
 	public void resetNormalizeIcon() {
-		titlebar.resetNormalizeIcon();
+		titlebar.setToNormalizeIcon();
 	}
 }
 
+/**
+ * 标题栏组件 应当至少具备两种功能: 1. 如果是主窗口, 则标题栏为图片 2. 如果是分支窗口, 则标题栏为文字
+ * 
+ * @author shinysky
+ * 
+ */
 class Titlebar extends JPanel {
 	/**
 	 * what's this svID?
@@ -230,13 +310,14 @@ class Titlebar extends JPanel {
 	JButton blogo;
 	JLabel lab_title;
 	JButton bconfig;
-	//JSlider slider;
+	// JSlider slider;
 	JButton bminimize;
 	JButton bmaximize;
 	JButton bclose;
 
-	FrameConfigDialog fconfig;
-	
+	FrameConfigDialog transparencyConfigBar;
+
+	String ttl;
 	String path_max;
 	String path_max_rollover;
 	String path_norm;
@@ -251,8 +332,8 @@ class Titlebar extends JPanel {
 	 *            父组件, 用于控制其最大最小化
 	 * @param path_logo
 	 *            logo图片路径
-	 * @param path_title
-	 *            标题图片路径
+	 * @param title
+	 *            标题图片路径(IAmBase==true)/标题文字(IAmBase==false)
 	 * @param path_minimize
 	 *            最小化按钮图片路径
 	 * @param path_minimize_rollover
@@ -272,7 +353,7 @@ class Titlebar extends JPanel {
 	 * @param IAmBase
 	 *            true: 是根窗口, 关闭按钮推出整个系统; false: 不是根窗口, 关闭按钮只关闭本窗口
 	 */
-	Titlebar(final NoxFrame parent, String path_logo, String path_title,
+	Titlebar(final NoxFrame parent, String path_logo, String title,
 			String path_minimize, String path_minimize_rollover,
 			final String path_maximize, final String path_maximize_rollover,
 			final String path_normalize, final String path_normalize_rollover,
@@ -310,12 +391,17 @@ class Titlebar extends JPanel {
 			}
 		});
 
-		/*
-		 * lab_title = new JLabel("NoX"); //Font font = new Font("宋体-方正超大字符集",
-		 * Font.BOLD, 24); Font font = new Font("Times New Roman", Font.BOLD,
-		 * 24); lab_title.setForeground(Color.WHITE); lab_title.setFont(font);
-		 */
-		lab_title = new JLabel(new ImageIcon(path_title));
+		ttl = title;
+		if (IAmBase) {// 如果是主窗口
+			lab_title = new JLabel(new ImageIcon(title));
+		} else {// 如果不是主窗口
+			// lab_title = new JLabel("NoX");
+			lab_title = new JLabel(title);
+			Font font = new Font("宋体-方正超大字符集", Font.BOLD, 24);
+			// Font font = new Font("Times New Roman", Font.BOLD, 24);
+			lab_title.setForeground(Color.WHITE);
+			lab_title.setFont(font);
+		}
 
 		/*
 		 * btitle = new JButton(new ImageIcon("resrc\\nox.png"));
@@ -325,8 +411,8 @@ class Titlebar extends JPanel {
 		 * btitle.setBorderPainted(false); btitle.setContentAreaFilled(false);
 		 * btitle.setOpaque(false);
 		 */
-		fconfig = new FrameConfigDialog(parent);
-		if (IAmBase) {			
+		transparencyConfigBar = new FrameConfigDialog(parent);
+		if (IAmBase) {
 			bconfig = new JButton(new ImageIcon("resrc\\buttons\\config.png"));
 			bconfig.setRolloverIcon(new ImageIcon(
 					"resrc\\buttons\\config_rollover.png"));
@@ -341,30 +427,40 @@ class Titlebar extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 					System.out.println("You just clicked the config button");
 					// parent.setBackground(Color.BLUE);
-					//slider.setValue(100);
+					// slider.setValue(100);
 					final JPopupMenu m = new JPopupMenu();
-	                // use a heavyweight popup to avoid having it clipped
-	                // by the window mask
-	                m.add(new AbstractAction("Set Window's Color") {
-	                    public void actionPerformed(ActionEvent e) {
-	                    	Color color = JColorChooser.showDialog(parent,
-	            					"Select a color for the GUI", Color.orange);
-	                    	if (color != null) {
-	                    		parent.setBackgroudColor(color);
-	            			}
-	                    }
-	                });
-	                m.add(new AbstractAction("Set Window's Transparency") {
-	                    public void actionPerformed(ActionEvent e) {
-	                    	fconfig.setLocation(bconfig.getLocation().x,
-	                    			bconfig.getLocation().y+20);
-	                    	fconfig.setVisible(true);
-	                    }
-	                });
-	                m.pack();
-	                m.show((Component)e.getSource(),
-	                		((JButton)e.getSource()).getLocation().x,
-	                		((JButton)e.getSource()).getLocation().y+20);
+					// use a heavyweight popup to avoid having it clipped
+					// by the window mask
+					m.add(new AbstractAction("Set Window's Color") {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = -729947600305959488L;
+
+						public void actionPerformed(ActionEvent e) {
+							Color color = JColorChooser.showDialog(parent,
+									"Select a color for the GUI", Color.orange);
+							if (color != null) {
+								parent.setBackgroundColor(color);
+							}
+						}
+					});
+					m.add(new AbstractAction("Set Window's Transparency") {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 8141980952424431845L;
+
+						public void actionPerformed(ActionEvent e) {
+							transparencyConfigBar.setLocation(bconfig
+									.getLocationOnScreen().x, bconfig
+									.getLocationOnScreen().y + 20);
+							transparencyConfigBar.Show();
+						}
+					});
+					m.pack();
+					// 位置应该是相对于JButton的位置
+					m.show((Component) e.getSource(), 0, 20);
 				}
 			});
 		}
@@ -412,13 +508,13 @@ class Titlebar extends JPanel {
 				case JFrame.MAXIMIZED_BOTH:
 					state &= JFrame.NORMAL;// '&', not '|'
 					// System.out.println("max->normal");
-					resetMaximizeIcon();
+					setToMaximizeIcon();
 					break;
 				// 如果当前不是最大状态, 则最大化
 				default:
 					state |= JFrame.MAXIMIZED_BOTH;
 					// System.out.println("normal->max");
-					resetNormalizeIcon();
+					setToNormalizeIcon();
 					// Dimension dim =
 					// Toolkit.getDefaultToolkit().getScreenSize();
 					// parent.setBounds(0, 0, dim.width, dim.height );
@@ -445,9 +541,9 @@ class Titlebar extends JPanel {
 		bclose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parent.dispose();
-				if (IAmBase)// 如果是根窗口
+				/*if (IAmBase)// 如果是根窗口
 					System.exit(0);// .............
-			}
+*/			}
 		});
 
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -459,7 +555,7 @@ class Titlebar extends JPanel {
 		this.add(Box.createHorizontalGlue());
 		if (IAmBase) {
 			this.add(bconfig);
-			//this.add(slider);
+			// this.add(slider);
 		}
 		this.add(bminimize);
 		this.add(bmaximize);
@@ -467,14 +563,22 @@ class Titlebar extends JPanel {
 		this.setOpaque(false);
 	}
 
-	public void resetMaximizeIcon() {
+	public void setToMaximizeIcon() {
 		bmaximize.setIcon(new ImageIcon(path_max));
 		bmaximize.setRolloverIcon(new ImageIcon(path_max_rollover));
 	}
 
-	public void resetNormalizeIcon() {
+	public void setToNormalizeIcon() {
 		bmaximize.setIcon(new ImageIcon(path_norm));
 		bmaximize.setRolloverIcon(new ImageIcon(path_norm_rollover));
+	}
+
+	public void setForegroundColor(boolean white) {
+		// 还需要改!!!!!!!!!!!!!!!
+		if (white)
+			lab_title.setIcon(new ImageIcon(ttl));
+		else
+			lab_title.setIcon(new ImageIcon(ttl + ".png"));
 	}
 }
 
@@ -514,7 +618,7 @@ class FootPane extends JPanel {
 	}
 }
 
-class FrameConfigDialog extends JDialog{
+class FrameConfigDialog extends JDialog {
 	/**
 	 * 
 	 */
@@ -524,29 +628,31 @@ class FrameConfigDialog extends JDialog{
 	JLabel opaque;
 	JSlider slider;
 	JButton close;
-	
-	FrameConfigDialog(NoxFrame nf){
-		//super(nf, "", true);
+	JPanel root;
+
+	FrameConfigDialog(NoxFrame nf) {
+		// super(nf, "", true);
 		parent = nf;
 		this.setUndecorated(true);
 		transparent = new JLabel("Transparent");
 		opaque = new JLabel("Opaque");
-		
+
 		slider = new JSlider(20, 100);
 		slider.setValue(100);
+		slider.setOpaque(false);
 		slider.requestFocus();
 		slider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				float value = slider.getValue();
-				if (WindowUtils.isWindowAlphaSupported())
-					WindowUtils.setWindowAlpha(parent, value * 0.01f);
-				else
-					System.out
-							.println("Sorry, WindowAlpha is not Supported");// ///
+				parent.setOpacity(value * 0.01f);
 			}
 		});
 		close = new JButton(new ImageIcon("resrc\\buttons\\close.png"));
-		close.setPressedIcon(new ImageIcon("resrc\\buttons\\close_rollover.png"));
+		close
+				.setPressedIcon(new ImageIcon(
+						"resrc\\buttons\\close_rollover.png"));
+		close.setOpaque(false);
+		close.setContentAreaFilled(false);
 		Dimension bnsize = new Dimension(20, 20);
 		close.setSize(bnsize);
 		close.setPreferredSize(bnsize);
@@ -554,29 +660,30 @@ class FrameConfigDialog extends JDialog{
 		close.setMinimumSize(bnsize);
 		close.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				((JDialog)FrameConfigDialog.this).setVisible(false);
+				((JDialog) FrameConfigDialog.this).setVisible(false);
 			}
 		});
-		
-		JPanel root = new JPanel();
+
+		root = new JPanel();
 		root.setLayout(new BoxLayout(root, BoxLayout.X_AXIS));
 		root.add(transparent);
 		root.add(slider);
 		root.add(opaque);
 		root.add(close);
-		
-		//this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		/*this.getContentPane().add(transparent);
-		this.getContentPane().add(slider);
-		this.getContentPane().add(opaque);*/
-		this.getContentPane().add(root);
+		root.setBackground(parent.getBackgroundColor());
+		// this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		/*
+		 * this.getContentPane().add(transparent);
+		 * this.getContentPane().add(slider); this.getContentPane().add(opaque);
+		 */
+		// this.getContentPane().add(root);
+		this.setContentPane(root);
 		Dimension size = new Dimension(250, 20);
 		this.setSize(size);
 		this.setPreferredSize(size);
 		this.setMaximumSize(size);
 		this.setMinimumSize(size);
-		slider.addFocusListener(new FocusListener(){
-
+		slider.addFocusListener(new FocusListener() {
 			@Override
 			public void focusGained(FocusEvent e) {
 				// TODO Auto-generated method stub
@@ -590,6 +697,26 @@ class FrameConfigDialog extends JDialog{
 				FrameConfigDialog.this.setVisible(false);
 			}
 		});
-		
+	}
+
+	public void Show() {
+		Color color = parent.getBackgroundColor();
+		// 先把背景色RGB值转为灰度值, 判断是否是深色,
+		// 如果是深色则把标签文字设为白色, 否则设为黑色
+		// ----------真人性化, ft
+		if ((float) (color.getRed() * 0.3f + color.getGreen() * 0.59f + color
+				.getBlue() * 0.11f) < 128) {
+			System.out
+					.println("GRAY: "
+							+ (float) (color.getRed() * 0.3f + color.getGreen()
+									* 0.59f + color.getBlue() * 0.11f));
+			transparent.setForeground(Color.WHITE);
+			opaque.setForeground(Color.WHITE);
+		} else {
+			transparent.setForeground(Color.BLACK);
+			opaque.setForeground(Color.BLACK);
+		}
+		root.setBackground(parent.getBackgroundColor());
+		this.setVisible(true);
 	}
 }

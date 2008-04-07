@@ -3,23 +3,29 @@ package noxUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.MenuItem;
 import java.awt.Point;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
-import javax.swing.BorderFactory;
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-
-import com.sun.jna.examples.WindowUtils;
 /**
  * 
  * @author shinysky
@@ -133,13 +139,84 @@ public class Cheyenne extends NoxFrame {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 		contentPane.add(profile);
 		contentPane.add(tabs);
+		
+		setForegroundColor();
+		initTrayIcon();
 	}
 	/**
-	 * 设置窗口颜色
+	 * 设置托盘
 	 */
-	public void setBackgroudColor(Color color)
+	private void initTrayIcon(){
+        try{
+            SystemTray tray=SystemTray.getSystemTray();
+            Image trayImg=ImageIO.read(new File("resrc\\logo\\NoXlogo_16.png"));
+            PopupMenu traymenu=new PopupMenu("Tray Menu");
+            traymenu.add(new MenuItem("About")).addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent ae){
+                	AboutDialog about = new AboutDialog();
+    				DialogEarthquakeCenter dec = new DialogEarthquakeCenter(about);
+    				about.pack();
+    				about.setModal(false);
+    				about.setSize(new Dimension(500, 350));
+    				about.setPreferredSize(new Dimension(500, 350));
+    				/*
+    				 * this.setMaximumSize(new Dimension(400,500));
+    				 * this.setMinimumSize(new Dimension(400,500));
+    				 */
+    				about.setLocation(new Point(300, 150));
+    				about.setVisible(true);
+    				dec.startShake();// 对话框必须setModal (false)才可以抖动, 否则不行
+                }
+            });
+            traymenu.addSeparator();
+            traymenu.add(new MenuItem("Show up")).addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent ae){
+                    Cheyenne.this.setVisible(true);
+                }
+            });
+            traymenu.add(new MenuItem("Configure")).addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent ae){
+                	JOptionPane.showMessageDialog(Cheyenne.this,
+                			"<html><Font color=red><center><h2>About</h2></center></Font>" +
+                            "NoX is a P2P instant messaging system<br>base on JXTA, similar to QQ, MSN, etc.<br>" +
+                            "<br>Enjoy! :)<br><br>" +
+                            "If there's any problem, please contact me.<br>" +
+                            "<Font color=blue>Author: Dai Zhiwei<br>" +
+                            "moyueyh-net@yahoo.com.cn" +
+                            "</Font></html>");
+                }
+            });
+            traymenu.add(new MenuItem("Exit")).addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent ae){
+                    System.exit(0);
+                }
+            });
+            TrayIcon trayIcon=new TrayIcon(trayImg,"NoX",traymenu);
+            tray.add(trayIcon);
+            trayIcon.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent ae){
+                    Cheyenne.this.setVisible(true);
+                }
+            });
+        }catch(Exception exe){
+            exe.printStackTrace();
+        }
+    }
+	/**
+	 * 设置窗口前景颜色
+	 */
+	public void setForegroundColor()
 	{
-		super.setBackgroudColor(color);
+		super.setForegroundColor();
+		Color color = super.getForegroundColor();
+		profile.setForegroundColor(color);
+	}
+	/**
+	 * 设置窗口背景颜色
+	 */
+	public void setBackgroundColor(Color color)
+	{
+		super.setBackgroundColor(color);
 		if(color == Color.WHITE)
 			tabs.setBackground(Color.GRAY);
 		else
@@ -155,6 +232,8 @@ class MiniProfilePane extends JPanel {
 	// JMapPanel myPortraitPane;
 	JButton myPortrait;
 	JPanel miniProfilePane;
+	JPanel nickAndStat;
+	JLabel nick;
 	JComboBox myStatus;
 	JTextField mySign;
 
@@ -206,14 +285,12 @@ class MiniProfilePane extends JPanel {
 		 */
 
 		miniProfilePane = new JPanel();
-		JPanel nickAndStat = new JPanel();
-		JLabel nick = new JLabel(nickname);
-		nick.setForeground(Color.WHITE);
+		nickAndStat = new JPanel();
+		nick = new JLabel(nickname);
 		myStatus = new JComboBox();
 		// myStatus.setOpaque(false);
 		mySign = new JTextField(sign);
 		mySign.setOpaque(false);
-		mySign.setForeground(Color.WHITE);
 		myStatus.addItem("Online");
 		myStatus.addItem("Busy");
 		myStatus.addItem("Invisible");
@@ -253,6 +330,10 @@ class MiniProfilePane extends JPanel {
 		this.add(Box.createHorizontalStrut(5));
 		this.add(miniProfilePane);
 		this.setOpaque(false);
+	}
+	public void setForegroundColor(Color color){
+		nick.setForeground(color);
+		mySign.setForeground(color);
 	}
 }
 
