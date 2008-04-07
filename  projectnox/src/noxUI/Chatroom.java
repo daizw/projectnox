@@ -38,7 +38,12 @@ public class Chatroom extends NoxFrame{
 	JSplitPane rootpane;
 	JPanel LeftPane;
 	ChatRoomPane crp;
-	
+	/**
+	 * 最终应该从主窗口继承颜色, 透明度
+	 * 考虑实现---------主窗口和从属窗口同步调节颜色和透明度
+	 * 在实例化从属窗口的时候将引用保存在一个Vector中, 调节颜色及透明度时对
+	 * Vector中实例依次调用调节函数
+	 */
 	Chatroom(){
 		super("NoX Chatroom", "resrc\\images\\bkgrd.png",
 				"resrc\\icons\\chat2.png", "resrc\\logo\\nox.png",
