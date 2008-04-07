@@ -21,12 +21,12 @@ public class Chatroom extends NoxFrame{
 	/**
 	 * Ä¬ÈÏ³ß´ç³£Á¿
 	 */
-	public static final int WIDTH_DEFLT = 600;
-	public static final int WIDTH_PREF = 600;
+	public static final int WIDTH_DEFLT = 700;
+	public static final int WIDTH_PREF = 700;
 	public static final int WIDTH_MAX = 2000;
 	public static final int WIDTH_MIN = 300;
-	public static final int HEIGHT_DEFLT = 450;
-	public static final int HEIGHT_PREF = 450;
+	public static final int HEIGHT_DEFLT = 500;
+	public static final int HEIGHT_PREF = 500;
 	public static final int HEIGHT_MAX = 2000;
 	public static final int HEIGHT_MIN = 200;
 	
@@ -86,7 +86,7 @@ public class Chatroom extends NoxFrame{
 		//crp.setLayout(new FlowLayout());
 		rootpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, groupmembers, crp);
 		rootpane.setOneTouchExpandable(true);
-		rootpane.setDividerLocation(0.3f);
+		rootpane.setDividerLocation(0.25f);
 		rootpane.setDividerSize(8);
 		
 		this.getContainer().setLayout(new BorderLayout());
