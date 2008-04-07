@@ -332,7 +332,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		Dimension buttonSize = new Dimension(26, 26);
 
 		b_emotion = new JButton(new ImageIcon(path_icon + "emotion.png"));
-		b_emotion.setToolTipText("Insert a emotion image to the message");
+		b_emotion.setToolTipText("Insert a emotion image");
 		b_emotion.setActionCommand("Emotion");
 		b_emotion.addActionListener(this);
 		// b_InsertImg.setContentAreaFilled(false);
@@ -370,7 +370,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		b_sendPic.setMinimumSize(buttonSize);
 
 		b_snapshot = new JButton(new ImageIcon(path_icon + "snapshot.png"));
-		b_snapshot.setToolTipText("Rock and Roll !");
+		b_snapshot.setToolTipText("Snap it !");
 		b_snapshot.setActionCommand("Snapshot");
 		b_snapshot.addActionListener(this);
 		b_snapshot.setSize(buttonSize);
@@ -399,22 +399,22 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					Thread.sleep(300);// 睡500毫秒是为了让主窗完全不见
 					Robot ro = new Robot();
 					Toolkit tk = Toolkit.getDefaultToolkit();
-					Dimension di = tk.getScreenSize();
-					Rectangle rec = new Rectangle(0, 0, di.width, di.height);
-					BufferedImage bi = ro.createScreenCapture(rec);
+					Dimension screenSize = tk.getScreenSize();
+					Rectangle rec = new Rectangle(0, 0, screenSize.width, screenSize.height);
+					BufferedImage buffImg = ro.createScreenCapture(rec);
 					JDialog fakeWin = new JDialog(parent, true);
-					FakeScreenPane temp = new FakeScreenPane(fakeWin, bi,
-							di.width, di.height);
+					FakeScreenPane temp = new FakeScreenPane(fakeWin, buffImg,
+							screenSize.width, screenSize.height);
 					fakeWin.getContentPane().add(temp, BorderLayout.CENTER);
 					fakeWin.setUndecorated(true);
-					fakeWin.setSize(di);
+					fakeWin.setSize(screenSize);
 					fakeWin.setVisible(true);
 					fakeWin.setAlwaysOnTop(true);
 
 					parent.setVisible(true);
-					bi = temp.getWhatWegot();
-					if (bi != null) {
-						ChatRoomPane.this.sendAPicture(new ImageIcon(bi));
+					buffImg = temp.getWhatWeGot();
+					if (buffImg != null) {
+						ChatRoomPane.this.sendAPicture(new ImageIcon(buffImg));
 					} else {
 						System.out.println("phew~we got nothing.");
 					}
