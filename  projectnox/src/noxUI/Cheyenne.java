@@ -56,9 +56,9 @@ public class Cheyenne extends NoxFrame {
 	public static void main(String args[]) {	
 		System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
 		
-		Cheyenne chyn = new Cheyenne();
+		/*Cheyenne chyn = new Cheyenne();
 		chyn.pack();
-		chyn.setVisible(true);
+		chyn.setVisible(true);*/
 		
 		Chatroom room = new Chatroom();
 		room.pack();
