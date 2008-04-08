@@ -389,7 +389,8 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 				// TODO Auto-generated method stub
 				if (hideFrame.getState())// 如果用户选择隐藏窗口, 则隐藏
 				{
-					parent.setVisible(false);
+					//parent.setVisible(false);
+					parent.setState(JFrame.ICONIFIED);
 					// System.out.println("in if: What the hell is wrong with
 					// you!" + hideFrame.isSelected());
 				}
@@ -403,7 +404,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					Rectangle rec = new Rectangle(0, 0, screenSize.width, screenSize.height);
 					BufferedImage buffImg = ro.createScreenCapture(rec);
 					JDialog fakeWin = new JDialog(parent, true);
-					FakeScreenPane temp = new FakeScreenPane(fakeWin, buffImg,
+					ScreenCapturer temp = new ScreenCapturer(fakeWin, buffImg,
 							screenSize.width, screenSize.height);
 					fakeWin.getContentPane().add(temp, BorderLayout.CENTER);
 					fakeWin.setUndecorated(true);
@@ -411,7 +412,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					fakeWin.setVisible(true);
 					fakeWin.setAlwaysOnTop(true);
 
-					parent.setVisible(true);
+					parent.setState(JFrame.NORMAL);
 					buffImg = temp.getWhatWeGot();
 					if (buffImg != null) {
 						ChatRoomPane.this.sendAPicture(new ImageIcon(buffImg));
