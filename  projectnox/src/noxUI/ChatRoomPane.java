@@ -403,7 +403,26 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					Dimension screenSize = tk.getScreenSize();
 					Rectangle rec = new Rectangle(0, 0, screenSize.width, screenSize.height);
 					BufferedImage buffImg = ro.createScreenCapture(rec);
-					JDialog fakeWin = new JDialog(parent, true);
+					final JDialog fakeWin = new JDialog(parent, true);
+					fakeWin.addKeyListener(new KeyListener() {
+						public void keyPressed(KeyEvent event) {
+							int keyCode = event.getKeyCode();
+							/**
+							 * 如果按键为ESC则退出截屏
+							 */
+							if (keyCode == KeyEvent.VK_ESCAPE) {
+								fakeWin.dispose();
+							}
+						}
+
+						public void keyTyped(KeyEvent e) {
+							// TODO Auto-generated method stub
+						}
+
+						public void keyReleased(KeyEvent e) {
+							// TODO Auto-generated method stub
+						}
+					});
 					ScreenCapturer temp = new ScreenCapturer(fakeWin, buffImg,
 							screenSize.width, screenSize.height);
 					fakeWin.getContentPane().add(temp, BorderLayout.CENTER);
@@ -411,6 +430,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					fakeWin.setSize(screenSize);
 					fakeWin.setVisible(true);
 					fakeWin.setAlwaysOnTop(true);
+					
 
 					parent.setState(JFrame.NORMAL);
 					buffImg = temp.getWhatWeGot();
