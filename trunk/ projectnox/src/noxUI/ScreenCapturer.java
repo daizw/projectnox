@@ -503,10 +503,7 @@ class ScreenCapturer extends JPanel implements MouseListener,
 		if (select.contains(me.getPoint())) {
 			this.setCursor(new Cursor(Cursor.MOVE_CURSOR));
 			current = States.MOVE;
-		} /*else if(editPane.isVisible()){
-			//如果显示editPane, 则鼠标移动到上面时, 光标应复位
-			editPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		}*/ else {
+		}else {
 			States[] st = States.values();
 			for (int i = 0; i < rec.length; i++) {
 				// 如果鼠标处于某个小框内, 则设为可调节状态(改变光标)
@@ -539,7 +536,6 @@ class ScreenCapturer extends JPanel implements MouseListener,
 			endY += (y - tempY);
 			tempX = x;
 			tempY = y;
-			UpdateEditPane();
 		} else if (current == States.EAST || current == States.WEST) {
 			if (currentX == START_X) {
 				startX += (x - tempX);
@@ -556,7 +552,7 @@ class ScreenCapturer extends JPanel implements MouseListener,
 				endY += (y - tempY);
 				tempY = y;
 			}
-		} else if (current == States.NORTH_EAST || current == States.NORTH_EAST
+		} else if (current == States.NORTH_EAST || current == States.NORTH_WEST
 				|| current == States.SOUTH_EAST || current == States.SOUTH_WEST) {
 			if (currentY == START_Y) {
 				startY += (y - tempY);
@@ -579,6 +575,7 @@ class ScreenCapturer extends JPanel implements MouseListener,
 			endX = me.getX();
 			endY = me.getY();
 		}
+		UpdateEditPane();
 		this.repaint();
 	}
 
@@ -596,10 +593,6 @@ class ScreenCapturer extends JPanel implements MouseListener,
 			if (current == States.MOVE) {
 				// show menu here
 				menuSnap.show(fakewindow, me.getPoint().x, me.getPoint().y);
-				/*
-				 * showTip = true; p = me.getPoint(); startX = 0; startY = 0;
-				 * endX = 0; endY = 0; repaint();
-				 */
 			} else if ((select.getHeight() + select.getWidth()) != 0
 					&& !select.contains(me.getPoint())) {
 				// 如果选区存在, 并且右击选区外的地方
@@ -613,10 +606,17 @@ class ScreenCapturer extends JPanel implements MouseListener,
 				repaint();
 			} else {
 				fakewindow.dispose();
-				// updates();
 			}
-		}else{
+		}else if(select.height + select.width > 0){
 			UpdateEditPane();
+		}else if(select.height + select.width <= 0){
+			showTip = true;
+			p = me.getPoint();
+			startX = 0;
+			startY = 0;
+			endX = 0;
+			endY = 0;
+			repaint();
 		}
 	}
 
@@ -652,12 +652,6 @@ class ScreenCapturer extends JPanel implements MouseListener,
 			}
 		}
 	}
-
-	/*
-	 * else if (me.getButton() == MouseEvent.BUTTON3) {
-	 * System.out.println("ooops, you just right click the img");
-	 * menuSnap.show(this, me.getPoint().x, me.getPoint().y); }
-	 */
 
 	private void whatWeGet() {
 		if (select.x + select.width < this.getWidth()
@@ -774,39 +768,5 @@ enum States {
 
 	public Cursor getCursor() {
 		return cs;
-	}
-}
-class SnapOperationDialog extends JDialog {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6622077121546791460L;
-	JButton send;
-	JButton save;
-	JButton cancel;
-	JPanel root;
-
-	/**
-	 * 一个暂时无用的类...
-	 */
-	SnapOperationDialog() {
-		// this.setUndecorated(true);
-		send = new JButton("Send");
-		save = new JButton("Save");
-		cancel = new JButton("Cancel");
-		root = new JPanel();
-		root.setLayout(new BoxLayout(root, BoxLayout.X_AXIS));
-		root.add(send);
-		root.add(save);
-		root.add(cancel);
-		root.setSize(new Dimension(100, 20));
-		root.setPreferredSize(new Dimension(100, 20));
-		root.setMaximumSize(new Dimension(100, 20));
-		root.setMinimumSize(new Dimension(100, 20));
-		this.setContentPane(root);
-		this.setSize(new Dimension(100, 20));
-		this.setPreferredSize(new Dimension(100, 20));
-		this.setMaximumSize(new Dimension(100, 20));
-		this.setMinimumSize(new Dimension(100, 20));
 	}
 }
