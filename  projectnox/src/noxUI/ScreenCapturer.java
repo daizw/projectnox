@@ -39,7 +39,9 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -50,7 +52,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 // 一个暂时类，用于显示当前的屏幕图像
-class FakeScreenPane extends JPanel implements MouseListener,
+class ScreenCapturer extends JPanel implements MouseListener,
 		MouseMotionListener {
 	/**
 	 * 
@@ -74,6 +76,12 @@ class FakeScreenPane extends JPanel implements MouseListener,
 	private Point p = new Point();// 当前鼠标移的地点
 	private boolean showTip = true;// 是否显示提示.如果鼠标左键一按,则提示不再显了
 
+	//边界工具条
+	JPanel editPane = new JPanel();
+	JButton b_send = new JButton(new ImageIcon("resrc\\buttons\\send.png"));
+	JButton b_copy = new JButton(new ImageIcon("resrc\\buttons\\copy.png"));
+	JButton b_save = new JButton(new ImageIcon("resrc\\buttons\\save.png"));
+	JButton b_cancel = new JButton(new ImageIcon("resrc\\buttons\\cancel.png"));
 	// 右键菜单
 	JPopupMenu menuSnap = new JPopupMenu();
 	JMenuItem send = new JMenuItem("Send");
@@ -81,7 +89,7 @@ class FakeScreenPane extends JPanel implements MouseListener,
 	JMenuItem save = new JMenuItem("Save");
 	JMenuItem cacel = new JMenuItem("Cancel");
 
-	public FakeScreenPane(JDialog fakeWindow, BufferedImage bi, int width,
+	public ScreenCapturer(JDialog fakeWindow, BufferedImage bi, int width,
 			int height) {
 		this.fakewindow = fakeWindow;
 		this.bi = bi;
@@ -89,6 +97,124 @@ class FakeScreenPane extends JPanel implements MouseListener,
 		this.height = height;
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+		
+		Dimension bsize = new Dimension(20, 20);
+		b_send.setSize(bsize);
+		b_send.setPreferredSize(bsize);
+		b_send.setMaximumSize(bsize);
+		b_send.setMinimumSize(bsize);
+		b_copy.setSize(bsize);
+		b_copy.setPreferredSize(bsize);
+		b_copy.setMaximumSize(bsize);
+		b_copy.setMinimumSize(bsize);
+		b_save.setSize(bsize);
+		b_save.setPreferredSize(bsize);
+		b_save.setMaximumSize(bsize);
+		b_save.setMinimumSize(bsize);
+		b_cancel.setSize(bsize);
+		b_cancel.setPreferredSize(bsize);
+		b_cancel.setMaximumSize(bsize);
+		b_cancel.setMinimumSize(bsize);
+		
+		b_send.setToolTipText("Send");
+		b_copy.setToolTipText("Copy");
+		b_save.setToolTipText("Save");
+		b_cancel.setToolTipText("Cancel");
+		
+		b_send.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				whatWeGet();
+			}
+			;
+		});
+		b_copy.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				whatWeGet();
+				doCopy(get);
+				//get清空
+				get = null;
+			}
+			;
+		});
+		b_save.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				whatWeGet();
+				//文件保存对话框
+				doSave(get);
+				//get清空
+				get = null;
+			}
+			;
+		});
+		b_cancel.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				HideEditPane();
+				showTip = true;
+				// p = getPoint();
+				startX = 0;
+				startY = 0;
+				endX = 0;
+				endY = 0;
+				repaint();
+			}
+			;
+		});
+		editPane.setLayout(new BoxLayout(editPane, BoxLayout.X_AXIS));
+		editPane.add(Box.createHorizontalGlue());
+		editPane.add(b_send);
+		editPane.add(b_copy);
+		editPane.add(b_save);
+		editPane.add(b_cancel);
+		editPane.add(Box.createHorizontalGlue());
+		editPane.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				editPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				doMouseMoved(e);
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+
+		editPane.setBackground(new Color(204, 255, 255));
+		editPane.setSize(new Dimension(84, 24));
+		editPane.setPreferredSize(new Dimension(84, 24));
+		editPane.setMaximumSize(new Dimension(84, 24));
+		editPane.setMinimumSize(new Dimension(84, 24));
+		editPane.setBounds(1020, 765, 84, 24);
+
+		this.setLayout(null);
+		this.add(editPane);
+		HideEditPane();		
+		
 		menuSnap.add(send);
 		menuSnap.add(copy);
 		menuSnap.add(save);
@@ -112,7 +238,7 @@ class FakeScreenPane extends JPanel implements MouseListener,
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				whatWeGet();
-				// TODO 文件保存对话框
+				//文件保存对话框
 				doSave(get);
 				//get清空
 				get = null;
@@ -121,6 +247,7 @@ class FakeScreenPane extends JPanel implements MouseListener,
 		cacel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				HideEditPane();
 				showTip = true;
 				// p = getPoint();
 				startX = 0;
@@ -376,7 +503,10 @@ class FakeScreenPane extends JPanel implements MouseListener,
 		if (select.contains(me.getPoint())) {
 			this.setCursor(new Cursor(Cursor.MOVE_CURSOR));
 			current = States.MOVE;
-		} else {
+		} /*else if(editPane.isVisible()){
+			//如果显示editPane, 则鼠标移动到上面时, 光标应复位
+			editPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}*/ else {
 			States[] st = States.values();
 			for (int i = 0; i < rec.length; i++) {
 				// 如果鼠标处于某个小框内, 则设为可调节状态(改变光标)
@@ -409,6 +539,7 @@ class FakeScreenPane extends JPanel implements MouseListener,
 			endY += (y - tempY);
 			tempX = x;
 			tempY = y;
+			UpdateEditPane();
 		} else if (current == States.EAST || current == States.WEST) {
 			if (currentX == START_X) {
 				startX += (x - tempX);
@@ -472,6 +603,7 @@ class FakeScreenPane extends JPanel implements MouseListener,
 			} else if ((select.getHeight() + select.getWidth()) != 0
 					&& !select.contains(me.getPoint())) {
 				// 如果选区存在, 并且右击选区外的地方
+				HideEditPane();
 				showTip = true;
 				p = me.getPoint();
 				startX = 0;
@@ -483,7 +615,31 @@ class FakeScreenPane extends JPanel implements MouseListener,
 				fakewindow.dispose();
 				// updates();
 			}
+		}else{
+			UpdateEditPane();
 		}
+	}
+
+	private void UpdateEditPane() {
+		Point loc = new Point(select.x +select.width-editPane.getWidth(),
+				select.y + select.height +1);
+		
+		if(loc.x + editPane.getWidth() > bi.getWidth())//超出右边界
+			loc.x = bi.getWidth() - editPane.getWidth();
+		else if(loc.x < 0)//超出左边界
+			loc.x = 0;
+		if(loc.y + editPane.getHeight() > bi.getHeight())//超出下界
+		{
+			//在上边显示
+			loc.y = select.y - editPane.getHeight() - 1;
+			if(loc.y < 0)//如果上边也显示不了...
+				loc.y = 0;
+		}
+		editPane.setLocation(loc);
+		editPane.setVisible(true);
+	}
+	private void HideEditPane(){
+		editPane.setVisible(false);
 	}
 
 	public void mouseClicked(MouseEvent me) {
