@@ -1,5 +1,5 @@
 /*
- * FakeScreenPane.java
+ * ScreenCapturer.java
  *
  * Created on 2007年8月30日, 下午12:46
  *
