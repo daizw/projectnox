@@ -194,6 +194,7 @@ public class NoxFrame extends JFrame {
 
 		/**
 		 * 设置默认窗口操作(ALT+F4)
+		 * TODO: 如果使用托盘图标, 则应将关闭操作设为dispose
 		 */
 		if (IAmBase)
 			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -211,7 +212,7 @@ public class NoxFrame extends JFrame {
 		else
 			foregrdColor = Color.BLACK;
 		// 似乎只有标题栏需要更新
-		titlebar.setForegroundColor(foregrdColor == Color.WHITE);
+		titlebar.setForegroundColor(foregrdColor.equals(Color.WHITE));
 	}
 
 	/**
