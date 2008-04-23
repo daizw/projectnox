@@ -175,11 +175,11 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	/**
 	 * 字符串处理中间变量
 	 */
-	private int position;
+	//private int position;
 	/**
 	 * 字符串长度
 	 */
-	private int strLength;
+	//private int strLength;
 	/**
 	 * 欢迎消息
 	 */
@@ -239,8 +239,8 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		sayHello = new String(
 				"\t------====  Welcome to the Chat Room  ====------\n"
 						+ "\t  ------====     What do U wanna say ?   ====------\n");
-		strLength = sayHello.length();
-		position = 0;
+		//strLength = sayHello.length();
+		//position = 0;
 		/**
 		 * 历史消息窗口
 		 */
