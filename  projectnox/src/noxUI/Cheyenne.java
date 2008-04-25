@@ -1,31 +1,49 @@
 package noxUI;
 
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.MenuItem;
+import java.awt.MenuShortcut;
 import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 /**
  * 
  * @author shinysky
@@ -53,6 +71,11 @@ public class Cheyenne extends NoxFrame {
 	private MiniProfilePane profile;
 	private ListsPane tabs;
 
+	/**
+	 * 个人/系统设置窗口
+	 */
+	ConfigCenterFrame ccf = new ConfigCenterFrame();
+	
 	public static void main(String args[]) {	
 		System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
 		
@@ -60,9 +83,9 @@ public class Cheyenne extends NoxFrame {
 		chyn.pack();
 		chyn.setVisible(true);
 		
-		Chatroom room = new Chatroom();
+		/*Chatroom room = new Chatroom("Groupname or Friendsname here");
 		room.pack();
-		room.setVisible(true);
+		room.setVisible(true);*/
 	}
 
 	Cheyenne() {
@@ -83,7 +106,7 @@ public class Cheyenne extends NoxFrame {
 		/**
 		 * mini profile 组件 含: 头像, 昵称, 状态, 签名
 		 */
-		profile = new MiniProfilePane("resrc\\portrait\\portrait.png",
+		profile = new MiniProfilePane(this, "resrc\\portrait\\portrait.png",
 				"Shinysky", "Hello, everyone~");
 		// profile.setBackground(new Color(0, 255, 0));
 		profile.setSize(new Dimension(WIDTH_DEFLT, 50));
@@ -102,8 +125,8 @@ public class Cheyenne extends NoxFrame {
 
 		for (int i = 0; i < flistItems.length; i++) {
 			friends[i] = new FriendItem(new ImageIcon(
-					"resrc\\portrait\\user.png"), flistItems[i], "(Hi, 我是"
-					+ flistItems[i] + ')');
+					"resrc\\portrait\\user.png"), flistItems[i], "Hi, 我是"
+					+ flistItems[i]);
 		}
 		ObjectList flist = new ObjectList(friends);
 		/**
@@ -116,7 +139,7 @@ public class Cheyenne extends NoxFrame {
 
 		for (int i = 0; i < glistItems.length; i++) {
 			groups[i] = new FriendItem(new ImageIcon("resrc\\icons\\chatroom.png"),
-					glistItems[i], "(Hi, 这是" + glistItems[i] + "的聊天室)");
+					glistItems[i], "Hi, 这是" + glistItems[i] + "的聊天室");
 		}
 		ObjectList glist = new ObjectList(groups);
 		/**
@@ -129,7 +152,7 @@ public class Cheyenne extends NoxFrame {
 
 		for (int i = 0; i < blistItems.length; i++) {
 			badguys[i] = new FriendItem(new ImageIcon("resrc\\icons\\blacklist.png"),
-					blistItems[i], "(Hi, 我是" + blistItems[i] + ')');
+					blistItems[i], "Hi, 我是" + blistItems[i]);
 		}
 		ObjectList blist = new ObjectList(badguys);
 
@@ -151,41 +174,32 @@ public class Cheyenne extends NoxFrame {
             SystemTray tray=SystemTray.getSystemTray();
             Image trayImg=ImageIO.read(new File("resrc\\logo\\NoXlogo_16.png"));
             PopupMenu traymenu=new PopupMenu("Tray Menu");
-            traymenu.add(new MenuItem("About")).addActionListener(new ActionListener(){
+            traymenu.add(new MenuItem("Configure")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
-                	AboutDialog about = new AboutDialog();
-    				DialogEarthquakeCenter dec = new DialogEarthquakeCenter(about);
-    				about.pack();
-    				about.setModal(false);
-    				about.setSize(new Dimension(500, 350));
-    				about.setPreferredSize(new Dimension(500, 350));
-    				/*
-    				 * this.setMaximumSize(new Dimension(400,500));
-    				 * this.setMinimumSize(new Dimension(400,500));
-    				 */
-    				about.setLocation(new Point(300, 150));
-    				about.setVisible(true);
-    				dec.startShake();// 对话框必须setModal (false)才可以抖动, 否则不行
+                	ccf.setVisible(true);
                 }
             });
-            traymenu.addSeparator();
             traymenu.add(new MenuItem("Show up")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
                     Cheyenne.this.setVisible(true);
+                    Cheyenne.this.setExtendedState(JFrame.NORMAL );
                 }
             });
-            traymenu.add(new MenuItem("Configure")).addActionListener(new ActionListener(){
+            traymenu.addSeparator();
+            traymenu.add(new MenuItem("About NoX")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
                 	JOptionPane.showMessageDialog(Cheyenne.this,
                 			"<html><Font color=red><center><h2>About</h2></center></Font>" +
                             "NoX is a P2P instant messaging system<br>base on JXTA, similar to QQ, MSN, etc.<br>" +
                             "<br>Enjoy! :)<br><br>" +
                             "If there's any problem, please contact me.<br>" +
-                            "<Font color=blue>Author: Dai Zhiwei<br>" +
+                            "<Font color=blue>Author: Dai Zhiwei@SEU<br>" +
                             "moyueyh-net@yahoo.com.cn" +
                             "</Font></html>");
                 }
             });
+           // MenuItem mi = new MenuItem("Exit");
+            //mi.setShortcut(new MenuShortcut(KeyEvent.VK_X, true));
             traymenu.add(new MenuItem("Exit")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
                     System.exit(0);
@@ -222,6 +236,12 @@ public class Cheyenne extends NoxFrame {
 		else
 			tabs.setBackground(color);
 	}
+	/**
+	 * 显示个人/系统设置窗口
+	 */
+	void ShowConfigCenter(){
+		ccf.setVisible(true);
+	}
 }
 
 class MiniProfilePane extends JPanel {
@@ -247,7 +267,7 @@ class MiniProfilePane extends JPanel {
 	 * @param sign
 	 *            签名档
 	 */
-	MiniProfilePane(String path_portrait, String nickname, String sign) {
+	MiniProfilePane(final Cheyenne parent, String path_portrait, String nickname, String sign) {
 		myPortrait = new JButton(new ImageIcon(path_portrait));
 		myPortrait.setSize(new Dimension(50, 50));
 		myPortrait.setPreferredSize(new Dimension(50, 50));
@@ -262,6 +282,13 @@ class MiniProfilePane extends JPanel {
 		myPortrait.setContentAreaFilled(false);
 		myPortrait.setOpaque(false);
 
+		myPortrait.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				parent.ShowConfigCenter();
+			}
+		});
+		
 		/*
 		 * JButton statSign = new JButton(new
 		 * ImageIcon("resrc\\portrait\\busy.png")); statSign.setSize(new
@@ -349,12 +376,28 @@ class ListsPane extends JTabbedPane {
 	private JScrollPane frdListScrPane;
 	private JScrollPane grpListScrPane;
 	private JScrollPane blkListScrPane;
+	
+	JButton myFriends = new JButton("My Friends("+7+'/'+15+')');
+	JButton blacklist = new JButton("Blacklist");
 
-	ListsPane(ObjectList flist, ObjectList glist, ObjectList blist,
+	Dimension btnsize = new Dimension(Cheyenne.WIDTH_PREF, 20);
+
+	FriendItem fi = null;
+	
+	ListsPane(final ObjectList flist, final ObjectList glist, final ObjectList blist,
 			String path_flist, String path_glist, String path_blist) {
 		frdlistpane = new JPanel();
 		grplistpane = new JPanel();
 		blklistpane = new JPanel();
+		
+		myFriends.setSize(new Dimension(Cheyenne.WIDTH_DEFLT, 20));
+		myFriends.setPreferredSize(new Dimension(Cheyenne.WIDTH_PREF, 20));
+		myFriends.setMaximumSize(new Dimension(Cheyenne.WIDTH_MAX, 20));
+		myFriends.setMinimumSize(new Dimension(Cheyenne.WIDTH_MIN, 20));
+		blacklist.setSize(new Dimension(Cheyenne.WIDTH_DEFLT, 20));
+		blacklist.setPreferredSize(new Dimension(Cheyenne.WIDTH_PREF, 20));
+		blacklist.setMaximumSize(new Dimension(Cheyenne.WIDTH_MAX, 20));
+		blacklist.setMinimumSize(new Dimension(Cheyenne.WIDTH_MIN, 20));
 
 		// add to gui
 		frdListScrPane = new JScrollPane(flist,
@@ -366,17 +409,275 @@ class ListsPane extends JTabbedPane {
 		blkListScrPane = new JScrollPane(blist,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		frdlistpane.setLayout(new BorderLayout());
-		frdlistpane.add(frdListScrPane, BorderLayout.CENTER);
-		frdlistpane.add(flist.getFilterField(), BorderLayout.NORTH);
+		
+		frdlistpane.setLayout(new BoxLayout(frdlistpane, BoxLayout.Y_AXIS));
+		frdlistpane.setAlignmentX(0.0f);
+		frdlistpane.setAlignmentY(0.0f);
+		
+		frdlistpane.add(flist.getFilterField());
+		frdlistpane.add(blist.getFilterField());
+		frdlistpane.add(myFriends);
+		//myFriends.setLocation(myFriends.getLocation().x - 1000, 0);
+		//myFriends.setAlignmentX(LEFT_ALIGNMENT);
+		frdlistpane.add(frdListScrPane);
+		frdlistpane.add(blacklist);
+		//blacklist.setAlignmentY(RIGHT_ALIGNMENT);
+		frdlistpane.add(blkListScrPane);
+		
+		/**
+		 * 初始不可见
+		 */
+		blist.getFilterField().setVisible(false);
+		blkListScrPane.setVisible(false);
+		
+		myFriends.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				flist.getFilterField().setVisible(true);
+				frdListScrPane.setVisible(true);
+				blist.getFilterField().setVisible(false);
+				blkListScrPane.setVisible(false);
+				ListsPane.this.repaint();
+				//playAudio();
+			}
+		});
+		blacklist.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				flist.getFilterField().setVisible(false);
+				frdListScrPane.setVisible(false);
+				blist.getFilterField().setVisible(true);
+				blkListScrPane.setVisible(true);
+				ListsPane.this.repaint();
+				//playAudio();
+			}
+		});
+		
+		/*flist.addListSelectionListener(new ListSelectionListener(){
 
+			@Override
+			public void valueChanged(ListSelectionEvent se) {
+				// TODO Auto-generated method stub
+				;
+			}
+			
+		});*/
+		flist.addMouseListener(new MouseListener(){
+			@Override
+			public void mouseClicked(MouseEvent me) {
+				if(me.getClickCount() == 2){
+					//TODO 判断所点击的cell的在线状态进行对应处理, 暂时直接弹出弹出聊天窗口.
+					String title = ((FriendItem)flist.getSelectedValue()).getNick();
+					/**
+					 * TODO 应该对每一个对象只开一个窗口, 可以设定标记, 如果已经打开了一个则显示之, 否则开新窗口
+					 */
+					Chatroom room = new Chatroom(title, 
+							((FriendItem)flist.getSelectedValue()).getPortrait(),
+							((FriendItem)flist.getSelectedValue()).getNick());
+					room.pack();
+					room.setVisible(true);
+				}else if(me.getButton() == MouseEvent.BUTTON3){
+					final JPopupMenu fiendOprMenu = new JPopupMenu();
+					/*
+					 * 怎么实现右键可选取JListItem?
+					 */
+					fi = (FriendItem)flist.getSelectedValue();
+					//System.out.println(flist.getComponentAt(me.getPoint()).toString());
+					
+					if(fi == null)
+						return;
+					//System.out.println("You just Right Click the List Item!");
+					fiendOprMenu.add(new AbstractAction("Talk to him/her") {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = -729947600305959488L;
+
+						public void actionPerformed(ActionEvent e) {
+							String title = ((FriendItem)flist.getSelectedValue()).getNick();
+							Chatroom room = new Chatroom(title, 
+									((FriendItem)flist.getSelectedValue()).getPortrait(),
+									((FriendItem)flist.getSelectedValue()).getNick());
+							room.pack();
+							room.setVisible(true);
+						}
+					});
+					fiendOprMenu.add(new AbstractAction("His/Her information") {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = -729947600305959488L;
+
+						public void actionPerformed(ActionEvent e) {
+							JOptionPane.showMessageDialog((Component) null, 
+									"<html>"//<BODY bgColor=#ffffff>"
+									+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
+									+"<Font color=black>昵称:</Font> <Font color=blue>"
+									+ fi.getNick()
+									+"<br></Font>"
+									+"<Font color=black>签名档:</Font> <Font color=blue>"
+									+ fi.getSign()
+									+"<br></Font>"
+									+"<Font color=black>联系方式:</Font> <Font color=blue>"
+									+ "110, 119, 120, 114, 117"
+									+"<br></Font>"
+									+"<Font color=black>个人说明:</Font> <Font color=blue>"
+									+ fi.getNick() + " owns me so much MONEY!! "
+									+"<br></Font></BODY></html>",
+									"User Information", JOptionPane.INFORMATION_MESSAGE);
+						}
+					});
+					MenuElement els[] = fiendOprMenu.getSubElements();
+					for(int i = 0; i < els.length; i++)
+						els[i].getComponent().setBackground(Color.WHITE);
+					fiendOprMenu.setLightWeightPopupEnabled(true);
+					fiendOprMenu.pack();
+					// 位置应该是相对于源的位置
+					fiendOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		grplistpane.setLayout(new BorderLayout());
 		grplistpane.add(grpListScrPane, BorderLayout.CENTER);
 		grplistpane.add(glist.getFilterField(), BorderLayout.NORTH);
 
-		blklistpane.setLayout(new BorderLayout());
+		/**
+		 * 组成员列表, 测试用
+		 */
+		String[] flistItems = { "Chris", "Joshua", "Daniel", "Michael", "Don",
+				"Kimi", "Kelly", "Keagan", "夏", "张三", "张四", "张五", "张三丰" };
+
+		final FriendItem[] gmembers = new FriendItem[flistItems.length];
+		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
+
+		for (int i = 0; i < flistItems.length; i++) {
+			gmembers[i] = new FriendItem(new ImageIcon(
+					"resrc\\portrait\\user.png"), flistItems[i], "Hi, 我是"
+					+ flistItems[i]);
+		}
+		
+		glist.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent me) {
+				if(me.getClickCount() == 2){
+					//TODO 判断所点击的cell的在线状态进行对应处理, 暂时直接弹出弹出聊天窗口.
+					String title = ((FriendItem)glist.getSelectedValue()).getNick();
+					Chatroom room = new Chatroom(title, gmembers);
+					room.pack();
+					room.setVisible(true);
+				}else if(me.getButton() == MouseEvent.BUTTON3){
+					final JPopupMenu fiendOprMenu = new JPopupMenu();
+					/*
+					 * 怎么实现右键可选取JListItem?
+					 */
+					fi = (FriendItem)glist.getSelectedValue();
+					//System.out.println(flist.getComponentAt(me.getPoint()).toString());
+					
+					if(fi == null)
+						return;
+					//System.out.println("You just Right Click the List Item!");
+					fiendOprMenu.add(new AbstractAction("Talk in this Group") {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = -729947600305959488L;
+
+						public void actionPerformed(ActionEvent e) {
+							String title = ((FriendItem)glist.getSelectedValue()).getNick();
+							Chatroom room = new Chatroom(title, gmembers);
+							room.pack();
+							room.setVisible(true);
+						}
+					});
+					fiendOprMenu.add(new AbstractAction("Group information") {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = -729947600305959488L;
+
+						public void actionPerformed(ActionEvent e) {
+							JOptionPane.showMessageDialog((Component) null, 
+									"<html>"//<BODY bgColor=#ffffff>"
+									+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
+									+"<Font color=black>昵称:</Font> <Font color=blue>"
+									+ fi.getNick()
+									+"<br></Font>"
+									+"<Font color=black>签名档:</Font> <Font color=blue>"
+									+ fi.getSign()
+									+"<br></Font>"
+									+"<Font color=black>联系方式:</Font> <Font color=blue>"
+									+ "110, 119, 120, 114, 117"
+									+"<br></Font>"
+									+"<Font color=black>个人说明:</Font> <Font color=blue>"
+									+ fi.getNick() + " owns me so much MONEY!! "
+									+"<br></Font></BODY></html>",
+									"User Information", JOptionPane.INFORMATION_MESSAGE);
+						}
+					});
+					MenuElement els[] = fiendOprMenu.getSubElements();
+					for(int i = 0; i < els.length; i++)
+						els[i].getComponent().setBackground(Color.WHITE);
+					fiendOprMenu.setLightWeightPopupEnabled(true);
+					fiendOprMenu.pack();
+					// 位置应该是相对于源的位置
+					fiendOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			;
+		});
+		
+		/*blklistpane.setLayout(new BorderLayout());
 		blklistpane.add(blkListScrPane, BorderLayout.CENTER);
-		blklistpane.add(blist.getFilterField(), BorderLayout.NORTH);
+		blklistpane.add(blist.getFilterField(), BorderLayout.NORTH);*/
 
 		this.setTabPlacement(JTabbedPane.LEFT);
 		this.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);// 滚动标签(一行)
@@ -385,7 +686,28 @@ class ListsPane extends JTabbedPane {
 		this.setForeground(Color.WHITE);
 		this.addTab(null, new ImageIcon(path_flist), frdlistpane);
 		this.addTab(null, new ImageIcon(path_glist), grplistpane);
-		this.addTab(null, new ImageIcon(path_blist), blklistpane);
+		//this.addTab(null, new ImageIcon(path_blist), blklistpane);
 		this.setOpaque(false);
+	}
+	/**
+	 * 切换列表时播放提示音
+	 * ....某些音频文件会降低速度
+	 */
+	public void playAudio() {
+		AudioClip playsound;
+		try {
+			// AudioClip audioClip = Applet.newAudioClip(completeURL)
+			// codeBase = new URL("file:" + System.getProperty("user.dir") +
+			// "/");
+			URL url = new URL("file:\\" + System.getProperty("user.dir")
+					+ "\\resrc\\audio\\type.wav");
+			playsound = Applet.newAudioClip(url);
+			// System.out.println(url);
+			playsound.play();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(e.toString());
+		}
 	}
 }

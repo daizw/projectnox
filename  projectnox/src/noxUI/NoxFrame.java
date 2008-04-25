@@ -193,8 +193,7 @@ public class NoxFrame extends JFrame {
 		this.getRootPane().addMouseMotionListener(mml);
 
 		/**
-		 * 设置默认窗口操作(ALT+F4)
-		 * TODO: 如果使用托盘图标, 则应将关闭操作设为dispose
+		 * 设置默认窗口操作(ALT+F4) TODO: 如果使用托盘图标, 则应将关闭操作设为dispose
 		 */
 		if (IAmBase)
 			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -258,8 +257,7 @@ public class NoxFrame extends JFrame {
 			WindowUtils.setWindowAlpha(this, alpha);
 			opacity = alpha;
 			return true;
-		} else
-		{
+		} else {
 			System.out.println("Sorry, WindowAlpha is not Supported");
 			return false;
 		}
@@ -295,6 +293,13 @@ public class NoxFrame extends JFrame {
 	public void resetNormalizeIcon() {
 		titlebar.setToNormalizeIcon();
 	}
+
+	/**
+	 * 该操作暂时不可逆转; 即不能重新添加监听器
+	 */
+	public void removeResizeListener() {
+		footpane.removeResizeListener();
+	}
 }
 
 /**
@@ -310,7 +315,7 @@ class Titlebar extends JPanel {
 	private static final long serialVersionUID = -538877811148092522L;
 	JButton blogo;
 	JLabel lab_title;
-	JButton bconfig;
+	//JButton bconfig;
 	// JSlider slider;
 	JButton bminimize;
 	JButton bmaximize;
@@ -352,7 +357,8 @@ class Titlebar extends JPanel {
 	 * @param path_close_rollover
 	 *            鼠标经过关闭窗口按钮图片路径
 	 * @param IAmBase
-	 *            true: 是根窗口, 关闭按钮推出整个系统; false: 不是根窗口, 关闭按钮只关闭本窗口
+	 *            true: 是根窗口, 关闭按钮推出整个系统并且标题栏显示图片; false: 不是根窗口,
+	 *            关闭按钮只关闭本窗口并且标题栏显示文字.
 	 */
 	Titlebar(final NoxFrame parent, String path_logo, String title,
 			String path_minimize, String path_minimize_rollover,
@@ -364,6 +370,8 @@ class Titlebar extends JPanel {
 		path_norm = path_normalize;
 		path_norm_rollover = path_normalize_rollover;
 
+		transparencyConfigBar = new FrameConfigDialog(parent);
+
 		blogo = new JButton(new ImageIcon(path_logo));
 		blogo.setSize(new Dimension(20, 20));
 		blogo.setPreferredSize(new Dimension(20, 20));
@@ -372,23 +380,97 @@ class Titlebar extends JPanel {
 		blogo.setBorderPainted(false);
 		blogo.setContentAreaFilled(false);
 		blogo.setOpaque(false);
+
+		/*
+		 * if (IAmBase) { bconfig = new JButton(new
+		 * ImageIcon("resrc\\buttons\\config.png")); bconfig.setRolloverIcon(new
+		 * ImageIcon( "resrc\\buttons\\config_rollover.png"));
+		 * bconfig.setSize(new Dimension(20, 20)); bconfig.setPreferredSize(new
+		 * Dimension(20, 20)); bconfig.setMaximumSize(new Dimension(20, 20));
+		 * bconfig.setMinimumSize(new Dimension(20, 20));
+		 * bconfig.setBorderPainted(false); bconfig.setContentAreaFilled(false);
+		 * bconfig.setOpaque(false); bconfig.addActionListener(new
+		 * ActionListener() { public void actionPerformed(ActionEvent e) {
+		 * System.out.println("You just clicked the config button"); //
+		 * parent.setBackground(Color.BLUE); // slider.setValue(100);
+		 *  } }); }
+		 */
+
 		blogo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// JOptionPane.showMessageDialog(null, "Hello, I am DaiZW,
-				// welcome to the NoX world!");
-				AboutDialog about = new AboutDialog();
-				DialogEarthquakeCenter dec = new DialogEarthquakeCenter(about);
-				about.pack();
-				about.setModal(false);
-				about.setSize(new Dimension(500, 350));
-				about.setPreferredSize(new Dimension(500, 350));
-				/*
-				 * this.setMaximumSize(new Dimension(400,500));
-				 * this.setMinimumSize(new Dimension(400,500));
-				 */
-				about.setLocation(new Point(300, 150));
-				about.setVisible(true);
-				dec.startShake();// 对话框必须setModal (false)才可以抖动, 否则不行
+				final JPopupMenu m = new JPopupMenu();
+				// use a heavyweight popup to avoid having it clipped
+				// by the window mask
+				if (IAmBase) {
+					m.add(new AbstractAction("Set Window's Color") {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = -729947600305959488L;
+
+						public void actionPerformed(ActionEvent e) {
+							Color color = JColorChooser.showDialog(parent,
+									"Select a color for the GUI", Color.orange);
+							if (color != null) {
+								parent.setBackgroundColor(color);
+							}
+						}
+					});
+					m.add(new AbstractAction("Set Window's Transparency") {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 8141980952424431845L;
+
+						public void actionPerformed(ActionEvent e) {
+							transparencyConfigBar.setLocation(blogo
+									.getLocationOnScreen().x, blogo
+									.getLocationOnScreen().y + 20);
+							transparencyConfigBar.Show();
+						}
+					});
+				}
+				m.add(new AbstractAction("About") {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					public void actionPerformed(ActionEvent e) {
+						AboutDialog about = new AboutDialog();
+						DialogEarthquakeCenter dec = new DialogEarthquakeCenter(
+								about);
+						about.pack();
+						about.setModal(false);
+						about.setSize(new Dimension(500, 350));
+						about.setPreferredSize(new Dimension(500, 350));
+						about.setLocation(new Point(300, 150));
+						about.setVisible(true);
+						dec.startShake();// 对话框必须setModal (false)才可以抖动, 否则不行
+					}
+				});
+				m.add(new AbstractAction("Exit") {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					public void actionPerformed(ActionEvent e) {
+						if(IAmBase)
+							System.exit(0);
+						else
+							parent.dispose();
+					}
+				});
+				MenuElement els[] = m.getSubElements();
+				for(int i = 0; i < els.length; i++)
+					els[i].getComponent().setBackground(Color.WHITE);
+				m.setLightWeightPopupEnabled(true);
+				//m.setBackground(Color.YELLOW);
+				//m.setForeground(Color.RED);
+				m.pack();
+				// 位置应该是相对于JButton的位置
+				m.show((Component) e.getSource(), 0, 20);
 			}
 		});
 
@@ -412,60 +494,6 @@ class Titlebar extends JPanel {
 		 * btitle.setBorderPainted(false); btitle.setContentAreaFilled(false);
 		 * btitle.setOpaque(false);
 		 */
-		transparencyConfigBar = new FrameConfigDialog(parent);
-		if (IAmBase) {
-			bconfig = new JButton(new ImageIcon("resrc\\buttons\\config.png"));
-			bconfig.setRolloverIcon(new ImageIcon(
-					"resrc\\buttons\\config_rollover.png"));
-			bconfig.setSize(new Dimension(20, 20));
-			bconfig.setPreferredSize(new Dimension(20, 20));
-			bconfig.setMaximumSize(new Dimension(20, 20));
-			bconfig.setMinimumSize(new Dimension(20, 20));
-			bconfig.setBorderPainted(false);
-			bconfig.setContentAreaFilled(false);
-			bconfig.setOpaque(false);
-			bconfig.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					System.out.println("You just clicked the config button");
-					// parent.setBackground(Color.BLUE);
-					// slider.setValue(100);
-					final JPopupMenu m = new JPopupMenu();
-					// use a heavyweight popup to avoid having it clipped
-					// by the window mask
-					m.add(new AbstractAction("Set Window's Color") {
-						/**
-						 * 
-						 */
-						private static final long serialVersionUID = -729947600305959488L;
-
-						public void actionPerformed(ActionEvent e) {
-							Color color = JColorChooser.showDialog(parent,
-									"Select a color for the GUI", Color.orange);
-							if (color != null) {
-								parent.setBackgroundColor(color);
-							}
-						}
-					});
-					m.add(new AbstractAction("Set Window's Transparency") {
-						/**
-						 * 
-						 */
-						private static final long serialVersionUID = 8141980952424431845L;
-
-						public void actionPerformed(ActionEvent e) {
-							transparencyConfigBar.setLocation(bconfig
-									.getLocationOnScreen().x, bconfig
-									.getLocationOnScreen().y + 20);
-							transparencyConfigBar.Show();
-						}
-					});
-					m.pack();
-					// 位置应该是相对于JButton的位置
-					m.show((Component) e.getSource(), 0, 20);
-				}
-			});
-		}
-
 		bminimize = new JButton(new ImageIcon(path_minimize));
 		bminimize.setRolloverIcon(new ImageIcon(path_minimize_rollover));
 		bminimize.setSize(new Dimension(20, 20));
@@ -554,10 +582,9 @@ class Titlebar extends JPanel {
 		this.add(lab_title);
 		// this.add(btitle);
 		this.add(Box.createHorizontalGlue());
-		if (IAmBase) {
-			this.add(bconfig);
-			// this.add(slider);
-		}
+		/*
+		 * if (IAmBase) { this.add(bconfig); // this.add(slider); }
+		 */
 		this.add(bminimize);
 		this.add(bmaximize);
 		this.add(bclose);
@@ -591,6 +618,7 @@ class FootPane extends JPanel {
 
 	// 位于窗口右下角用于resize
 	JButton resizeButn;
+	ResizeListener resizer;
 
 	/**
 	 * 底部组件, 用于安放重设尺寸按钮
@@ -608,7 +636,7 @@ class FootPane extends JPanel {
 		resizeButn.setMinimumSize(new Dimension(15, 15));
 		// resizeButn.setOpaque(false);
 
-		ResizeListener resizer = new ResizeListener(parent, resizeButn);
+		resizer = new ResizeListener(parent, resizeButn);
 		resizeButn.addMouseListener(resizer);
 		resizeButn.addMouseMotionListener(resizer);
 
@@ -617,8 +645,22 @@ class FootPane extends JPanel {
 		this.add(resizeButn);
 		this.setOpaque(false);
 	}
+
+	/**
+	 * 该操作暂时不可逆转; 即不能重新添加监听器
+	 */
+	public void removeResizeListener() {
+		resizeButn.removeMouseListener(resizer);
+		resizeButn.removeMouseMotionListener(resizer);
+	}
 }
 
+/**
+ * 窗口透明度调节对话框
+ * 
+ * @author shinysky
+ * 
+ */
 class FrameConfigDialog extends JDialog {
 	/**
 	 * 
