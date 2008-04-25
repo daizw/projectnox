@@ -42,6 +42,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 /**
@@ -74,7 +75,7 @@ public class Cheyenne extends NoxFrame {
 	/**
 	 * 个人/系统设置窗口
 	 */
-	ConfigCenterFrame ccf = new ConfigCenterFrame();
+	ConfigCenterFrame ccf = new ConfigCenterFrame(this);
 	
 	public static void main(String args[]) {	
 		System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
@@ -96,6 +97,12 @@ public class Cheyenne extends NoxFrame {
 				"resrc\\buttons\\normalize.png", "resrc\\buttons\\normalize_rollover.png",
 				"resrc\\buttons\\close.png", "resrc\\buttons\\close_rollover.png", true);
 
+		/*try{
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        }catch(Exception exe){
+            exe.printStackTrace();
+        }*/
+        
 		JPanel contentPane = this.getContainer();
 		Cheyenne.this.setBounds(600, 80, WIDTH_DEFLT, HEIGHT_DEFLT);
 		Cheyenne.this.setSize(new Dimension(WIDTH_DEFLT, HEIGHT_DEFLT));
@@ -120,13 +127,13 @@ public class Cheyenne extends NoxFrame {
 		String[] flistItems = { "Chris", "Joshua", "Daniel", "Michael", "Don",
 				"Kimi", "Kelly", "Keagan", "夏", "张三", "张四", "张五", "张三丰" };
 
-		FriendItem[] friends = new FriendItem[flistItems.length];
+		PeerItem[] friends = new PeerItem[flistItems.length];
 		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
 
 		for (int i = 0; i < flistItems.length; i++) {
-			friends[i] = new FriendItem(new ImageIcon(
+			friends[i] = new PeerItem(new ImageIcon(
 					"resrc\\portrait\\user.png"), flistItems[i], "Hi, 我是"
-					+ flistItems[i]);
+					+ flistItems[i], "uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx");
 		}
 		ObjectList flist = new ObjectList(friends);
 		/**
@@ -135,11 +142,12 @@ public class Cheyenne extends NoxFrame {
 		String[] glistItems = { "group1", "group2", "group3", "group4", "三年二班",
 				"三年三班" };
 
-		FriendItem[] groups = new FriendItem[glistItems.length];
+		GroupItem[] groups = new GroupItem[glistItems.length];
 
 		for (int i = 0; i < glistItems.length; i++) {
-			groups[i] = new FriendItem(new ImageIcon("resrc\\icons\\chatroom.png"),
-					glistItems[i], "Hi, 这是" + glistItems[i] + "的聊天室");
+			groups[i] = new GroupItem(new ImageIcon("resrc\\icons\\chatroom.png"),
+					glistItems[i], "Hi, 这是" + glistItems[i] + "的聊天室", 
+					"uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx", 0, 0);
 		}
 		ObjectList glist = new ObjectList(groups);
 		/**
@@ -147,12 +155,12 @@ public class Cheyenne extends NoxFrame {
 		 */
 		String[] blistItems = { "Ben", "Laden", "Hitler", "Bush", "陈水扁" };
 
-		FriendItem[] badguys = new FriendItem[blistItems.length];
+		PeerItem[] badguys = new PeerItem[blistItems.length];
 		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
 
 		for (int i = 0; i < blistItems.length; i++) {
-			badguys[i] = new FriendItem(new ImageIcon("resrc\\icons\\blacklist.png"),
-					blistItems[i], "Hi, 我是" + blistItems[i]);
+			badguys[i] = new PeerItem(new ImageIcon("resrc\\icons\\blacklist.png"),
+					blistItems[i], "Hi, 我是" + blistItems[i], "uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx");
 		}
 		ObjectList blist = new ObjectList(badguys);
 
@@ -382,7 +390,7 @@ class ListsPane extends JTabbedPane {
 
 	Dimension btnsize = new Dimension(Cheyenne.WIDTH_PREF, 20);
 
-	FriendItem fi = null;
+	NoxJListItem fi = null;
 	
 	ListsPane(final ObjectList flist, final ObjectList glist, final ObjectList blist,
 			String path_flist, String path_glist, String path_blist) {
@@ -454,36 +462,29 @@ class ListsPane extends JTabbedPane {
 		});
 		
 		/*flist.addListSelectionListener(new ListSelectionListener(){
-
 			@Override
 			public void valueChanged(ListSelectionEvent se) {
 				// TODO Auto-generated method stub
-				;
 			}
-			
 		});*/
 		flist.addMouseListener(new MouseListener(){
 			@Override
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() == 2){
 					//TODO 判断所点击的cell的在线状态进行对应处理, 暂时直接弹出弹出聊天窗口.
-					String title = ((FriendItem)flist.getSelectedValue()).getNick();
+					String title = ((PeerItem)flist.getSelectedValue()).getNick();
 					/**
 					 * TODO 应该对每一个对象只开一个窗口, 可以设定标记, 如果已经打开了一个则显示之, 否则开新窗口
 					 */
 					Chatroom room = new Chatroom(title, 
-							((FriendItem)flist.getSelectedValue()).getPortrait(),
-							((FriendItem)flist.getSelectedValue()).getNick());
+							((PeerItem)flist.getSelectedValue()).getPortrait(),
+							((PeerItem)flist.getSelectedValue()).getNick());
 					room.pack();
 					room.setVisible(true);
 				}else if(me.getButton() == MouseEvent.BUTTON3){
 					final JPopupMenu fiendOprMenu = new JPopupMenu();
-					/*
-					 * 怎么实现右键可选取JListItem?
-					 */
-					fi = (FriendItem)flist.getSelectedValue();
-					//System.out.println(flist.getComponentAt(me.getPoint()).toString());
 					
+					fi = (PeerItem)flist.getSelectedValue();
 					if(fi == null)
 						return;
 					//System.out.println("You just Right Click the List Item!");
@@ -494,10 +495,10 @@ class ListsPane extends JTabbedPane {
 						private static final long serialVersionUID = -729947600305959488L;
 
 						public void actionPerformed(ActionEvent e) {
-							String title = ((FriendItem)flist.getSelectedValue()).getNick();
+							String title = ((PeerItem)flist.getSelectedValue()).getNick();
 							Chatroom room = new Chatroom(title, 
-									((FriendItem)flist.getSelectedValue()).getPortrait(),
-									((FriendItem)flist.getSelectedValue()).getNick());
+									((PeerItem)flist.getSelectedValue()).getPortrait(),
+									((PeerItem)flist.getSelectedValue()).getNick());
 							room.pack();
 							room.setVisible(true);
 						}
@@ -567,17 +568,20 @@ class ListsPane extends JTabbedPane {
 
 		/**
 		 * 组成员列表, 测试用
+		 * TODO 从数据库产生一个GroupItem[], 然后传值给objectlist构造函数
+		 * 或者 群聊窗口中组成员列表可以由聊天室窗口直接从数据库获取? 无所谓..最好在这里根据GroupID来获取列表然后传值,
+		 * 尽量把数据库操作集中在一个java文件中
 		 */
 		String[] flistItems = { "Chris", "Joshua", "Daniel", "Michael", "Don",
 				"Kimi", "Kelly", "Keagan", "夏", "张三", "张四", "张五", "张三丰" };
 
-		final FriendItem[] gmembers = new FriendItem[flistItems.length];
+		final GroupItem[] gmembers = new GroupItem[flistItems.length];
 		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
 
 		for (int i = 0; i < flistItems.length; i++) {
-			gmembers[i] = new FriendItem(new ImageIcon(
-					"resrc\\portrait\\user.png"), flistItems[i], "Hi, 我是"
-					+ flistItems[i]);
+			gmembers[i] = new GroupItem(new ImageIcon(
+					"resrc\\portrait\\user.png"), flistItems[i], "欢迎加入我们: "
+					+ flistItems[i], "uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx", 0, 0);
 		}
 		
 		glist.addMouseListener(new MouseListener(){
@@ -586,35 +590,35 @@ class ListsPane extends JTabbedPane {
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() == 2){
 					//TODO 判断所点击的cell的在线状态进行对应处理, 暂时直接弹出弹出聊天窗口.
-					String title = ((FriendItem)glist.getSelectedValue()).getNick();
+					String title = ((GroupItem)glist.getSelectedValue()).getNick();
 					Chatroom room = new Chatroom(title, gmembers);
 					room.pack();
 					room.setVisible(true);
 				}else if(me.getButton() == MouseEvent.BUTTON3){
-					final JPopupMenu fiendOprMenu = new JPopupMenu();
+					final JPopupMenu groupOprMenu = new JPopupMenu();
 					/*
 					 * 怎么实现右键可选取JListItem?
 					 */
-					fi = (FriendItem)glist.getSelectedValue();
+					fi = (GroupItem)glist.getSelectedValue();
 					//System.out.println(flist.getComponentAt(me.getPoint()).toString());
 					
 					if(fi == null)
 						return;
 					//System.out.println("You just Right Click the List Item!");
-					fiendOprMenu.add(new AbstractAction("Talk in this Group") {
+					groupOprMenu.add(new AbstractAction("Enter this chatroom") {
 						/**
 						 * 
 						 */
 						private static final long serialVersionUID = -729947600305959488L;
 
 						public void actionPerformed(ActionEvent e) {
-							String title = ((FriendItem)glist.getSelectedValue()).getNick();
+							String title = ((GroupItem)glist.getSelectedValue()).getNick();
 							Chatroom room = new Chatroom(title, gmembers);
 							room.pack();
 							room.setVisible(true);
 						}
 					});
-					fiendOprMenu.add(new AbstractAction("Group information") {
+					groupOprMenu.add(new AbstractAction("Group information") {
 						/**
 						 * 
 						 */
@@ -624,28 +628,25 @@ class ListsPane extends JTabbedPane {
 							JOptionPane.showMessageDialog((Component) null, 
 									"<html>"//<BODY bgColor=#ffffff>"
 									+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
-									+"<Font color=black>昵称:</Font> <Font color=blue>"
+									+"<Font color=black>组名:</Font> <Font color=blue>"
 									+ fi.getNick()
 									+"<br></Font>"
-									+"<Font color=black>签名档:</Font> <Font color=blue>"
+									+"<Font color=black>公告:</Font> <Font color=blue>"
 									+ fi.getSign()
 									+"<br></Font>"
-									+"<Font color=black>联系方式:</Font> <Font color=blue>"
+									+"<Font color=black>成员数量:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
-									+"<br></Font>"
-									+"<Font color=black>个人说明:</Font> <Font color=blue>"
-									+ fi.getNick() + " owns me so much MONEY!! "
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
 						}
 					});
-					MenuElement els[] = fiendOprMenu.getSubElements();
+					MenuElement els[] = groupOprMenu.getSubElements();
 					for(int i = 0; i < els.length; i++)
 						els[i].getComponent().setBackground(Color.WHITE);
-					fiendOprMenu.setLightWeightPopupEnabled(true);
-					fiendOprMenu.pack();
+					groupOprMenu.setLightWeightPopupEnabled(true);
+					groupOprMenu.pack();
 					// 位置应该是相对于源的位置
-					fiendOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
+					groupOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
 				}
 			}
 

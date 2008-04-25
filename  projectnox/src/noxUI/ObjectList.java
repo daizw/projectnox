@@ -52,7 +52,7 @@ public class ObjectList extends JList {
 		portrait = new JLabel();
 		nick = new JLabel();
 		sign = new JLabel();
-		this.setCellRenderer(new FriendCellRender());
+		this.setCellRenderer(new NoxJListCellRender());
 		filterField = new FilterField(DEFAULT_FIELD_WIDTH);
 		filterField.setSize(new Dimension(100, 20));
 		filterField.setPreferredSize(new Dimension(100, 20));
@@ -63,42 +63,46 @@ public class ObjectList extends JList {
 		this.setModel(fmod);
 		for (int i = 0; i < objs.length; i++) {
 			// System.out.println(objs[i].getClass().toString());
-			addItem((FriendItem) objs[i]);
+			addItem((NoxJListItem) objs[i]);
 		}
-		this.addMouseListener(new MouseListener(){
+		this.addMouseListener(new MouseListener() {
 
 			@Override
 			public void mouseClicked(MouseEvent me) {
-				// TODO Auto-generated method stub
-				/*if(me.getButton() == MouseEvent.BUTTON3)
-					ObjectList.this.getComponentAt(me.getPoint());
-				ObjectList.this.set*/
+				if (me.getButton() == MouseEvent.BUTTON3) {
+					/*
+					 * 实现右键可选取JListItem
+					 */
+					int index = ObjectList.this.locationToIndex(me.getPoint());
+					ObjectList.this.setSelectedIndex(index);
+				}
 			}
 
 			@Override
-			public void mouseEntered(MouseEvent arg0) {
+			public void mouseEntered(MouseEvent menter) {
 				// TODO Auto-generated method stub
-				
+				// int index =
+				// ObjectList.this.locationToIndex(menter.getPoint());
+				// ObjectList.this.set
 			}
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
 		});
 	}
 
@@ -109,36 +113,40 @@ public class ObjectList extends JList {
 	}
 
 	public void addItem(Object o) {
-		((FilterModel) getModel()).addElement((FriendItem) o);
+		((FilterModel) getModel()).addElement((NoxJListItem) o);
 	}
 
-	public class FriendCellRender extends JPanel implements ListCellRenderer {
+	public class NoxJListCellRender extends JPanel implements ListCellRenderer {
 		/**
 		 * JList单元格渲染器
 		 */
 		private static final long serialVersionUID = 1L;
 
-		public Component getListCellRendererComponent(JList list, Object value,
-				int index, boolean isSelected, boolean cellHasFocus) {
-			FriendItem item = (FriendItem) value;
+		public Component getListCellRendererComponent(final JList list,
+				Object value, int index, boolean isSelected,
+				boolean cellHasFocus) {
+			NoxJListItem item = (NoxJListItem) value;
 
 			portrait.setIcon((Icon) item.getPortrait());
 			nick.setText(item.getNick());
 			sign.setText('(' + item.getSign() + ')');
 
-			// setOpaque(true);
+			/*
+			 * portrait.setOpaque(false); nick.setOpaque(false);
+			 * sign.setOpaque(false); setOpaque(true);
+			 */
 			Font defaultFont = sign.getFont();
 			Font nameFont = defaultFont.deriveFont(Font.BOLD, defaultFont
 					.getSize() + 1);
 			nick.setFont(nameFont);
 
-			FriendCellRender.this.setLayout(new GridBagLayout());
-			addWithGridBag(portrait, FriendCellRender.this, 0, 0, 1, 2,
+			NoxJListCellRender.this.setLayout(new GridBagLayout());
+			addWithGridBag(portrait, NoxJListCellRender.this, 0, 0, 1, 2,
 					GridBagConstraints.WEST, GridBagConstraints.BOTH, 0, 0);
-			addWithGridBag(nick, FriendCellRender.this, 1, 0, 1, 1,
+			addWithGridBag(nick, NoxJListCellRender.this, 1, 0, 1, 1,
 					GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, 1,
 					0);
-			addWithGridBag(sign, FriendCellRender.this, 1, 1, 1, 1,
+			addWithGridBag(sign, NoxJListCellRender.this, 1, 1, 1, 1,
 					GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, 1,
 					0);
 
@@ -146,24 +154,51 @@ public class ObjectList extends JList {
 					.getBackground());
 			setForeground(isSelected ? list.getSelectionForeground() : list
 					.getForeground());
-			
+
+			/*
+			 * setBackground(cellHasFocus ? Color.RED : list .getBackground());
+			 * setForeground(cellHasFocus ? Color.GREEN : list
+			 * .getForeground());
+			 */
 			/**
 			 * 暂时只能用绝对路径, 并且需要把头像存储到本地
 			 */
-			this.setToolTipText("<html><BODY bgColor=#ffffff>"
-					+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
-					+"<Font color=black>昵称:</Font> <Font color=blue>"
-					+ item.getNick()
-					+"<br></Font>"
-					+"<Font color=black>签名档:</Font> <Font color=blue>"
-					+ item.getSign()
-					+"<br></Font>"
-					+"<Font color=black>联系方式:</Font> <Font color=blue>"
-					+ "110, 119, 120, 114, 117"
-					+"<br></Font>"
-					+"<Font color=black>个人说明:</Font> <Font color=blue>"
-					+ item.getNick() + " owns me so much MONEY!! "
-					+"<br></Font></BODY></html>");
+			//System.out.println(item.getClass().toString().endsWith("PeerItem"));
+			if (item.getClass().toString().endsWith("PeerItem")) {
+				this
+						.setToolTipText("<html><BODY bgColor=#ffffff>"
+								+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
+								+ "<Font color=black>昵称:</Font> <Font color=blue>"
+								+ item.getNick()
+								+ "<br></Font>"
+								+ "<Font color=black>签名档:</Font> <Font color=blue>"
+								+ item.getSign()
+								+ "<br></Font>"
+								+ "<Font color=black>联系方式:</Font> <Font color=blue>"
+								+ "110, 119, 120, 114, 117"
+								+ "<br></Font>"
+								+ "<Font color=black>个人说明:</Font> <Font color=blue>"
+								+ item.getNick()
+								+ " owns me so much MONEY!! "
+								+ "<br></Font>"
+								+ "<Font color=black>UUID:</Font> <Font color=blue>"
+								+ item.getUUID() + "<br></Font></BODY></html>");
+			} else if (item.getClass().toString().endsWith("GroupItem")) {
+				this
+						.setToolTipText("<html><BODY bgColor=#ffffff>"
+								+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
+								+ "<Font color=black>组名:</Font> <Font color=blue>"
+								+ item.getNick()
+								+ "<br></Font>"
+								+ "<Font color=black>公告:</Font> <Font color=blue>"
+								+ item.getSign()
+								+ "<br></Font>"
+								+ "<Font color=black>成员数量:</Font> <Font color=blue>"
+								+ "110, 119, 120, 114, 117"
+								+ "<br></Font>"
+								+ "<Font color=black>UUID:</Font> <Font color=blue>"
+								+ item.getUUID() + "<br></Font></BODY></html>");
+			}
 			return this;
 		}
 
@@ -193,13 +228,13 @@ public class ObjectList extends JList {
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
-		ArrayList<FriendItem> items;
-		ArrayList<FriendItem> filterItems;
+		ArrayList<NoxJListItem> items;
+		ArrayList<NoxJListItem> filterItems;
 
 		public FilterModel() {
 			super();
-			items = new ArrayList<FriendItem>();
-			filterItems = new ArrayList<FriendItem>();
+			items = new ArrayList<NoxJListItem>();
+			filterItems = new ArrayList<NoxJListItem>();
 		}
 
 		public Object getElementAt(int index) {
@@ -214,7 +249,7 @@ public class ObjectList extends JList {
 		}
 
 		public void addElement(Object o) {
-			items.add((FriendItem) o);
+			items.add((NoxJListItem) o);
 			// System.out.println("addElement...");
 			refilter();
 		}

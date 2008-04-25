@@ -55,8 +55,10 @@
  */
 package net.nox;
 
+import java.util.Date;
 import java.util.Enumeration;
 
+import javax.swing.Timer;
 import net.jxta.discovery.DiscoveryEvent;
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
@@ -64,6 +66,7 @@ import net.jxta.document.Advertisement;
 import net.jxta.peergroup.PeerGroup;
 import net.jxta.platform.NetworkManager;
 import net.jxta.protocol.DiscoveryResponseMsg;
+import noxUI.SearchingFrame.AdvTableModel;
 
 /**
  * Illustrates the use of the Discovery Service
@@ -72,6 +75,11 @@ public class PeerHunter implements DiscoveryListener {
 
 	private transient NetworkManager manager;
 	private transient DiscoveryService discovery;
+	
+	AdvTableModel model;
+	Thread hunter;
+	long startTime = 0;
+	long curTime = 0;
 
 	/**
 	 * Constructor for the DiscoveryClient
@@ -89,52 +97,61 @@ public class PeerHunter implements DiscoveryListener {
 
 	/**
 	 * loop forever attempting to discover advertisements every minute
+	 * @param model 
 	 */
-	public void start() {
-		long waittime = 10 * 1000L;
-
-		try {
-			// Add ourselves as a DiscoveryListener for DiscoveryResponse events
-			discovery.addDiscoveryListener(this);
-			
-			System.out.println("Sending a Discovery Message");
-			discovery.getRemoteAdvertisements(// no specific peer (propagate)
-					null, // Adv type
-					DiscoveryService.PEER, // Attribute = any
-					null, // Value = any
-					null, // one advertisement response is all we are looking
-							// for
-					1, // no query specific listener. we are using a global
-						// listener
-					null);
-			while (true) {
-				// wait a bit before sending a discovery message
+	public void start(AdvTableModel model) {
+		this.model = model;
+		final long waittime = 10 * 1000L;
+		
+		hunter = new Thread(new Runnable() {
+			public void run() {
 				try {
-					System.out.println("Sleeping for :" + waittime);
-					Thread.sleep(waittime);
+					// Add ourselves as a DiscoveryListener for DiscoveryResponse events
+					discovery.addDiscoveryListener(PeerHunter.this);
+					
+					System.out.println("Sending a Discovery Message");
+					discovery.getRemoteAdvertisements(// no specific peer (propagate)
+							null, // Adv type
+							DiscoveryService.PEER, // Attribute = any
+							null, // Value = any
+							null, // one advertisement response is all we are looking
+									// for
+							1, // no query specific listener. we are using a global
+								// listener
+							null);
+					startTime = new Date().getTime();
+					System.out.println(startTime);
+					while (true) {
+						// wait a bit before sending a discovery message
+						try {
+							System.out.println("Sleeping for :" + waittime);
+							Thread.sleep(waittime);
+						} catch (Exception e) {
+							// ignored
+						}
+						System.out.println("Sending a Discovery Message");
+						// look for any peer
+						discovery.getRemoteAdvertisements(
+						// no specific peer (propagate)
+								null,
+								// Adv type
+								DiscoveryService.PEER,
+								// Attribute = name
+								null,//"Name",
+								// Value = the tutorial
+								null,//"Discovery tutorial",
+								// one advertisement response is all we are looking for
+								1,
+								// no query specific listener. we are using a global
+								// listener
+								null);
+					}
 				} catch (Exception e) {
-					// ignored
+					e.printStackTrace();
 				}
-				System.out.println("Sending a Discovery Message");
-				// look for any peer
-				discovery.getRemoteAdvertisements(
-				// no specific peer (propagate)
-						null,
-						// Adv type
-						DiscoveryService.PEER,
-						// Attribute = name
-						null,//"Name",
-						// Value = the tutorial
-						null,//"Discovery tutorial",
-						// one advertisement response is all we are looking for
-						1,
-						// no query specific listener. we are using a global
-						// listener
-						null);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		}, "Hunting");
+		hunter.start();
 	}
 
 	/**
@@ -153,7 +170,10 @@ public class PeerHunter implements DiscoveryListener {
 		System.out.println(" [  Got a Discovery Response ["
 				+ res.getResponseCount() + " elements]  from peer : "
 				+ ev.getSource() + "  ]");
-
+		
+		curTime = new Date().getTime();
+		System.out.println(curTime);
+		
 		Advertisement adv;
 		Enumeration<Advertisement> en = res.getAdvertisements();
 
@@ -161,6 +181,13 @@ public class PeerHunter implements DiscoveryListener {
 			while (en.hasMoreElements()) {
 				adv = (Advertisement) en.nextElement();
 				System.out.println(adv);
+				Object[] advitem = new Object[4];
+				advitem[0] = adv.getAdvType();
+				advitem[1] = adv.getClass();
+				advitem[2] = adv.getID();
+				advitem[3] = curTime - startTime;
+				
+				model.addRow(advitem);
 			}
 		}
 	}
@@ -168,8 +195,10 @@ public class PeerHunter implements DiscoveryListener {
 	/**
 	 * Stops the platform
 	 */
+	@SuppressWarnings("deprecation")
 	public void stop() {
 		// Stop JXTA
-		manager.stopNetwork();
+		//manager.stopNetwork();
+		hunter.stop();
 	}
 }

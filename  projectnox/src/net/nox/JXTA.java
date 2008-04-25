@@ -3,6 +3,8 @@ import net.jxta.exception.PeerGroupException;
 import net.jxta.peergroup.PeerGroup;
 import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
+import noxUI.SearchingFrame;
+import noxUI.SearchingFrame.AdvTableModel;
 
 import java.text.MessageFormat;
 import java.io.File;
@@ -15,17 +17,21 @@ public class JXTA {
     public static final String Local_Peer_Name = "My Local Peer";
     public static final String Local_Network_Manager_Name = "My Local Network Manager";
 
+    String locpeername = "";
     NetworkManager TheNetworkManager;
     NetworkConfigurator TheConfig;
     PeerGroup TheNetPeerGroup;
+    PeerHunter disocveryClient;
 
     public JXTA() {
         // Creating the Network Manager
         try {
             System.out.println("Creating the Network Manager");
+            String peername = GetPrincipal(); 
+            
             TheNetworkManager = new NetworkManager(
                     NetworkManager.ConfigMode.EDGE, Local_Network_Manager_Name,
-                    new File(".cache").toURI());
+                    new File(new File(".cache"), peername).toURI());
             System.out.println("Network Manager created");
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -69,9 +75,10 @@ public class JXTA {
             }
         } else {
             System.out.println("No local configuration found");
-            TheConfig.setName(Local_Peer_Name);
+            
             TheConfig.setPrincipal(GetPrincipal());
             TheConfig.setPassword(GetPassword());
+            TheConfig.setName(Local_Peer_Name);
 
             System.out.println("Principal: " + TheConfig.getPrincipal());
             System.out.println("Password : " + TheConfig.getPassword());
@@ -88,8 +95,8 @@ public class JXTA {
     }
 
     private String GetPrincipal() {
-        return (String) JOptionPane.showInputDialog(
-                null, "Enter principal", "Principal", JOptionPane.QUESTION_MESSAGE,
+        return locpeername = (String) JOptionPane.showInputDialog(
+                null, "Enter username", "Username", JOptionPane.QUESTION_MESSAGE,
                 null, null, "");
     }
 
@@ -107,11 +114,12 @@ public class JXTA {
 
             System.out.println("Peer name      : "
                     + TheNetPeerGroup.getPeerName());
+            System.out.println("Peer ID  : "
+                    + TheNetPeerGroup.getPeerID().toString());
             System.out.println("Peer Group name: "
                     + TheNetPeerGroup.getPeerGroupName());
             System.out.println("Peer Group ID  : "
-                    + TheNetPeerGroup.getPeerID().toString());
-
+                    + TheNetPeerGroup.getPeerGroupID().toString());
         } catch (PeerGroupException ex) {
             // Cannot initialize peer group
             ex.printStackTrace();
@@ -126,9 +134,12 @@ public class JXTA {
         boolean connected = TheNetworkManager.waitForRendezvousConnection(5000);
         System.out.println(MessageFormat.format("Connected :{0}", connected));
     }
-    public void GoHunting(){
-    	PeerHunter disocveryClient = new PeerHunter(TheNetworkManager);
-        disocveryClient.start();
+    public void GoHunting(SearchingFrame.AdvTableModel model){
+    	disocveryClient = new PeerHunter(TheNetworkManager);
+        disocveryClient.start(model);
+    }
+    public void StopHunting(){
+    	disocveryClient.stop();
     }
     public void StopNetwork(){
     	System.out.println("Stopping JXTA");
@@ -138,8 +149,13 @@ public class JXTA {
     public static void main(String[] args) {
         JXTA MyLogin = new JXTA();
         MyLogin.SeekRendezVousConnection();
-        MyLogin.GoHunting();
+        //MyLogin.GoHunting(null);
         
         MyLogin.StopNetwork();
     }
+
+	public void GoHunting(noxUI.SearchingFrame model) {
+		// TODO Auto-generated method stub
+		
+	}
 }
