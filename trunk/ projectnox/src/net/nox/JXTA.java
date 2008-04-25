@@ -24,7 +24,8 @@ public class JXTA {
         try {
             System.out.println("Creating the Network Manager");
             TheNetworkManager = new NetworkManager(
-                    NetworkManager.ConfigMode.EDGE, Local_Network_Manager_Name);
+                    NetworkManager.ConfigMode.EDGE, Local_Network_Manager_Name,
+                    new File(".cache").toURI());
             System.out.println("Network Manager created");
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -120,16 +121,25 @@ public class JXTA {
             System.exit(-1);
         }
 
-        System.out.println("Waiting for a rendezvous connection for 25 seconds " + "(maximum)");
-        boolean connected = TheNetworkManager.waitForRendezvousConnection(25000);
+        System.out.println("Waiting for a rendezvous connection for 5 seconds " + "(maximum)");
+        TheNetworkManager.setUseDefaultSeeds(false);
+        boolean connected = TheNetworkManager.waitForRendezvousConnection(5000);
         System.out.println(MessageFormat.format("Connected :{0}", connected));
-        System.out.println("Stopping JXTA");
+    }
+    public void GoHunting(){
+    	PeerHunter disocveryClient = new PeerHunter(TheNetworkManager);
+        disocveryClient.start();
+    }
+    public void StopNetwork(){
+    	System.out.println("Stopping JXTA");
         TheNetworkManager.stopNetwork();
-
     }
 
     public static void main(String[] args) {
         JXTA MyLogin = new JXTA();
         MyLogin.SeekRendezVousConnection();
+        MyLogin.GoHunting();
+        
+        MyLogin.StopNetwork();
     }
 }

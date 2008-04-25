@@ -386,7 +386,6 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				if (hideFrame.getState())// 如果用户选择隐藏窗口, 则隐藏
 				{
 					//parent.setVisible(false);
@@ -488,6 +487,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		this.setSize(new Dimension(Chatroom.WIDTH_DEFLT,
 				Chatroom.HEIGHT_DEFLT - 35));
 		this.setDividerLocation(0.65);// 必须先指定尺寸才有效
+		this.setResizeWeight(0.62d);
 		this.setDividerSize(3);
 		// this.setOneTouchExpandable(true);
 		this.add(sp_historymsg);
@@ -596,7 +596,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		// System.out.println("label_buf :" + label_buf);
 		// System.out.println("msg_buf :" + msg_buf);
 
-		// playAudio();
+		 //playAudio();
 
 		/**
 		 * 将消息添加到消息记录

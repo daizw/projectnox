@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 import javax.swing.AbstractListModel;
@@ -30,8 +32,7 @@ public class ObjectList extends JList {
 	private int DEFAULT_FIELD_WIDTH = 20;
 
 	/**
-	 * 如果变量为render类内部变量,
-	 * 则会出现列表元素被添加到同一行, 并且该行重复N次的情况
+	 * 如果变量为render类内部变量, 则会出现列表元素被添加到同一行, 并且该行重复N次的情况
 	 */
 	JLabel portrait;
 	JLabel nick;
@@ -39,12 +40,14 @@ public class ObjectList extends JList {
 
 	/**
 	 * 具有自定义列表元素和过滤功能的列表
-	 * @param objs 列表元素(FriendItem类型)数组
+	 * 
+	 * @param objs
+	 *            列表元素(FriendItem类型)数组
 	 */
 	ObjectList(Object[] objs) {
 		// super(objs);
 
-		if(objs == null)
+		if (objs == null)
 			return;
 		portrait = new JLabel();
 		nick = new JLabel();
@@ -62,6 +65,41 @@ public class ObjectList extends JList {
 			// System.out.println(objs[i].getClass().toString());
 			addItem((FriendItem) objs[i]);
 		}
+		this.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent me) {
+				// TODO Auto-generated method stub
+				/*if(me.getButton() == MouseEvent.BUTTON3)
+					ObjectList.this.getComponentAt(me.getPoint());
+				ObjectList.this.set*/
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 	}
 
 	public void setModel(ListModel m) {
@@ -86,7 +124,7 @@ public class ObjectList extends JList {
 
 			portrait.setIcon((Icon) item.getPortrait());
 			nick.setText(item.getNick());
-			sign.setText(item.getSign());
+			sign.setText('(' + item.getSign() + ')');
 
 			// setOpaque(true);
 			Font defaultFont = sign.getFont();
@@ -108,6 +146,24 @@ public class ObjectList extends JList {
 					.getBackground());
 			setForeground(isSelected ? list.getSelectionForeground() : list
 					.getForeground());
+			
+			/**
+			 * 暂时只能用绝对路径, 并且需要把头像存储到本地
+			 */
+			this.setToolTipText("<html><BODY bgColor=#ffffff>"
+					+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
+					+"<Font color=black>昵称:</Font> <Font color=blue>"
+					+ item.getNick()
+					+"<br></Font>"
+					+"<Font color=black>签名档:</Font> <Font color=blue>"
+					+ item.getSign()
+					+"<br></Font>"
+					+"<Font color=black>联系方式:</Font> <Font color=blue>"
+					+ "110, 119, 120, 114, 117"
+					+"<br></Font>"
+					+"<Font color=black>个人说明:</Font> <Font color=blue>"
+					+ item.getNick() + " owns me so much MONEY!! "
+					+"<br></Font></BODY></html>");
 			return this;
 		}
 
