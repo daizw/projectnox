@@ -65,9 +65,9 @@ public class Chatroom extends NoxFrame{
 		//crp.setLayout(new FlowLayout());
 		rootpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		rootpane.setOneTouchExpandable(true);
-		rootpane.setDividerLocation(0.25f);
+		rootpane.setDividerLocation(0.2f);
 		rootpane.setDividerSize(8);
-		rootpane.setResizeWeight(0.16d);
+		rootpane.setResizeWeight(0.2d);
 		
 		this.getContainer().setLayout(new BorderLayout());
 		this.getContainer().add (rootpane, BorderLayout.CENTER);
@@ -80,7 +80,7 @@ public class Chatroom extends NoxFrame{
 		rootpane.add(portraits);
 		rootpane.add(crp);
 	}
-	public Chatroom(String title, FriendItem[] gmembers) {
+	public Chatroom(String title, GroupItem[] gmembers) {
 		this(title);
 		MultiChatRoomSidePane groupmembers = new MultiChatRoomSidePane(
 				"Hello, everyone, happy everyday!", gmembers
