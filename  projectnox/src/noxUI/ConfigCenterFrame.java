@@ -16,21 +16,19 @@ import java.awt.event.ActionListener;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 /**
  * 设置中心窗口. 在这里可以设置个人及系统的各项参数: 例如: 个人设置: 昵称; 签名档; 个人资料; 头像; 身份验证; 其它. 系统设置:
  * 代理服务器; 数据保存文件夹; 修改密码; 自动登录; 隐身登录; 其它. (有些细节可以以后实现)
+ * 启动后隐藏界面.
  * 
  * @author shinysky
  */

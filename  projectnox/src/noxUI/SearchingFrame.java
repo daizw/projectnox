@@ -237,7 +237,7 @@ public class SearchingFrame extends JFrame {
 		this.setContentPane(rootpane);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		this.pack();
+		//this.pack();
 	}
 
 	protected Container buildInfinitePanel() {

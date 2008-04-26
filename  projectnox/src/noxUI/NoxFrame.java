@@ -571,9 +571,9 @@ class Titlebar extends JPanel {
 		bclose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parent.dispose();
-				if (IAmBase)// 如果是根窗口
+				/*if (IAmBase)// 如果是根窗口
 					System.exit(0);// .............
-			}
+*/			}
 		});
 
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
