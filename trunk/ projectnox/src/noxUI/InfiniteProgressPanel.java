@@ -83,6 +83,7 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener
     
     /** The scale, defalt: 1f */
     protected double Scale = 1.0f;
+    
     /**
      * Creates a new progress panel with default values:<br />
      * <ul>
@@ -263,7 +264,6 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener
         {
             int width  = getWidth();
             int height = getHeight();
-
             double maxY = 0.0; 
 
             Graphics2D g2 = (Graphics2D) g;

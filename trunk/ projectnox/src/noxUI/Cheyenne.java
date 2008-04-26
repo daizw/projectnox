@@ -175,7 +175,7 @@ public class Cheyenne extends NoxFrame {
             });
             traymenu.add(new MenuItem("Search")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
-            		sfrm.pack();
+            		//sfrm.pack();
             		sfrm.setVisible(true);
                 }
             });
@@ -462,15 +462,10 @@ class ListsPane extends JTabbedPane {
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() == 2){
 					//TODO 判断所点击的cell的在线状态进行对应处理, 暂时直接弹出弹出聊天窗口.
-					String title = ((PeerItem)flist.getSelectedValue()).getNick();
 					/**
 					 * TODO 应该对每一个对象只开一个窗口, 可以设定标记, 如果已经打开了一个则显示之, 否则开新窗口
 					 */
-					Chatroom room = new Chatroom(title, 
-							((PeerItem)flist.getSelectedValue()).getPortrait(),
-							((PeerItem)flist.getSelectedValue()).getNick());
-					room.pack();
-					room.setVisible(true);
+					Chatroom room = new Chatroom((PeerItem)flist.getSelectedValue());
 				}else if(me.getButton() == MouseEvent.BUTTON3){
 					final JPopupMenu fiendOprMenu = new JPopupMenu();
 					
@@ -485,12 +480,7 @@ class ListsPane extends JTabbedPane {
 						private static final long serialVersionUID = -729947600305959488L;
 
 						public void actionPerformed(ActionEvent e) {
-							String title = ((PeerItem)flist.getSelectedValue()).getNick();
-							Chatroom room = new Chatroom(title, 
-									((PeerItem)flist.getSelectedValue()).getPortrait(),
-									((PeerItem)flist.getSelectedValue()).getNick());
-							room.pack();
-							room.setVisible(true);
+							Chatroom room = new Chatroom((PeerItem)flist.getSelectedValue());
 						}
 					});
 					fiendOprMenu.add(new AbstractAction("His/Her information") {

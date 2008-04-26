@@ -134,12 +134,15 @@ public class JXTANetwork {
 			System.out.println("JXTA Started");
 
 			System.out.println("Peer name	: " + TheNetPeerGroup.getPeerName());
+			System.out.println("Description	: " + TheNetPeerGroup.getPeerAdvertisement().getDescription());
 			System.out.println("Peer ID		: "
 					+ TheNetPeerGroup.getPeerID().toString());
+			
 			System.out.println("Peer Group name	: "
 					+ TheNetPeerGroup.getPeerGroupName());
 			System.out.println("Peer Group ID	: "
 					+ TheNetPeerGroup.getPeerGroupID().toString());
+			
 		} catch (PeerGroupException ex) {
 			// Cannot initialize peer group
 			ex.printStackTrace();
@@ -149,9 +152,10 @@ public class JXTANetwork {
 			System.exit(-1);
 		}
 
-		System.out.println("Waiting for a rendezvous connection for 5 seconds "
+		long waittime = 2 * 1000;
+		System.out.println("Waiting for a rendezvous connection for " + (waittime/1000) + " seconds "
 				+ "(maximum)");
-		boolean connected = TheNetworkManager.waitForRendezvousConnection(5000);
+		boolean connected = TheNetworkManager.waitForRendezvousConnection(waittime);
 		System.out.println(MessageFormat.format("Connected :{0}", connected));
 	}
 

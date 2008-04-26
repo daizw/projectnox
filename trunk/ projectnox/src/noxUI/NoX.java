@@ -26,7 +26,7 @@ public class NoX {
 					+ flistItems[i], "uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx");
 		}
 		ObjectList flist = new ObjectList(friends);*/
-		String[] flistItems = {};
+		String[] flistItems = {"Chris", "Joshua"};
 
 		PeerItem[] friends = new PeerItem[flistItems.length];
 		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
