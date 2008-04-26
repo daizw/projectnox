@@ -6,18 +6,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.MenuItem;
-import java.awt.MenuShortcut;
-import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -30,7 +25,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -42,9 +36,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 /**
  * 
  * @author shinysky
@@ -380,7 +371,6 @@ class ListsPane extends JTabbedPane {
 
 	private JPanel frdlistpane;
 	private JPanel grplistpane;
-	private JPanel blklistpane;
 	private JScrollPane frdListScrPane;
 	private JScrollPane grpListScrPane;
 	private JScrollPane blkListScrPane;
@@ -396,7 +386,6 @@ class ListsPane extends JTabbedPane {
 			String path_flist, String path_glist, String path_blist) {
 		frdlistpane = new JPanel();
 		grplistpane = new JPanel();
-		blklistpane = new JPanel();
 		
 		myFriends.setSize(new Dimension(Cheyenne.WIDTH_DEFLT, 20));
 		myFriends.setPreferredSize(new Dimension(Cheyenne.WIDTH_PREF, 20));
@@ -540,26 +529,18 @@ class ListsPane extends JTabbedPane {
 
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 		});
 		grplistpane.setLayout(new BorderLayout());
@@ -652,28 +633,19 @@ class ListsPane extends JTabbedPane {
 
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
-			;
 		});
 		
 		/*blklistpane.setLayout(new BorderLayout());
@@ -706,7 +678,6 @@ class ListsPane extends JTabbedPane {
 			// System.out.println(url);
 			playsound.play();
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println(e.toString());
 		}

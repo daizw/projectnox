@@ -6,6 +6,7 @@ package noxUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -14,46 +15,74 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.MenuElement;
 import javax.swing.table.DefaultTableModel;
 
+import net.jxta.discovery.DiscoveryService;
+import net.jxta.document.Advertisement;
 import net.nox.JXTA;
+import net.nox.NoxToolkit;
 
 /**
  * @author shinysky
  * 
  */
 public class SearchingFrame extends JFrame {
-
-	public class AdvTableModel extends DefaultTableModel {
+	public class AdvTable extends JTable {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
 
-		public AdvTableModel(Object[][] data, Object[] columns) {
-			super(data, columns);
+		AdvTable(AdvTableModel model) {
+			super(model);
+
+			this.getSelectionModel().setSelectionMode(
+					ListSelectionModel.SINGLE_SELECTION);
+		}
+
+		public void addRow(Advertisement adv) {
+			addRow(adv, "Unknown", -1);
 		}
 
 		/**
-		 * 单元格是否可编辑
+		 * 向搜索结果列表中添加一行. 添加之前判断表中是否已有该元素, 没有才需要添加. TODO 以后根据具体情况还需要改
+		 * 
+		 * @param adv
+		 *            获取的广告
+		 * @param src
+		 *            从src处获取的广告
+		 * @param delay
+		 *            时间延迟
 		 */
-		public boolean isCellEditable(int row, int col) {
-			return false;
-		}
+		public void addRow(Advertisement adv, Object src, long delay) {
+			int rows = model.getRowCount();
+			for (int i = 0; i < rows; i++) {
+				if (model.getValueAt(i, 2).equals(src))
+					return;
+			}
 
-		/**
-		 * 列类
-		 */
-		public Class<?> getColumnClass(int column) {
-			Vector<?> v = (Vector<?>) dataVector.elementAt(0);
-			return v.elementAt(column).getClass();
+			Object[] advitem = new Object[4];
+			advitem[0] = adv.getAdvType();
+			advitem[1] = adv.getClass();
+			advitem[2] = src;
+			if (delay < 0)
+				advitem[3] = "-";
+			else
+				advitem[3] = delay;
+
+			model.addRow(advitem);
 		}
 	}
+
 	/**
 	 * 
 	 */
@@ -62,52 +91,90 @@ public class SearchingFrame extends JFrame {
 	JPanel rootpane = new JPanel();
 	Container infinitePane = new JPanel();
 	JButton searchPeersBtn = new JButton("Search");
-	JTable searchResultTable;
+	AdvTable searchResultTable;
 	AdvTableModel model;
-	
-	JXTA MyLogin;
 
+	JXTA MyLogin;
+	//HuntingEventHandler hehandler=new HuntingEventHandler(searchResultTable);;
 	/**
 	 * 
 	 */
-	public SearchingFrame() {
-		super("Search Frame");
+	public SearchingFrame(JXTA MyLogin) {
+		super("Searching");
+		this.MyLogin = MyLogin;
 		infinitePane = buildInfinitePanel();
 
 		String[] columns = { "Name", "Sign", "UUID", "Delay/ms" };
-		Object[][] data = { { "Who", "I am Who",
-				"uuid:jxta:xxxxxxxxxxxxxxxxxx", 1000 } };
+		Object[][] data = {
+				{ "Who", "I am Who", "uuid:jxta:xxxxxxxxxxxxxxxxxx", 1000 },
+				{ "Who", "I am Who", "uuid:jxta:xxxxxxxxxxxxxxxxxx", 1000 }};
 		model = new AdvTableModel(data, columns);
-		searchResultTable = new JTable(model);
-		/*TableColumn column = searchResultTable.getColumnModel().getColumn(3);
-		column.setPreferredWidth(20);*/
-		searchResultTable.addMouseListener(new MouseListener(){
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				int[] selected = searchResultTable.getSelectedRows();
-				for(int i = 0; i< selected.length; i++){
-					//TODO 把选中的元素添加到好友
-					System.out.println(searchResultTable.getValueAt(selected[i], 2));
+		searchResultTable = new AdvTable(model);
+		/**
+		 * 搜索之前必须先设定目标JTable, 否则事件处理程序不知道向哪里输出搜索结果
+		 */
+		new NoxToolkit().getHuntingEventHandler().setAdvTable(searchResultTable);
+		/*
+		 * TableColumn column = searchResultTable.getColumnModel().getColumn(3);
+		 * column.setPreferredWidth(20);
+		 */
+		searchResultTable.addMouseListener(new MouseListener() {
+				@Override
+				public void mouseClicked(MouseEvent me) {
+					JPopupMenu ResultOprMenu = new JPopupMenu();
+					if (me.getButton() == MouseEvent.BUTTON3) {
+						/*
+						 * TODO 实现右键可选取JTable 的行
+						 */
+						searchResultTable.getVisibleRect();
+						int row = me.getY() / searchResultTable.getRowHeight();
+						searchResultTable.getSelectionModel()
+								.setLeadSelectionIndex(row);
+						ResultOprMenu
+						.add(new AbstractAction("Add him/her to my friendlist") {
+							public void actionPerformed(ActionEvent e) {
+								// TODO 添加到好友列表
+								/*int[] selected = searchResultTable.getSelectedRows();
+								for (int i = 0; i < selected.length; i++) {
+									// TODO 把选中的元素添加到好友, 目前只是输出所选行
+									System.out.println(searchResultTable.getValueAt(
+											selected[i], 2));
+								}*/
+							}
+						});
+				ResultOprMenu.add(new AbstractAction("Talk to him/her") {
+					public void actionPerformed(ActionEvent e) {
+						// TODO 打开聊天窗口
+					}
+				});
+				MenuElement els[] = ResultOprMenu.getSubElements();
+				for (int i = 0; i < els.length; i++)
+					els[i].getComponent().setBackground(Color.WHITE);
+				ResultOprMenu.setLightWeightPopupEnabled(true);
+				ResultOprMenu.pack();
+						ResultOprMenu.show((Component) me.getSource(), me
+								.getPoint().x, me.getPoint().y);
+					}
 				}
-			}
 
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-			}
+				@Override
+				public void mouseEntered(MouseEvent arg0) {
+				}
 
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-			}
+				@Override
+				public void mouseExited(MouseEvent arg0) {
+				}
 
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-			}
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					// AdvTable.this.getSelectedRow();
+				}
 
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-			}
-		});
+				@Override
+				public void mouseReleased(MouseEvent arg0) {
+				}
+
+			});
 
 		JScrollPane scrollPane = new JScrollPane(searchResultTable);
 
@@ -118,11 +185,8 @@ public class SearchingFrame extends JFrame {
 
 		this.setContentPane(rootpane);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		MyLogin = new JXTA();
-        MyLogin.SeekRendezVousConnection();
-        
-        this.pack();
+
+		this.pack();
 	}
 
 	protected Container buildInfinitePanel() {
@@ -130,7 +194,6 @@ public class SearchingFrame extends JFrame {
 
 		glassPane = new InfiniteProgressPanel("搜索中, 请稍候...", 12);
 		glassPane.setScale(0.2d);
-		// this.setGlassPane(glassPane);
 		Dimension size = new Dimension(100, 100);
 		glassPane.setSize(size);
 		glassPane.setPreferredSize(size);
@@ -158,22 +221,14 @@ public class SearchingFrame extends JFrame {
 					indicating.start();
 					Thread hunter = new Thread(new Runnable() {
 						public void run() {
-					MyLogin.GoHunting(model);
-					// TODO 将搜索到的节点添加到表中
-					/*Object[] advitem = new Object[4];
-					advitem[0] = "";
-					advitem[1] = "";
-					advitem[2] = "";
-					advitem[3] = 1000;
-					
-					model.addRow(advitem);*/
+							MyLogin.GoHunting(	DiscoveryService.PEER, new NoxToolkit().getHuntingEventHandler());
 						}
 					}, "Hunter");
 					hunter.start();
 				} else if (searchPeersBtn.getText() == "Stop") {
 					glassPane.stop();
 					searchPeersBtn.setText("Search");
-					MyLogin.StopNetwork();
+					MyLogin.StopHunting();
 				}
 			}
 		});
@@ -188,12 +243,40 @@ public class SearchingFrame extends JFrame {
 	 */
 	public static void main(String[] args) {
 
-        SearchingFrame sfrm = new SearchingFrame();
-		sfrm.setLocation(100, 50);
-		sfrm.setSize(new Dimension(800, 650));
-		//sfrm.pack();
+		JXTA MyLogin;
+		MyLogin = new JXTA();
+		MyLogin.SeekRendezVousConnection();
+
+		SearchingFrame sfrm = new SearchingFrame(MyLogin);
+		sfrm.setLocation(0, 0);
+		sfrm.setSize(new Dimension(1000, 350));
+		// sfrm.pack();
 		sfrm.setVisible(true);
-		
-		//MyLogin.StopNetwork();
+	}
+}
+
+class AdvTableModel extends DefaultTableModel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public AdvTableModel(Object[][] data, Object[] columns) {
+		super(data, columns);
+	}
+
+	/**
+	 * 单元格是否可编辑
+	 */
+	public boolean isCellEditable(int row, int col) {
+		return false;
+	}
+
+	/**
+	 * 列类
+	 */
+	public Class<?> getColumnClass(int column) {
+		Vector<?> v = (Vector<?>) dataVector.elementAt(0);
+		return v.elementAt(column).getClass();
 	}
 }
