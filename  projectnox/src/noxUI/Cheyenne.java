@@ -36,6 +36,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
+
+import net.jxta.protocol.PeerAdvertisement;
+import net.jxta.protocol.PeerGroupAdvertisement;
 /**
  * 
  * @author shinysky
@@ -62,25 +65,28 @@ public class Cheyenne extends NoxFrame {
 	 */
 	private MiniProfilePane profile;
 	private ListsPane tabs;
+	
+	/**
+	 * 好友列表/组列表/黑名单
+	 */
+	ObjectList friendlist, grouplist, blacklist;
 
+	
 	/**
 	 * 个人/系统设置窗口
 	 */
 	ConfigCenterFrame ccf = new ConfigCenterFrame(this);
-	
-	public static void main(String args[]) {	
-		System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
-		
-		Cheyenne chyn = new Cheyenne();
-		chyn.pack();
-		chyn.setVisible(true);
-		
-		/*Chatroom room = new Chatroom("Groupname or Friendsname here");
-		room.pack();
-		room.setVisible(true);*/
-	}
-
-	Cheyenne() {
+	/**
+	 * 搜索窗口
+	 */
+	SearchingFrame sfrm = new SearchingFrame(Cheyenne.this);
+	/**
+	 * 
+	 * @param flist
+	 * @param glist
+	 * @param blist
+	 */
+	Cheyenne(ObjectList flist, ObjectList glist, ObjectList blist) {
 		super("NoX: a IM system", "resrc\\images\\bkgrd.png", 
 				"resrc\\logo\\NoXlogo_20.png", "resrc\\logo\\nox.png",
 				"resrc\\buttons\\minimize.png", "resrc\\buttons\\minimize_rollover.png",
@@ -88,6 +94,9 @@ public class Cheyenne extends NoxFrame {
 				"resrc\\buttons\\normalize.png", "resrc\\buttons\\normalize_rollover.png",
 				"resrc\\buttons\\close.png", "resrc\\buttons\\close_rollover.png", true);
 
+		friendlist = flist;
+		grouplist = glist;
+		blacklist = blist;
 		/*try{
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         }catch(Exception exe){
@@ -112,50 +121,7 @@ public class Cheyenne extends NoxFrame {
 		profile.setMaximumSize(new Dimension(WIDTH_MAX, 50));
 		profile.setMinimumSize(new Dimension(WIDTH_MIN, 50));
 
-		/**
-		 * 好友列表
-		 */
-		String[] flistItems = { "Chris", "Joshua", "Daniel", "Michael", "Don",
-				"Kimi", "Kelly", "Keagan", "夏", "张三", "张四", "张五", "张三丰" };
-
-		PeerItem[] friends = new PeerItem[flistItems.length];
-		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
-
-		for (int i = 0; i < flistItems.length; i++) {
-			friends[i] = new PeerItem(new ImageIcon(
-					"resrc\\portrait\\user.png"), flistItems[i], "Hi, 我是"
-					+ flistItems[i], "uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx");
-		}
-		ObjectList flist = new ObjectList(friends);
-		/**
-		 * 组列表
-		 */
-		String[] glistItems = { "group1", "group2", "group3", "group4", "三年二班",
-				"三年三班" };
-
-		GroupItem[] groups = new GroupItem[glistItems.length];
-
-		for (int i = 0; i < glistItems.length; i++) {
-			groups[i] = new GroupItem(new ImageIcon("resrc\\icons\\chatroom.png"),
-					glistItems[i], "Hi, 这是" + glistItems[i] + "的聊天室", 
-					"uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx", 0, 0);
-		}
-		ObjectList glist = new ObjectList(groups);
-		/**
-		 * 黑名单
-		 */
-		String[] blistItems = { "Ben", "Laden", "Hitler", "Bush", "陈水扁" };
-
-		PeerItem[] badguys = new PeerItem[blistItems.length];
-		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
-
-		for (int i = 0; i < blistItems.length; i++) {
-			badguys[i] = new PeerItem(new ImageIcon("resrc\\icons\\blacklist.png"),
-					blistItems[i], "Hi, 我是" + blistItems[i], "uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx");
-		}
-		ObjectList blist = new ObjectList(badguys);
-
-		tabs = new ListsPane(flist, glist, blist, "resrc\\icons\\chat.png",
+		tabs = new ListsPane(friendlist, grouplist, blacklist, "resrc\\icons\\chat.png",
 				"resrc\\icons\\chatroom.png", "resrc\\icons\\blacklist.png");
 
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -164,7 +130,36 @@ public class Cheyenne extends NoxFrame {
 		
 		setForegroundColor();
 		initTrayIcon();
+		
+		sfrm.setLocation(0, 0);
+		sfrm.setSize(new Dimension(1000, 350));
 	}
+	/**
+	 * 将广告所代表的peer添加到好友列表中
+	 * @param adv 要添加的peer的广告 
+	 * @return 成功:返回false; 如果已经处于好友列表中: 返回true.
+	 */
+	public boolean add2Friendlist(PeerAdvertisement adv){
+		//TODO 将广告所代表的peer添加到好友列表中
+		PeerItem newFriend = new PeerItem(new ImageIcon(
+		"resrc\\portrait\\user.png"), adv.getName(), adv.getDescription(), adv.getPeerID().toString());
+		
+		friendlist.addItem(newFriend);
+		tabs.repaint();
+		return false;
+	}
+	/**
+	 * 将广告所代表的peer添加到好友列表中
+	 * @param adv 要添加的peer的广告 
+	 * @return 成功:返回false; 如果已经处于该组中: 返回true.
+	 */
+	public boolean joinThisGroup(PeerGroupAdvertisement adv){
+		//TODO 加入到adv所代表的组中
+		grouplist.toString();
+		tabs.repaint();
+		return false;
+	}
+	
 	/**
 	 * 设置托盘
 	 */
@@ -176,6 +171,12 @@ public class Cheyenne extends NoxFrame {
             traymenu.add(new MenuItem("Configure")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
                 	ccf.setVisible(true);
+                }
+            });
+            traymenu.add(new MenuItem("Search")).addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent ae){
+            		sfrm.pack();
+            		sfrm.setVisible(true);
                 }
             });
             traymenu.add(new MenuItem("Show up")).addActionListener(new ActionListener(){

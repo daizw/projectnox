@@ -4,9 +4,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/examples.jar"/>
 	<classpathentry kind="lib" path="lib/jna.jar"/>
-	<classpathentry kind="lib" path="lib/jxta.jar" sourcepath="E:/Java/NoX/bin/jxse-src-2.5.zip">
+	<classpathentry kind="lib" path="lib/jxta.jar" sourcepath="E:/Java/NoX/lib/jxse-src-2.5.zip">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/E:/Java/NoX/bin/jxse-doc-2.5.zip!/"/>
+			<attribute name="javadoc_location" value="jar:file:/E:/Java/NoX/lib/jxse-doc-2.5.zip!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/bcprov-jdk14.jar"/>

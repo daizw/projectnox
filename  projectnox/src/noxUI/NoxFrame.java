@@ -429,8 +429,9 @@ class Titlebar extends JPanel {
 							transparencyConfigBar.Show();
 						}
 					});
+					m.addSeparator();
 				}
-				m.add(new AbstractAction("About") {
+				m.add(new AbstractAction("About NoX") {
 					/**
 					 * 
 					 */
