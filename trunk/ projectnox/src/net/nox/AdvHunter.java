@@ -69,29 +69,28 @@ import net.jxta.protocol.DiscoveryResponseMsg;
 /**
  * Illustrates the use of the Discovery Service
  */
-public class AdvHunter implements DiscoveryListener {
+public class AdvHunter {
 
 	private transient NetworkManager manager;
 	private transient DiscoveryService discovery;
 	DiscoveryEventHandler dehandler;
-	
+
 	Thread hunter;
 	long startTime = 0;
 	long curTime = 0;
 	boolean Stop = false;
+
 	/**
 	 * Constructor for the DiscoveryClient
 	 */
-	public AdvHunter(NetworkManager mnger, DiscoveryEventHandler deh) {
+	public AdvHunter(NetworkManager mnger) {
 		manager = mnger;
-		dehandler = deh;
 
 		// Get the NetPeerGroup
 		PeerGroup netPeerGroup = manager.getNetPeerGroup();
 
 		// get the discovery service
 		discovery = netPeerGroup.getDiscoveryService();
-		discovery.addDiscoveryListener(AdvHunter.this);
 	}
 
 	/**
@@ -100,21 +99,26 @@ public class AdvHunter implements DiscoveryListener {
 	 * @param model
 	 *            向搜索结果列表中添加行需要用到的"句柄"
 	 */
-	public void LookAround(int advType, long starttime) {
+	public void LookAround(String peerid, int type, String attribute,
+			String value, int threshold, DiscoveryListener listener, long starttime) {
 		startTime = starttime;
 		try {
 			// Add ourselves as a DiscoveryListener for DiscoveryResponse events
-
 			System.out.println("Sending a Discovery Message");
-			discovery.getRemoteAdvertisements(// no specific peer (propagate)
-					null, // Adv type
-					advType, // Attribute = any
-					null, // Value = any
-					null, // one advertisement response is all we are looking
+			discovery.getRemoteAdvertisements(
+					// no specific peer (propagate)
+					peerid,
+					// Adv type
+					type,
+					// Attribute = any
+					attribute, 
+					// Value = any
+					value,
+					// one advertisement response is all we are looking
 					// for
-					1, // no query specific listener. we are using a global
-					// listener
-					null);
+					threshold, 
+					// no query specific listener. we are using a global listener
+					listener);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -147,8 +151,10 @@ public class AdvHunter implements DiscoveryListener {
 			while (en.hasMoreElements()) {
 				adv = (Advertisement) en.nextElement();
 				System.out.println(adv);
-				dehandler.eventOccured(adv, ev.getSource(), curTime - startTime);
-				//new NoxToolkit().getHuntingEventHandler().eventOccured(adv, ev.getSource(), curTime - startTime);
+				dehandler
+						.eventOccured(adv, ev.getSource(), curTime - startTime);
+				// new NoxToolkit().getHuntingEventHandler().eventOccured(adv,
+				// ev.getSource(), curTime - startTime);
 			}
 		}
 	}

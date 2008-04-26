@@ -13,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -26,12 +28,17 @@ import javax.swing.ListSelectionModel;
 import javax.swing.MenuElement;
 import javax.swing.table.DefaultTableModel;
 
+import net.jxta.discovery.DiscoveryEvent;
+import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
-import net.nox.JXTA;
+import net.jxta.protocol.DiscoveryResponseMsg;
+import net.jxta.protocol.PeerAdvertisement;
+import net.nox.JXTANetwork;
 import net.nox.NoxToolkit;
 
 /**
+ * 搜索窗口, 用于搜索peer/group
  * @author shinysky
  * 
  */
@@ -41,10 +48,10 @@ public class SearchingFrame extends JFrame {
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
+		Vector<Advertisement> advs = new Vector<Advertisement>();
 
 		AdvTable(AdvTableModel model) {
 			super(model);
-
 			this.getSelectionModel().setSelectionMode(
 					ListSelectionModel.SINGLE_SELECTION);
 		}
@@ -64,22 +71,43 @@ public class SearchingFrame extends JFrame {
 		 *            时间延迟
 		 */
 		public void addRow(Advertisement adv, Object src, long delay) {
+			/**
+			 * 如果已经添加过或者是自己的adv, 就不添加, 直接返回
+			 */
+			if(((PeerAdvertisement) adv).getPeerID()
+					.equals(new NoxToolkit().getNetworkManager().getPeerID()))
+				return;
+			System.out.println("Got:	" + ((PeerAdvertisement) adv).getPeerID());
+			System.out.println("Me:	" + new NoxToolkit().getNetworkManager().getPeerID());
+			
 			int rows = model.getRowCount();
 			for (int i = 0; i < rows; i++) {
-				if (model.getValueAt(i, 2).equals(src))
+				if (model.getValueAt(i, 2).equals(((PeerAdvertisement) adv).getPeerID()))
 					return;
 			}
 
 			Object[] advitem = new Object[4];
-			advitem[0] = adv.getAdvType();
-			advitem[1] = adv.getClass();
-			advitem[2] = src;
+			advitem[0] = ((PeerAdvertisement) adv).getName();
+			advitem[1] = ((PeerAdvertisement) adv).getDescription();
+			advitem[2] = ((PeerAdvertisement) adv).getPeerID();
 			if (delay < 0)
 				advitem[3] = "-";
 			else
 				advitem[3] = delay;
 
 			model.addRow(advitem);
+			/**
+			 * 同步广告向量
+			 */
+			advs.add(adv);
+			System.out.println("Add a Adv to the vector:" + advs.size());
+		}
+
+		public Advertisement getAdvAt(int row) {
+			System.out.println("Fetch a Adv from the vector, which has "
+					+ advs.size() + " Advertisements: ");
+			System.out.println(advs.get(row));
+			return advs.get(row);
 		}
 	}
 
@@ -94,87 +122,110 @@ public class SearchingFrame extends JFrame {
 	AdvTable searchResultTable;
 	AdvTableModel model;
 
-	JXTA MyLogin;
-	//HuntingEventHandler hehandler=new HuntingEventHandler(searchResultTable);;
+	JXTANetwork MyLogin;
+	Cheyenne parent;
+	long startTime;
+
+	// HuntingEventHandler hehandler=new
+	// HuntingEventHandler(searchResultTable);;
 	/**
+	 * @param chyn
 	 * 
 	 */
-	public SearchingFrame(JXTA MyLogin) {
+	public SearchingFrame(Cheyenne chyn) {
 		super("Searching");
-		this.MyLogin = MyLogin;
+		this.MyLogin = new NoxToolkit().getNetwork();
+		parent = chyn;
+
 		infinitePane = buildInfinitePanel();
 
-		String[] columns = { "Name", "Sign", "UUID", "Delay/ms" };
-		Object[][] data = {
-				{ "Who", "I am Who", "uuid:jxta:xxxxxxxxxxxxxxxxxx", 1000 },
-				{ "Who", "I am Who", "uuid:jxta:xxxxxxxxxxxxxxxxxx", 1000 }};
+		String[] columns = { "Name", "Sign", "UUID", "Delay/ms", "Adv" };
+		Object[][] data = {};
+
 		model = new AdvTableModel(data, columns);
 		searchResultTable = new AdvTable(model);
 		/**
 		 * 搜索之前必须先设定目标JTable, 否则事件处理程序不知道向哪里输出搜索结果
 		 */
-		new NoxToolkit().getHuntingEventHandler().setAdvTable(searchResultTable);
+		new NoxToolkit().getHuntingEventHandler()
+				.setAdvTable(searchResultTable);
 		/*
 		 * TableColumn column = searchResultTable.getColumnModel().getColumn(3);
 		 * column.setPreferredWidth(20);
 		 */
 		searchResultTable.addMouseListener(new MouseListener() {
-				@Override
-				public void mouseClicked(MouseEvent me) {
-					JPopupMenu ResultOprMenu = new JPopupMenu();
-					if (me.getButton() == MouseEvent.BUTTON3) {
-						/*
-						 * TODO 实现右键可选取JTable 的行
+			@Override
+			public void mouseClicked(MouseEvent me) {
+				JPopupMenu ResultOprMenu = new JPopupMenu();
+				if (me.getButton() == MouseEvent.BUTTON3) {
+					/*
+					 * TODO 实现右键可选取JTable 的行 有缺陷: 在已选择某行的情况下才可用;否则无效
+					 */
+					searchResultTable.getVisibleRect();
+					int row = me.getY() / searchResultTable.getRowHeight();
+					searchResultTable.getSelectionModel()
+							.setLeadSelectionIndex(row);
+
+					ResultOprMenu.add(new AbstractAction(
+							"Add him/her to my friendlist") {
+						/**
+						 * 
 						 */
-						searchResultTable.getVisibleRect();
-						int row = me.getY() / searchResultTable.getRowHeight();
-						searchResultTable.getSelectionModel()
-								.setLeadSelectionIndex(row);
-						ResultOprMenu
-						.add(new AbstractAction("Add him/her to my friendlist") {
-							public void actionPerformed(ActionEvent e) {
-								// TODO 添加到好友列表
-								/*int[] selected = searchResultTable.getSelectedRows();
-								for (int i = 0; i < selected.length; i++) {
-									// TODO 把选中的元素添加到好友, 目前只是输出所选行
-									System.out.println(searchResultTable.getValueAt(
-											selected[i], 2));
-								}*/
+						private static final long serialVersionUID = 1L;
+
+						public void actionPerformed(ActionEvent e) {
+							// TODO 添加到好友列表
+							int[] selected = searchResultTable
+									.getSelectedRows();
+							for (int i = 0; i < selected.length; i++) {
+								Advertisement adv = (Advertisement) searchResultTable
+										.getAdvAt(selected[i]);
+								// TODO 把选中的元素添加到好友, 目前只是输出所选行的adv
+								System.out.println(adv);
+								// TODO 根据广告标签确定添加好友是否需要验证; 暂时直接添加
+								// adv.getID();
+								parent.add2Friendlist((PeerAdvertisement) adv);
 							}
-						});
-				ResultOprMenu.add(new AbstractAction("Talk to him/her") {
-					public void actionPerformed(ActionEvent e) {
-						// TODO 打开聊天窗口
-					}
-				});
-				MenuElement els[] = ResultOprMenu.getSubElements();
-				for (int i = 0; i < els.length; i++)
-					els[i].getComponent().setBackground(Color.WHITE);
-				ResultOprMenu.setLightWeightPopupEnabled(true);
-				ResultOprMenu.pack();
-						ResultOprMenu.show((Component) me.getSource(), me
-								.getPoint().x, me.getPoint().y);
-					}
-				}
+						}
+					});
+					ResultOprMenu.add(new AbstractAction("Talk to him/her") {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 1L;
 
-				@Override
-				public void mouseEntered(MouseEvent arg0) {
+						public void actionPerformed(ActionEvent e) {
+							// TODO 打开聊天窗口
+						}
+					});
+					MenuElement els[] = ResultOprMenu.getSubElements();
+					for (int i = 0; i < els.length; i++)
+						els[i].getComponent().setBackground(Color.WHITE);
+					ResultOprMenu.setLightWeightPopupEnabled(true);
+					ResultOprMenu.pack();
+					ResultOprMenu.show((Component) me.getSource(), me
+							.getPoint().x, me.getPoint().y);
 				}
+			}
 
-				@Override
-				public void mouseExited(MouseEvent arg0) {
-				}
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+			}
 
-				@Override
-				public void mousePressed(MouseEvent arg0) {
-					// AdvTable.this.getSelectedRow();
-				}
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+			}
 
-				@Override
-				public void mouseReleased(MouseEvent arg0) {
-				}
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// AdvTable.this.getSelectedRow();
+			}
 
-			});
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+			}
+
+		});
 
 		JScrollPane scrollPane = new JScrollPane(searchResultTable);
 
@@ -205,10 +256,43 @@ public class SearchingFrame extends JFrame {
 		searchPeersBtn.setMaximumSize(size);
 		searchPeersBtn.setMinimumSize(size);
 
+		final DiscoveryListener listener = new DiscoveryListener(){
+
+			@Override
+			public void discoveryEvent(DiscoveryEvent event) {
+				DiscoveryResponseMsg res = event.getResponse();
+
+				// let's get the responding peer's advertisement
+				System.out.println(" [  Got a Discovery Response ["
+						+ res.getResponseCount() + " elements]  from peer : "
+						+ event.getSource() + "  ]");
+
+				long curTime = new Date().getTime();
+				System.out.println(curTime);
+
+				Advertisement adv;
+				Enumeration<Advertisement> en = res.getAdvertisements();
+
+				if (en != null) {
+					while (en.hasMoreElements()) {
+						adv = (Advertisement) en.nextElement();
+						System.out.println(adv);
+						new NoxToolkit().getHuntingEventHandler()
+								.eventOccured(searchResultTable, adv, event.getSource(), curTime - startTime);
+						// new NoxToolkit().getHuntingEventHandler().eventOccured(adv,
+						// ev.getSource(), curTime - startTime);
+					}
+				}
+			}
+		};
+		
 		searchPeersBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				if (searchPeersBtn.getText() == "Search") {
 					glassPane.start();
+					/**
+					 * 搜索进度指示器
+					 */
 					Thread indicating = new Thread(new Runnable() {
 						public void run() {
 							try {
@@ -221,9 +305,12 @@ public class SearchingFrame extends JFrame {
 					indicating.start();
 					Thread hunter = new Thread(new Runnable() {
 						public void run() {
-							MyLogin.GoHunting(	DiscoveryService.PEER, new NoxToolkit().getHuntingEventHandler());
+							//(String peerid, int AdvType, 
+							//String attribute, String value, int threshold, DiscoveryListener listener) 
+							MyLogin.GoHunting(null, DiscoveryService.PEER, null, null, 10, listener);
 						}
 					}, "Hunter");
+					startTime = new Date().getTime();
 					hunter.start();
 				} else if (searchPeersBtn.getText() == "Stop") {
 					glassPane.stop();
@@ -243,11 +330,11 @@ public class SearchingFrame extends JFrame {
 	 */
 	public static void main(String[] args) {
 
-		JXTA MyLogin;
-		MyLogin = new JXTA();
+		JXTANetwork MyLogin;
+		MyLogin = new JXTANetwork();
 		MyLogin.SeekRendezVousConnection();
 
-		SearchingFrame sfrm = new SearchingFrame(MyLogin);
+		SearchingFrame sfrm = new SearchingFrame(null);
 		sfrm.setLocation(0, 0);
 		sfrm.setSize(new Dimension(1000, 350));
 		// sfrm.pack();
@@ -265,6 +352,12 @@ class AdvTableModel extends DefaultTableModel {
 		super(data, columns);
 	}
 
+	public int getColumnCount() {
+		return 4;
+	}
+
+	// public int getRowCount() { return 10; }
+
 	/**
 	 * 单元格是否可编辑
 	 */
@@ -272,6 +365,9 @@ class AdvTableModel extends DefaultTableModel {
 		return false;
 	}
 
+	/*
+	 * public int getColumns(){ return 3; }
+	 */
 	/**
 	 * 列类
 	 */
