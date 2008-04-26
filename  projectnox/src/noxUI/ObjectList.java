@@ -80,7 +80,7 @@ public class ObjectList extends JList {
 
 			@Override
 			public void mouseEntered(MouseEvent menter) {
-				// TODO Auto-generated method stub
+				// TODO 自动改变背景色
 				// int index =
 				// ObjectList.this.locationToIndex(menter.getPoint());
 				// ObjectList.this.set
@@ -88,20 +88,14 @@ public class ObjectList extends JList {
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
 			}
 
 			@Override
 			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
 			}
 		});
 	}

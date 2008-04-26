@@ -1,16 +1,19 @@
 package net.nox;
+import java.io.File;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Date;
+
+import javax.security.cert.CertificateException;
+import javax.swing.JOptionPane;
+
 import net.jxta.exception.PeerGroupException;
 import net.jxta.peergroup.PeerGroup;
 import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
-import noxUI.SearchingFrame;
-import noxUI.SearchingFrame.AdvTableModel;
-
-import java.text.MessageFormat;
-import java.io.File;
-import java.io.IOException;
-import javax.security.cert.CertificateException;
-import javax.swing.JOptionPane;
+import net.nox.NoxToolkit.CheckStatusEventHandler;
+import net.nox.NoxToolkit.HuntingEventHandler;
+import noxUI.SearchingFrame.AdvTable;
 
 public class JXTA {
 
@@ -21,8 +24,12 @@ public class JXTA {
     NetworkManager TheNetworkManager;
     NetworkConfigurator TheConfig;
     PeerGroup TheNetPeerGroup;
-    PeerHunter disocveryClient;
-
+    AdvHunter disocveryClient;
+    NoxToolkit toolkit;
+    HuntingEventHandler hehandler;
+    CheckStatusEventHandler cshandler;
+    
+    boolean StopDiscovery = false;
     public JXTA() {
         // Creating the Network Manager
         try {
@@ -75,10 +82,10 @@ public class JXTA {
             }
         } else {
             System.out.println("No local configuration found");
-            
-            TheConfig.setPrincipal(GetPrincipal());
+            String principal = GetPrincipal();
+            TheConfig.setPrincipal(principal);
             TheConfig.setPassword(GetPassword());
-            TheConfig.setName(Local_Peer_Name);
+            TheConfig.setName(principal);
 
             System.out.println("Principal: " + TheConfig.getPrincipal());
             System.out.println("Password : " + TheConfig.getPassword());
@@ -92,6 +99,12 @@ public class JXTA {
                 System.exit(-1);
             }
         }
+        /**
+         * ≥ı ºªØNoxToolkit
+         */
+        hehandler = new NoxToolkit().new HuntingEventHandler(null);
+        cshandler = new NoxToolkit().new CheckStatusEventHandler(null);
+        toolkit = new NoxToolkit(TheNetworkManager, hehandler, cshandler);
     }
 
     private String GetPrincipal() {
@@ -134,28 +147,33 @@ public class JXTA {
         boolean connected = TheNetworkManager.waitForRendezvousConnection(5000);
         System.out.println(MessageFormat.format("Connected :{0}", connected));
     }
-    public void GoHunting(SearchingFrame.AdvTableModel model){
-    	disocveryClient = new PeerHunter(TheNetworkManager);
-        disocveryClient.start(model);
+    public void GoHunting(int AdvType, DiscoveryEventHandler dehandler){
+    	disocveryClient = new AdvHunter(TheNetworkManager, dehandler);
+    	//new AdvHunter(TheNetworkManager, AdvType);
+    	
+    	long startTime = new Date().getTime();
+    	long waittime = 5 * 1000L;
+		System.out.println(startTime);
+		
+		StopDiscovery = false;
+		
+    	while (!StopDiscovery) {
+			// wait a bit before sending a discovery message
+			try {
+				System.out.println("Sleeping for :" + waittime);
+				Thread.sleep(waittime);
+			} catch (Exception e) {
+				// ignored
+			}
+			// look for any peer
+			disocveryClient.LookAround(AdvType, startTime);
+		}
     }
     public void StopHunting(){
-    	disocveryClient.stop();
+    	StopDiscovery = true;
     }
     public void StopNetwork(){
     	System.out.println("Stopping JXTA");
         TheNetworkManager.stopNetwork();
     }
-
-    public static void main(String[] args) {
-        JXTA MyLogin = new JXTA();
-        MyLogin.SeekRendezVousConnection();
-        //MyLogin.GoHunting(null);
-        
-        MyLogin.StopNetwork();
-    }
-
-	public void GoHunting(noxUI.SearchingFrame model) {
-		// TODO Auto-generated method stub
-		
-	}
 }
