@@ -35,6 +35,8 @@ public class NoxFrame extends JFrame {
 	 */
 	public static final int WIDTH_MIN = 120;
 	public static final int HEIGHT_MIN = 60;
+	public static final int TITLE_HEIGHT = 20;
+	public static final int FOOT_HEIGHT = 15;
 
 	/**
 	 * 前景背景颜色
@@ -332,7 +334,7 @@ class Titlebar extends JPanel {
 	// boolean windowStateIsMax;
 
 	/**
-	 * 标题栏JPanel类
+	 * 标题栏JPanel类, 高度20;
 	 * 
 	 * @param parent
 	 *            父组件, 用于控制其最大最小化
@@ -372,11 +374,12 @@ class Titlebar extends JPanel {
 
 		transparencyConfigBar = new FrameConfigDialog(parent);
 
+		Dimension btnsize = new Dimension(NoxFrame.TITLE_HEIGHT, NoxFrame.TITLE_HEIGHT); 
 		blogo = new JButton(new ImageIcon(path_logo));
-		blogo.setSize(new Dimension(20, 20));
-		blogo.setPreferredSize(new Dimension(20, 20));
-		blogo.setMaximumSize(new Dimension(20, 20));
-		blogo.setMinimumSize(new Dimension(20, 20));
+		blogo.setSize(btnsize);
+		blogo.setPreferredSize(btnsize);
+		blogo.setMaximumSize(btnsize);
+		blogo.setMinimumSize(btnsize);
 		blogo.setBorderPainted(false);
 		blogo.setContentAreaFilled(false);
 		blogo.setOpaque(false);
@@ -425,7 +428,7 @@ class Titlebar extends JPanel {
 						public void actionPerformed(ActionEvent e) {
 							transparencyConfigBar.setLocation(blogo
 									.getLocationOnScreen().x, blogo
-									.getLocationOnScreen().y + 20);
+									.getLocationOnScreen().y + NoxFrame.TITLE_HEIGHT);
 							transparencyConfigBar.Show();
 						}
 					});
@@ -471,7 +474,7 @@ class Titlebar extends JPanel {
 				//m.setForeground(Color.RED);
 				m.pack();
 				// 位置应该是相对于JButton的位置
-				m.show((Component) e.getSource(), 0, 20);
+				m.show((Component) e.getSource(), 0, NoxFrame.TITLE_HEIGHT);
 			}
 		});
 
@@ -497,10 +500,10 @@ class Titlebar extends JPanel {
 		 */
 		bminimize = new JButton(new ImageIcon(path_minimize));
 		bminimize.setRolloverIcon(new ImageIcon(path_minimize_rollover));
-		bminimize.setSize(new Dimension(20, 20));
-		bminimize.setPreferredSize(new Dimension(20, 20));
-		bminimize.setMaximumSize(new Dimension(20, 20));
-		bminimize.setMinimumSize(new Dimension(20, 20));
+		bminimize.setSize(btnsize);
+		bminimize.setPreferredSize(btnsize);
+		bminimize.setMaximumSize(btnsize);
+		bminimize.setMinimumSize(btnsize);
 		bminimize.setBorderPainted(false);
 		bminimize.setContentAreaFilled(false);
 		bminimize.setOpaque(false);
@@ -519,10 +522,10 @@ class Titlebar extends JPanel {
 
 		bmaximize = new JButton(new ImageIcon(path_maximize));
 		bmaximize.setRolloverIcon(new ImageIcon(path_maximize_rollover));
-		bmaximize.setSize(new Dimension(20, 20));
-		bmaximize.setPreferredSize(new Dimension(20, 20));
-		bmaximize.setMaximumSize(new Dimension(20, 20));
-		bmaximize.setMinimumSize(new Dimension(20, 20));
+		bmaximize.setSize(btnsize);
+		bmaximize.setPreferredSize(btnsize);
+		bmaximize.setMaximumSize(btnsize);
+		bmaximize.setMinimumSize(btnsize);
 		bmaximize.setBorderPainted(false);
 		bmaximize.setContentAreaFilled(false);
 		bmaximize.setOpaque(false);
@@ -561,10 +564,10 @@ class Titlebar extends JPanel {
 
 		bclose = new JButton(new ImageIcon(path_close));
 		bclose.setRolloverIcon(new ImageIcon(path_close_rollover));
-		bclose.setSize(new Dimension(20, 20));
-		bclose.setPreferredSize(new Dimension(20, 20));
-		bclose.setMaximumSize(new Dimension(20, 20));
-		bclose.setMinimumSize(new Dimension(20, 20));
+		bclose.setSize(btnsize);
+		bclose.setPreferredSize(btnsize);
+		bclose.setMaximumSize(btnsize);
+		bclose.setMinimumSize(btnsize);
 		bclose.setBorderPainted(false);
 		bclose.setContentAreaFilled(false);
 		bclose.setOpaque(false);
@@ -631,10 +634,11 @@ class FootPane extends JPanel {
 		resizeButn = new JButton(new AngledLinesWindowsCornerIcon());
 		resizeButn.setBorderPainted(false);
 		resizeButn.setContentAreaFilled(false);
-		resizeButn.setSize(new Dimension(15, 15));
-		resizeButn.setPreferredSize(new Dimension(15, 15));
-		resizeButn.setMaximumSize(new Dimension(15, 15));
-		resizeButn.setMinimumSize(new Dimension(15, 15));
+		Dimension btnsize = new Dimension(NoxFrame.FOOT_HEIGHT, NoxFrame.FOOT_HEIGHT);
+		resizeButn.setSize(btnsize);
+		resizeButn.setPreferredSize(btnsize);
+		resizeButn.setMaximumSize(btnsize);
+		resizeButn.setMinimumSize(btnsize);
 		// resizeButn.setOpaque(false);
 
 		resizer = new ResizeListener(parent, resizeButn);
