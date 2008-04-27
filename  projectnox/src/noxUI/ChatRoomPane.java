@@ -17,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -45,6 +46,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
+import net.nox.NoxToolkit;
 
 /*
  * Created on 2006-9-9
@@ -224,7 +227,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * private RenderingHints hints = new RenderingHints(null);
 	 */
 	// ********************************************************
-	JFrame parent;
+	Chatroom parent;
 
 	/**
 	 * JSplitPane 聊天组件, 含输入框/消息窗口/表情按钮/闪屏按钮/.../发送按钮 等
@@ -232,7 +235,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * @param par
 	 *            父组件, 用于使窗口par振动
 	 */
-	public ChatRoomPane(JFrame par) {
+	public ChatRoomPane(Chatroom par) {
 		super(JSplitPane.VERTICAL_SPLIT);
 		parent = par;
 
@@ -529,8 +532,16 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			// 把"^n"替换为"\n"
 			strbuf_msg.replace(caretPos, caretPos + 2, "\n");
 		}
+		
+		String whoami = "ME";
+		try {
+			whoami = new NoxToolkit().getNetworkManager().getConfigurator().getName();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		if (strs[2].equals("ME"))// 此处要获取当前用户的用户名
+		if (strs[2].equals(whoami))// 此处要获取当前用户的用户名
 		{
 			String label = strs[1] + " say to me at " + strs[3];
 			appendToHMsg(label, strbuf_msg.toString(), true);
@@ -549,8 +560,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 				appendToHMsg(label, strbuf_msg.toString(), true);
 				playAudio();
 			}
-		} else
-			;
+		}
 	}
 
 	/**
@@ -618,6 +628,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(), blue);
 			tp_historymsg.replaceSelection(label + '\n');
 			System.out.println("label :" + label);
+			System.out.println("msg :" + msg);
 
 			tp_historymsg.setCaretPosition(styledDoc.getLength());// !!!
 			styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(), bold);
@@ -719,7 +730,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 
 		appendToHMsg(label, tp_input.getText(), true);
 		/**
-		 * 向服务器发送消息
+		 * 向对方发送消息
 		 */
 		StringBuffer strbuf_msg = new StringBuffer(tp_input.getText());
 		int caretPos = -1;
@@ -731,6 +742,8 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		}
 		System.out.println("strbuf_msg :" + strbuf_msg);
 
+		parent.SendMsg(new String(strbuf_msg));
+		
 		tp_input.setText("");// 输入框清空
 	}
 

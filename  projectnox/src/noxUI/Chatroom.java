@@ -1,51 +1,48 @@
 package noxUI;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import net.jxta.discovery.DiscoveryEvent;
-import net.jxta.discovery.DiscoveryListener;
-import net.jxta.discovery.DiscoveryService;
-import net.jxta.document.Advertisement;
 import net.jxta.document.AdvertisementFactory;
+import net.jxta.document.MimeMediaType;
 import net.jxta.endpoint.Message;
+import net.jxta.endpoint.MessageElement;
 import net.jxta.endpoint.StringMessageElement;
-import net.jxta.id.ID;
+import net.jxta.endpoint.WireFormatMessage;
+import net.jxta.endpoint.WireFormatMessageFactory;
+import net.jxta.endpoint.Message.ElementIterator;
 import net.jxta.id.IDFactory;
 import net.jxta.peer.PeerID;
+import net.jxta.pipe.InputPipe;
 import net.jxta.pipe.OutputPipe;
 import net.jxta.pipe.OutputPipeEvent;
 import net.jxta.pipe.OutputPipeListener;
 import net.jxta.pipe.PipeID;
+import net.jxta.pipe.PipeMsgEvent;
+import net.jxta.pipe.PipeMsgListener;
 import net.jxta.pipe.PipeService;
-import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PipeAdvertisement;
-
-import net.nox.*;
+import net.jxta.util.CountingOutputStream;
+import net.jxta.util.DevNullOutputStream;
+import net.nox.NoxToolkit;
 
 /**
  * 
  * @author shinysky
  * 
  */
-public class Chatroom extends NoxFrame implements OutputPipeListener {
+public class Chatroom extends NoxFrame implements OutputPipeListener,
+		PipeMsgListener {
 	/**
 	 * 
 	 */
@@ -72,15 +69,17 @@ public class Chatroom extends NoxFrame implements OutputPipeListener {
 			.concat("faces/");
 
 	JSplitPane rootpane;
-	ChatRoomPane crp;
+	ChatRoomPane chatroompane;
 	protected InfiniteProgressPanel glassPane;
 	boolean connected = false;
 
 	private PipeService pipeService;
 	private PipeAdvertisement pipeAdv;
 	private OutputPipe outputPipe;
-	private final Object lock = new Object();
-	public final static String MESSAGE_NAME_SPACE = "PipeTutorial";
+	public final static String MESSAGE_NAME_SPACE = "NoXMessage";
+	public final static String MESSAGE_TIME_NAME_SPACE = "SENDTIME";
+
+	private InputPipe inputPipe = null;
 
 	/**
 	 * 最终应该从主窗口继承颜色, 透明度 考虑实现---------主窗口和从属窗口同步调节颜色和透明度
@@ -111,7 +110,7 @@ public class Chatroom extends NoxFrame implements OutputPipeListener {
 		this.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
 		this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
 
-		crp = new ChatRoomPane(this);
+		chatroompane = new ChatRoomPane(this);
 		// crp.setLayout(new FlowLayout());
 		rootpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		rootpane.setOneTouchExpandable(true);
@@ -127,10 +126,11 @@ public class Chatroom extends NoxFrame implements OutputPipeListener {
 				.getNick(), friend.getPortrait(), new ImageIcon(
 				"resrc\\portrait\\portrait.png"));
 		rootpane.add(portraits);
-		rootpane.add(crp);
+		rootpane.add(chatroompane);
 
 		glassPane = new InfiniteProgressPanel("连接中, 请稍候...", 12);
-		glassPane.setBounds(0, 0, WIDTH_PREF, HEIGHT_PREF - 100);
+		glassPane.setBounds(0, 0, WIDTH_PREF, 
+				HEIGHT_PREF - NoxFrame.HEIGHT_MIN - NoxFrame.FOOT_HEIGHT);
 		glassPane.start();
 
 		Thread connector = new Thread(new Runnable() {
@@ -138,7 +138,7 @@ public class Chatroom extends NoxFrame implements OutputPipeListener {
 				/**
 				 * 与该peer建立连接
 				 */
-				TryToConnect(friend.getUUID());
+				TryToConnect(friend.getUUID(), 2 * 1000);
 				/**
 				 * 等候N秒钟
 				 */
@@ -179,7 +179,7 @@ public class Chatroom extends NoxFrame implements OutputPipeListener {
 		MultiChatRoomSidePane groupmembers = new MultiChatRoomSidePane(
 				"Hello, everyone, happy everyday!", gmembers);
 		rootpane.add(groupmembers);
-		rootpane.add(crp);
+		rootpane.add(chatroompane);
 		this.getContainer().setLayout(new BorderLayout());
 		this.getContainer().add(rootpane, BorderLayout.CENTER);
 	}
@@ -189,19 +189,28 @@ public class Chatroom extends NoxFrame implements OutputPipeListener {
 	 * 
 	 * @return
 	 */
-	private void TryToConnect(String peerid) {
+	private void TryToConnect(String peerid, long waittime) {
 		// get the pipe service, and discovery
 		pipeService = new NoxToolkit().getNetworkManager().getNetPeerGroup()
 				.getPipeService();
 		// create the pipe advertisement
 		pipeAdv = getPipeAdvertisement();
 		PeerID peerID = null;
-		/*
-		 * try { peerID = (PeerID) IDFactory.fromURI(new URI(peerid)); } catch
-		 * (URISyntaxException use) { use.printStackTrace(); }
-		 */
+		try {
+			peerID = (PeerID) IDFactory.fromURI(new URI(peerid));
+		} catch(URISyntaxException use)
+		{
+			use.printStackTrace();
+		}
+		 
 		System.out.println("Pipe Adv	: " + pipeAdv);
 		System.out.println("Peer ID	: " + peerID);
+
+		Set<PeerID> resolvablePeers = new HashSet<PeerID>();
+		resolvablePeers.add(peerID);
+		
+		long unittime = 500;
+		long timecount = waittime / unittime;
 
 		try {
 			// issue a pipe resolution asynchronously. outputPipeEvent() is
@@ -209,21 +218,46 @@ public class Chatroom extends NoxFrame implements OutputPipeListener {
 			// once the pipe has resolved
 			// pipeService.createOutputPipe(pipeAdv, (OutputPipeListener) this);
 			pipeService.createOutputPipe(pipeAdv, this);
+			pipeService.createOutputPipe(pipeAdv, resolvablePeers, this);
+			TryToGetInputPipe();
 			/**
-			 * 等待10秒钟
+			 * 等待N秒钟
 			 */
 			try {
-				synchronized (lock) {
-					lock.wait(2000);
+				while (!connected && timecount > 0){
+					Thread.sleep(unittime);
+					timecount--;
+					System.out.println("timecount: " + timecount);
 				}
-			} catch (InterruptedException e) {
-				System.out.println("Thread interrupted");
+			}catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		} catch (IOException e) {
 			System.out.println("OutputPipe creation failure");
 			e.printStackTrace();
 		}
 		System.out.println("-------=========End of TryToConnect()");
+	}
+
+	/**
+	 * Creates the input pipe with this as the message listener
+	 */
+	public void TryToGetInputPipe() {
+		try {
+			System.out.println("Creating input pipe");
+			// Create the InputPipe and register this for message arrival
+			// notification call-back
+			inputPipe = pipeService.createInputPipe(pipeAdv, this);
+		} catch (IOException io) {
+			io.printStackTrace();
+			return;
+		}
+		if (inputPipe == null) {
+			System.out.println(" cannot open InputPipe");
+			System.exit(-1);
+		}
+		System.out.println("Waiting for msgs on input pipe");
 	}
 
 	/**
@@ -251,52 +285,159 @@ public class Chatroom extends NoxFrame implements OutputPipeListener {
 	}
 
 	/**
+	 * Dumps the message content to stdout
+	 * 
+	 * @param msg
+	 *            the message
+	 * @param verbose
+	 *            dumps message element content if true
+	 */
+	public void printMessageStats(Message msg, boolean verbose) {
+		String inputMsg = "";
+		try {
+			CountingOutputStream cnt;
+			ElementIterator it = msg.getMessageElements();
+
+			System.out
+					.println("------------------Begin Message---------------------");
+			inputMsg += "------------------Begin Message---------------------^n";
+
+			WireFormatMessage serialed = WireFormatMessageFactory.toWire(msg,
+					new MimeMediaType("application/x-jxta-msg"), null);
+
+			System.out.println("Message Size :" + serialed.getByteLength());
+			inputMsg += ("Message Size :" + serialed.getByteLength() + "^n");
+
+			while (it.hasNext()) {
+				MessageElement el = it.next();
+				String eName = el.getElementName();
+
+				cnt = new CountingOutputStream(new DevNullOutputStream());
+				el.sendToStream(cnt);
+				long size = cnt.getBytesWritten();
+
+				System.out.println("Element " + eName + " : " + size);
+				inputMsg += ("Element " + eName + " : " + size + "^n");
+
+				if (verbose) {
+					System.out.println("[" + el + "]");
+					inputMsg += ("[" + el + "]" + "^n");
+				}
+			}
+			System.out
+					.println("---------[F:100]----------End Message----------[F:035]------------");
+			inputMsg += "---------[F:100]----------End Message----------[F:035]------------";
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String whoami = "ME";
+		try {
+			whoami = new NoxToolkit().getNetworkManager().getConfigurator()
+					.getName();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String[] fullMsg = { "", "Someone", whoami, new Date().toString(),
+				inputMsg };
+		chatroompane.receiveMsgAndAccess(fullMsg);
+	}
+
+	/**
 	 * Closes the output pipe and stops the platform
 	 */
+	@SuppressWarnings("unused")
 	private void stop() {
 		// Close the output pipe
 		outputPipe.close();
 		// lock.notify();
+		inputPipe.close();
 	}
 
-	@Override
-	public void outputPipeEvent(OutputPipeEvent event) {
-
-		connected = true;
-		/*
-		 * try { lock.notify(); } catch (IllegalMonitorStateException exc) {
-		 * exc.printStackTrace(); }
-		 */
-
-		System.out.println("Received the output pipe resolution event");
-		// get the output pipe object
-		outputPipe = event.getOutputPipe();
-
+	public boolean SendMsg(String strbuf_msg) {
+		if(outputPipe == null)
+			return false;
 		Message msg;
-
 		try {
 			System.out.println("Sending message");
 			// create the message
 			msg = new Message();
 			Date date = new Date(System.currentTimeMillis());
 			// add a string message element with the current date
-			StringMessageElement sme = new StringMessageElement(
-					MESSAGE_NAME_SPACE, date.toString(), null);
+			StringMessageElement stns = new StringMessageElement(
+					MESSAGE_TIME_NAME_SPACE, date.toString(), null);
+			/*
+			 * StringMessageElement bla = new StringMessageElement( "FUNNY",
+			 * "Isn't it?", null); msg.addMessageElement(null, sme);
+			 * msg.addMessageElement(null, bla);
+			 */
+			StringMessageElement mns = new StringMessageElement(
+					MESSAGE_NAME_SPACE, strbuf_msg, null);
 
-			msg.addMessageElement(null, sme);
+			msg.addMessageElement(null, stns);
+			msg.addMessageElement(null, mns);
 			// send the message
 			outputPipe.send(msg);
 			System.out.println("message sent");
 		} catch (IOException e) {
 			System.out.println("failed to send message");
 			e.printStackTrace();
-			System.exit(-1);
+			return false;
 		}
-		stop();
+		return true;
 	}
 
-	protected Container buildInfinitePanel() {
+	@Override
+	public void outputPipeEvent(OutputPipeEvent event) {
+		connected = true;
+		System.out.println("Received the output pipe resolution event");
+		// get the output pipe object
+		outputPipe = event.getOutputPipe();
+		SendMsg("It's funny, huh?");
+	}
 
-		return null;
+	/**
+	 * PipeMsgListener interface for asynchronous message arrival notification
+	 * 
+	 * @param event
+	 *            the message event
+	 */
+	@Override
+	public void pipeMsgEvent(PipeMsgEvent event) {
+		Message msg;
+		try {
+			// Obtain the message from the event
+			msg = event.getMessage();
+			if (msg == null) {
+				System.out.println("Received an empty message");
+				return;
+			}
+			// dump the message content to screen
+			printMessageStats(msg, true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+
+		// get all the message elements
+		Message.ElementIterator en = msg.getMessageElements();
+
+		if (!en.hasNext()) {
+			return;
+		}
+
+		// get the message element in the name space
+		// PipeClient.MESSAGE_NAME_SPACE
+		MessageElement msgElement = msg.getMessageElement(null,
+				MESSAGE_TIME_NAME_SPACE);
+
+		// Get message
+		if (msgElement.toString() == null) {
+			System.out.println("null msg received");
+		} else {
+			Date date = new Date(System.currentTimeMillis());
+			System.out.println("Message received at :" + date.toString());
+			System.out.println("Message  created at :" + msgElement.toString());
+		}
 	}
 }
