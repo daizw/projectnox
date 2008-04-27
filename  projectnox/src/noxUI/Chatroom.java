@@ -3,8 +3,6 @@ package noxUI;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,6 +19,7 @@ import net.jxta.endpoint.StringMessageElement;
 import net.jxta.endpoint.WireFormatMessage;
 import net.jxta.endpoint.WireFormatMessageFactory;
 import net.jxta.endpoint.Message.ElementIterator;
+import net.jxta.id.ID;
 import net.jxta.id.IDFactory;
 import net.jxta.peer.PeerID;
 import net.jxta.pipe.InputPipe;
@@ -80,6 +79,7 @@ public class Chatroom extends NoxFrame implements OutputPipeListener,
 	public final static String MESSAGE_TIME_NAME_SPACE = "SENDTIME";
 
 	private InputPipe inputPipe = null;
+	private ID roomID;
 
 	/**
 	 * 最终应该从主窗口继承颜色, 透明度 考虑实现---------主窗口和从属窗口同步调节颜色和透明度
@@ -129,8 +129,8 @@ public class Chatroom extends NoxFrame implements OutputPipeListener,
 		rootpane.add(chatroompane);
 
 		glassPane = new InfiniteProgressPanel("连接中, 请稍候...", 12);
-		glassPane.setBounds(0, 0, WIDTH_PREF, 
-				HEIGHT_PREF - NoxFrame.HEIGHT_MIN - NoxFrame.FOOT_HEIGHT);
+		glassPane.setBounds(0, -NoxFrame.TITLE_HEIGHT, WIDTH_PREF, HEIGHT_PREF
+				- NoxFrame.TITLE_HEIGHT * 2);
 		glassPane.start();
 
 		Thread connector = new Thread(new Runnable() {
@@ -138,7 +138,7 @@ public class Chatroom extends NoxFrame implements OutputPipeListener,
 				/**
 				 * 与该peer建立连接
 				 */
-				TryToConnect(friend.getUUID(), 2 * 1000);
+				TryToConnect(5 * 1000);
 				/**
 				 * 等候N秒钟
 				 */
@@ -171,17 +171,24 @@ public class Chatroom extends NoxFrame implements OutputPipeListener,
 		this.getContainer().add(rootpane/* , BorderLayout.SOUTH */);
 		rootpane.setVisible(false);
 
+		roomID = friend.getUUID();
 		this.setVisible(true);
 	}
 
-	public Chatroom(String title, GroupItem[] gmembers) {
-		this(title);
+	public Chatroom(final GroupItem group, GroupItem[] gmembers) {
+		this(group.getNick());
 		MultiChatRoomSidePane groupmembers = new MultiChatRoomSidePane(
 				"Hello, everyone, happy everyday!", gmembers);
 		rootpane.add(groupmembers);
 		rootpane.add(chatroompane);
 		this.getContainer().setLayout(new BorderLayout());
 		this.getContainer().add(rootpane, BorderLayout.CENTER);
+		roomID = group.getUUID();
+		this.setVisible(true);
+	}
+
+	public ID getRoomID() {
+		return roomID;
 	}
 
 	/**
@@ -189,47 +196,42 @@ public class Chatroom extends NoxFrame implements OutputPipeListener,
 	 * 
 	 * @return
 	 */
-	private void TryToConnect(String peerid, long waittime) {
+	private void TryToConnect(long waittime) {
 		// get the pipe service, and discovery
 		pipeService = new NoxToolkit().getNetworkManager().getNetPeerGroup()
 				.getPipeService();
+
+		//BidirectionalPipeService bps;
 		// create the pipe advertisement
 		pipeAdv = getPipeAdvertisement();
-		PeerID peerID = null;
-		try {
-			peerID = (PeerID) IDFactory.fromURI(new URI(peerid));
-		} catch(URISyntaxException use)
-		{
-			use.printStackTrace();
-		}
-		 
+
 		System.out.println("Pipe Adv	: " + pipeAdv);
-		System.out.println("Peer ID	: " + peerID);
+		System.out.println("Room ID	: " + getRoomID());
 
 		Set<PeerID> resolvablePeers = new HashSet<PeerID>();
-		resolvablePeers.add(peerID);
-		
+		resolvablePeers.clear();
+		resolvablePeers.add((PeerID) getRoomID());
+
 		long unittime = 500;
 		long timecount = waittime / unittime;
 
-		try {
-			// issue a pipe resolution asynchronously. outputPipeEvent() is
-			// called
-			// once the pipe has resolved
+		try {TryToGetInputPipe();
+			// issue a pipe resolution asynchronously.
+			// outputPipeEvent() is called once the pipe has resolved
 			// pipeService.createOutputPipe(pipeAdv, (OutputPipeListener) this);
 			pipeService.createOutputPipe(pipeAdv, this);
 			pipeService.createOutputPipe(pipeAdv, resolvablePeers, this);
-			TryToGetInputPipe();
+			
 			/**
 			 * 等待N秒钟
 			 */
 			try {
-				while (!connected && timecount > 0){
+				while (!connected && timecount > 0) {
 					Thread.sleep(unittime);
 					timecount--;
 					System.out.println("timecount: " + timecount);
 				}
-			}catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -267,19 +269,18 @@ public class Chatroom extends NoxFrame implements OutputPipeListener,
 	 */
 	private static PipeAdvertisement getPipeAdvertisement() {
 		PipeID pipeID = null;
-		String PIPEIDSTR = "urn:jxta:uuid-59616261646162614E50472050325033C0C1DE89719B456691A596B983BA0E1004";
-
-		try {
-			pipeID = (PipeID) IDFactory.fromURI(new URI(PIPEIDSTR));
-		} catch (URISyntaxException use) {
-			use.printStackTrace();
-		}
+		// String PIPEIDSTR =
+		// "urn:jxta:uuid-59616261646162614E50472050325033C0C1DE89719B456691A596B983BA0E1004";
+		// pipeID = (PipeID) IDFactory.fromURI(new URI(PIPEIDSTR));
+		pipeID = (PipeID) IDFactory.newPipeID(new NoxToolkit()
+				.getNetworkManager().getNetPeerGroup().getPeerGroupID());
+		
 		PipeAdvertisement advertisement = (PipeAdvertisement) AdvertisementFactory
 				.newAdvertisement(PipeAdvertisement.getAdvertisementType());
 
 		advertisement.setPipeID(pipeID);
 		advertisement.setType(PipeService.UnicastType);
-		advertisement.setName("Pipe tutorial");
+		advertisement.setName("NoX Wormhole");
 
 		return advertisement;
 	}
@@ -331,13 +332,7 @@ public class Chatroom extends NoxFrame implements OutputPipeListener,
 			e.printStackTrace();
 		}
 		String whoami = "ME";
-		try {
-			whoami = new NoxToolkit().getNetworkManager().getConfigurator()
-					.getName();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		whoami = new NoxToolkit().getNetworkConfigurator().getName();
 		String[] fullMsg = { "", "Someone", whoami, new Date().toString(),
 				inputMsg };
 		chatroompane.receiveMsgAndAccess(fullMsg);
@@ -355,7 +350,7 @@ public class Chatroom extends NoxFrame implements OutputPipeListener,
 	}
 
 	public boolean SendMsg(String strbuf_msg) {
-		if(outputPipe == null)
+		if (outputPipe == null)
 			return false;
 		Message msg;
 		try {

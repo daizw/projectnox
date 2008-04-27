@@ -34,7 +34,7 @@ public class NoX {
 		for (int i = 0; i < flistItems.length; i++) {
 			friends[i] = new PeerItem(new ImageIcon(
 					"resrc\\portrait\\user.png"), flistItems[i], "Hi, 我是"
-					+ flistItems[i], "uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx");
+					+ flistItems[i], null);
 		}
 		ObjectList flist = new ObjectList(friends);
 		/**
@@ -48,7 +48,7 @@ public class NoX {
 		for (int i = 0; i < glistItems.length; i++) {
 			groups[i] = new GroupItem(new ImageIcon("resrc\\icons\\chatroom.png"),
 					glistItems[i], "Hi, 这是" + glistItems[i] + "的聊天室", 
-					"uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx", 0, 0);
+					null, 0, 0);
 		}
 		ObjectList glist = new ObjectList(groups);
 		/**
@@ -61,7 +61,7 @@ public class NoX {
 
 		for (int i = 0; i < blistItems.length; i++) {
 			badguys[i] = new PeerItem(new ImageIcon("resrc\\icons\\blacklist.png"),
-					blistItems[i], "Hi, 我是" + blistItems[i], "uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx");
+					blistItems[i], "Hi, 我是" + blistItems[i], null);
 		}
 		ObjectList blist = new ObjectList(badguys);
 		

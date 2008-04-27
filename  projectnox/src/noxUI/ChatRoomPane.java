@@ -178,11 +178,11 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	/**
 	 * 字符串处理中间变量
 	 */
-	//private int position;
+	// private int position;
 	/**
 	 * 字符串长度
 	 */
-	//private int strLength;
+	// private int strLength;
 	/**
 	 * 欢迎消息
 	 */
@@ -242,8 +242,8 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		sayHello = new String(
 				"\t------====  Welcome to the Chat Room  ====------\n"
 						+ "\t  ------====     What do U wanna say ?   ====------\n");
-		//strLength = sayHello.length();
-		//position = 0;
+		// strLength = sayHello.length();
+		// position = 0;
 		/**
 		 * 历史消息窗口
 		 */
@@ -391,7 +391,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			public void actionPerformed(ActionEvent e) {
 				if (hideFrame.getState())// 如果用户选择隐藏窗口, 则隐藏
 				{
-					//parent.setVisible(false);
+					// parent.setVisible(false);
 					parent.setState(JFrame.ICONIFIED);
 					// System.out.println("in if: What the hell is wrong with
 					// you!" + hideFrame.isSelected());
@@ -403,7 +403,8 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					Robot ro = new Robot();
 					Toolkit tk = Toolkit.getDefaultToolkit();
 					Dimension screenSize = tk.getScreenSize();
-					Rectangle rec = new Rectangle(0, 0, screenSize.width, screenSize.height);
+					Rectangle rec = new Rectangle(0, 0, screenSize.width,
+							screenSize.height);
 					BufferedImage buffImg = ro.createScreenCapture(rec);
 					final JDialog fakeWin = new JDialog(parent, true);
 					fakeWin.addKeyListener(new KeyListener() {
@@ -432,7 +433,6 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					fakeWin.setSize(screenSize);
 					fakeWin.setVisible(true);
 					fakeWin.setAlwaysOnTop(true);
-					
 
 					parent.setState(JFrame.NORMAL);
 					buffImg = temp.getWhatWeGot();
@@ -532,20 +532,21 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			// 把"^n"替换为"\n"
 			strbuf_msg.replace(caretPos, caretPos + 2, "\n");
 		}
-		
+
 		String whoami = "ME";
-		try {
-			whoami = new NoxToolkit().getNetworkManager().getConfigurator().getName();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		whoami = new NoxToolkit().getNetworkConfigurator().getName();
 
 		if (strs[2].equals(whoami))// 此处要获取当前用户的用户名
 		{
 			String label = strs[1] + " say to me at " + strs[3];
 			appendToHMsg(label, strbuf_msg.toString(), true);
-			playAudio();
+			Thread playThd = new Thread(new Runnable(){
+				@Override
+				public void run() {
+					playAudio();
+				}
+			}, "Beeper");
+			playThd.start();
 		} else if (strs[0].equals("fromAll"))// 群聊消息
 		{
 			System.out.println("noDisturb " + noDisturb);
@@ -558,7 +559,13 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			} else// 防打扰未打开
 			{
 				appendToHMsg(label, strbuf_msg.toString(), true);
-				playAudio();
+				Thread playThd = new Thread(new Runnable(){
+					@Override
+					public void run() {
+						playAudio();
+					}
+				}, "Beeper");
+				playThd.start();
 			}
 		}
 	}
@@ -568,16 +575,15 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 
 	 */
 	public void playAudio() {
-		AudioClip playsound;
+		final AudioClip msgBeep;
 		try {
 			// AudioClip audioClip = Applet.newAudioClip(completeURL)
 			// codeBase = new URL("file:" + System.getProperty("user.dir") +
 			// "/");
 			URL url = new URL("file:\\" + System.getProperty("user.dir")
 					+ "\\resrc\\audio\\type.wav");
-			playsound = Applet.newAudioClip(url);
-			// System.out.println(url);
-			playsound.play();
+			msgBeep = Applet.newAudioClip(url);
+			msgBeep.play();
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -606,7 +612,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		// System.out.println("label_buf :" + label_buf);
 		// System.out.println("msg_buf :" + msg_buf);
 
-		 //playAudio();
+		// playAudio();
 
 		/**
 		 * 将消息添加到消息记录
@@ -743,7 +749,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		System.out.println("strbuf_msg :" + strbuf_msg);
 
 		parent.SendMsg(new String(strbuf_msg));
-		
+
 		tp_input.setText("");// 输入框清空
 	}
 

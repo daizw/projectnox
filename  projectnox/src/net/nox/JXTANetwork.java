@@ -113,7 +113,7 @@ public class JXTANetwork {
 		 */
 		hehandler = new NoxToolkit().new HuntingEventHandler(null);
 		cshandler = new NoxToolkit().new CheckStatusEventHandler(null);
-		toolkit = new NoxToolkit(this, TheNetworkManager, hehandler, cshandler);
+		toolkit = new NoxToolkit(this, TheNetworkManager, TheConfig, hehandler, cshandler);
 	}
 
 	private String GetPrincipal() {
@@ -135,8 +135,10 @@ public class JXTANetwork {
 
 			System.out.println("Peer name	: " + TheNetPeerGroup.getPeerName());
 			System.out.println("Description	: " + TheNetPeerGroup.getPeerAdvertisement().getDescription());
-			System.out.println("Peer ID		: "
+			System.out.println("(Group) Peer ID		: "
 					+ TheNetPeerGroup.getPeerID().toString());
+			System.out.println("(Config) Peer ID		: "	 + TheConfig.getPeerID().toString());
+			System.out.println("(Manager) Peer ID		: "	 + TheNetworkManager.getPeerID().toString());
 			
 			System.out.println("Peer Group name	: "
 					+ TheNetPeerGroup.getPeerGroupName());
