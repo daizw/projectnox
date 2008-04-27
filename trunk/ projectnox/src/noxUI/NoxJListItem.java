@@ -3,15 +3,17 @@ package noxUI;
 import javax.swing.ImageIcon;
 
 import net.jxta.document.Advertisement;
+import net.jxta.id.ID;
+import net.jxta.peergroup.PeerGroupID;
 
 public abstract class NoxJListItem {
 	private ImageIcon portrait;
 	private String nickname;
 	private String sign;
-	private String UUID;
+	private ID UUID;
 	protected ItemStatus stat;
 
-	NoxJListItem(ImageIcon portr, String nick, String signstr, String uuid) {
+	NoxJListItem(ImageIcon portr, String nick, String signstr, ID uuid) {
 		this.portrait = portr;
 		this.nickname = nick;
 		this.sign = signstr;
@@ -33,13 +35,13 @@ public abstract class NoxJListItem {
 		return sign;
 	}
 	
-	protected String getUUID(){
+	protected ID getUUID(){
 		return UUID;
 	}
 }
 
 class PeerItem extends NoxJListItem{
-	PeerItem(ImageIcon portr, String nick, String signstr, String uuid){
+	PeerItem(ImageIcon portr, String nick, String signstr, ID uuid){
 		super(portr, nick, signstr, uuid);
 	}
 
@@ -62,7 +64,7 @@ class PeerItem extends NoxJListItem{
 class GroupItem extends NoxJListItem{
 	private int onlineCount;
 	private int memberCount;
-	GroupItem(ImageIcon portr, String name, String signstr, String uuid, int oc, int mc){
+	GroupItem(ImageIcon portr, String name, String signstr, PeerGroupID uuid, int oc, int mc){
 		super(portr, name, signstr, uuid);
 		onlineCount = oc;
 		memberCount = mc;

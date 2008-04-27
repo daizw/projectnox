@@ -3,11 +3,17 @@
  */
 package net.nox;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import net.jxta.document.Advertisement;
+import net.jxta.id.ID;
+import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
 import noxUI.NoxJListItem;
 import noxUI.SearchingFrame.AdvTable;
-
+import noxUI.Chatroom;
 /**
  * NoX 工具包
  * @author shinysky
@@ -69,25 +75,33 @@ public class NoxToolkit {
 	}
 	private static JXTANetwork network;
 	private static NetworkManager manager;
+	private static NetworkConfigurator configer;
 	//private static AdvHunter advhunter;
 	private static HuntingEventHandler hehandler;
 	private static CheckStatusEventHandler cshandler;
+	private static Set<Chatroom> chatrooms;
 	
 	public NoxToolkit(){
 	}
 	
-	public NoxToolkit(JXTANetwork nw, NetworkManager mng, /*AdvHunter ah,*/ HuntingEventHandler heh, CheckStatusEventHandler csh){
+	public NoxToolkit(JXTANetwork nw, NetworkManager mng, NetworkConfigurator conf, /*AdvHunter ah,*/ HuntingEventHandler heh, CheckStatusEventHandler csh){
 		network = nw;
 		manager = mng;
+		configer = conf;
 		//advhunter = ah;
 		hehandler = heh;
 		cshandler = csh;
+		chatrooms = new HashSet<Chatroom>();
+		chatrooms.clear();
 	}
 	public JXTANetwork getNetwork(){
 		return network;
 	}
 	public NetworkManager getNetworkManager(){
 		return manager;
+	}
+	public NetworkConfigurator getNetworkConfigurator(){
+		return configer;
 	}
 	/*public AdvHunter getAdvHunter(){
 		return advhunter;
@@ -97,5 +111,25 @@ public class NoxToolkit {
 	}
 	public CheckStatusEventHandler getCheckStatusEventHandler(){
 		return cshandler;
+	}
+	public void addChatroom(Chatroom room){
+		chatrooms.add(room);
+	}
+	public Chatroom getChatroom(ID id){
+		Iterator<Chatroom> it = chatrooms.iterator();
+		Chatroom room;
+		while (it.hasNext())
+		{// 遍历集合
+			room = (Chatroom)(it.next());
+			System.out.println("Iterator here : " + room.getRoomID());
+			if(room.getRoomID() == null || id == null){
+				System.err.println("Error	: This room has no ID or you want to get a Chatroom without any id, it's very strange!!");
+				System.exit(-1);
+			}
+			if(id.equals(room.getRoomID())){
+				return room;
+			}
+		}
+		return null;
 	}
 }

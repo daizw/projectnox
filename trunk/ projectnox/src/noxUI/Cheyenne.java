@@ -37,8 +37,12 @@ import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
 
+import net.jxta.id.ID;
+import net.jxta.peer.PeerID;
+import net.jxta.peergroup.PeerGroupID;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
+import net.nox.NoxToolkit;
 /**
  * 
  * @author shinysky
@@ -142,7 +146,7 @@ public class Cheyenne extends NoxFrame {
 	public boolean add2Friendlist(PeerAdvertisement adv){
 		//TODO 将广告所代表的peer添加到好友列表中
 		PeerItem newFriend = new PeerItem(new ImageIcon(
-		"resrc\\portrait\\user.png"), adv.getName(), adv.getDescription(), adv.getPeerID().toString());
+		"resrc\\portrait\\user.png"), adv.getName(), adv.getDescription(), adv.getPeerID());
 		
 		friendlist.addItem(newFriend);
 		tabs.repaint();
@@ -381,7 +385,7 @@ class ListsPane extends JTabbedPane {
 
 	Dimension btnsize = new Dimension(Cheyenne.WIDTH_PREF, 20);
 
-	NoxJListItem fi = null;
+	NoxJListItem listItem = null;
 	
 	ListsPane(final ObjectList flist, final ObjectList glist, final ObjectList blist,
 			String path_flist, String path_glist, String path_blist) {
@@ -465,12 +469,12 @@ class ListsPane extends JTabbedPane {
 					/**
 					 * TODO 应该对每一个对象只开一个窗口, 可以设定标记, 如果已经打开了一个则显示之, 否则开新窗口
 					 */
-					Chatroom room = new Chatroom((PeerItem)flist.getSelectedValue());
+					listItem = (PeerItem)flist.getSelectedValue();
+					ListsPane.this.showChatRoom(listItem);
 				}else if(me.getButton() == MouseEvent.BUTTON3){
 					final JPopupMenu fiendOprMenu = new JPopupMenu();
-					
-					fi = (PeerItem)flist.getSelectedValue();
-					if(fi == null)
+					listItem = (PeerItem)flist.getSelectedValue();
+					if(listItem == null)
 						return;
 					//System.out.println("You just Right Click the List Item!");
 					fiendOprMenu.add(new AbstractAction("Talk to him/her") {
@@ -480,7 +484,7 @@ class ListsPane extends JTabbedPane {
 						private static final long serialVersionUID = -729947600305959488L;
 
 						public void actionPerformed(ActionEvent e) {
-							Chatroom room = new Chatroom((PeerItem)flist.getSelectedValue());
+							ListsPane.this.showChatRoom(listItem);
 						}
 					});
 					fiendOprMenu.add(new AbstractAction("His/Her information") {
@@ -494,16 +498,16 @@ class ListsPane extends JTabbedPane {
 									"<html>"//<BODY bgColor=#ffffff>"
 									+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
 									+"<Font color=black>昵称:</Font> <Font color=blue>"
-									+ fi.getNick()
+									+ listItem.getNick()
 									+"<br></Font>"
 									+"<Font color=black>签名档:</Font> <Font color=blue>"
-									+ fi.getSign()
+									+ listItem.getSign()
 									+"<br></Font>"
 									+"<Font color=black>联系方式:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font>"
 									+"<Font color=black>个人说明:</Font> <Font color=blue>"
-									+ fi.getNick() + " owns me so much MONEY!! "
+									+ listItem.getNick() + " owns me so much MONEY!! "
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
 						}
@@ -517,7 +521,6 @@ class ListsPane extends JTabbedPane {
 					fiendOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
 				}
 			}
-
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 			}
@@ -550,10 +553,12 @@ class ListsPane extends JTabbedPane {
 		final GroupItem[] gmembers = new GroupItem[flistItems.length];
 		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
 
+		PeerGroupID groupID = null;
+		//TODO 得到grouproom 的ID, 然后传值;
 		for (int i = 0; i < flistItems.length; i++) {
 			gmembers[i] = new GroupItem(new ImageIcon(
 					"resrc\\portrait\\user.png"), flistItems[i], "欢迎加入我们: "
-					+ flistItems[i], "uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx", 0, 0);
+					+ flistItems[i], groupID, 0, 0);
 		}
 		
 		glist.addMouseListener(new MouseListener(){
@@ -562,19 +567,17 @@ class ListsPane extends JTabbedPane {
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() == 2){
 					//TODO 判断所点击的cell的在线状态进行对应处理, 暂时直接弹出弹出聊天窗口.
-					String title = ((GroupItem)glist.getSelectedValue()).getNick();
-					Chatroom room = new Chatroom(title, gmembers);
-					room.pack();
-					room.setVisible(true);
+					listItem = (GroupItem)(glist.getSelectedValue());
+					ListsPane.this.showChatRoom(listItem);
 				}else if(me.getButton() == MouseEvent.BUTTON3){
 					final JPopupMenu groupOprMenu = new JPopupMenu();
 					/*
 					 * 怎么实现右键可选取JListItem?
 					 */
-					fi = (GroupItem)glist.getSelectedValue();
+					listItem = (GroupItem)glist.getSelectedValue();
 					//System.out.println(flist.getComponentAt(me.getPoint()).toString());
 					
-					if(fi == null)
+					if(listItem == null)
 						return;
 					//System.out.println("You just Right Click the List Item!");
 					groupOprMenu.add(new AbstractAction("Enter this chatroom") {
@@ -584,10 +587,7 @@ class ListsPane extends JTabbedPane {
 						private static final long serialVersionUID = -729947600305959488L;
 
 						public void actionPerformed(ActionEvent e) {
-							String title = ((GroupItem)glist.getSelectedValue()).getNick();
-							Chatroom room = new Chatroom(title, gmembers);
-							room.pack();
-							room.setVisible(true);
+							ListsPane.this.showChatRoom(listItem);
 						}
 					});
 					groupOprMenu.add(new AbstractAction("Group information") {
@@ -601,10 +601,10 @@ class ListsPane extends JTabbedPane {
 									"<html>"//<BODY bgColor=#ffffff>"
 									+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
 									+"<Font color=black>组名:</Font> <Font color=blue>"
-									+ fi.getNick()
+									+ listItem.getNick()
 									+"<br></Font>"
 									+"<Font color=black>公告:</Font> <Font color=blue>"
-									+ fi.getSign()
+									+ listItem.getSign()
 									+"<br></Font>"
 									+"<Font color=black>成员数量:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
@@ -652,6 +652,17 @@ class ListsPane extends JTabbedPane {
 		this.addTab(null, new ImageIcon(path_glist), grplistpane);
 		//this.addTab(null, new ImageIcon(path_blist), blklistpane);
 		this.setOpaque(false);
+	}
+	private void showChatRoom(NoxJListItem listItem) {
+		ID id = listItem.getUUID();
+		Chatroom room = new NoxToolkit().getChatroom(id);
+		if(room == null)//不存在
+		{
+			room = new Chatroom((PeerItem)listItem);
+			new NoxToolkit().addChatroom(room);
+		}
+		room.pack();
+		room.setVisible(true);
 	}
 	/**
 	 * 切换列表时播放提示音

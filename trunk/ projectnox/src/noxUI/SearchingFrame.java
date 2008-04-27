@@ -75,10 +75,10 @@ public class SearchingFrame extends JFrame {
 			 * 如果已经添加过或者是自己的adv, 就不添加, 直接返回
 			 */
 			if(((PeerAdvertisement) adv).getPeerID()
-					.equals(new NoxToolkit().getNetworkManager().getPeerID()))
+					.equals(new NoxToolkit().getNetworkConfigurator().getPeerID()))
 				return;
 			System.out.println("Got:	" + ((PeerAdvertisement) adv).getPeerID());
-			System.out.println("Me:	" + new NoxToolkit().getNetworkManager().getPeerID());
+			System.out.println("Me:	" + new NoxToolkit().getNetworkConfigurator().getPeerID());
 			
 			int rows = model.getRowCount();
 			for (int i = 0; i < rows; i++) {
@@ -257,7 +257,6 @@ public class SearchingFrame extends JFrame {
 		searchPeersBtn.setMinimumSize(size);
 
 		final DiscoveryListener listener = new DiscoveryListener(){
-
 			@Override
 			public void discoveryEvent(DiscoveryEvent event) {
 				DiscoveryResponseMsg res = event.getResponse();
@@ -276,11 +275,9 @@ public class SearchingFrame extends JFrame {
 				if (en != null) {
 					while (en.hasMoreElements()) {
 						adv = (Advertisement) en.nextElement();
-						System.out.println(adv);
+						System.out.println("AdvID: " + adv.getID());
 						new NoxToolkit().getHuntingEventHandler()
 								.eventOccured(searchResultTable, adv, event.getSource(), curTime - startTime);
-						// new NoxToolkit().getHuntingEventHandler().eventOccured(adv,
-						// ev.getSource(), curTime - startTime);
 					}
 				}
 			}
