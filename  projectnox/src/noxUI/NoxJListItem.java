@@ -5,6 +5,7 @@ import javax.swing.ImageIcon;
 import net.jxta.document.Advertisement;
 import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroupID;
+import net.jxta.protocol.PeerAdvertisement;
 
 public abstract class NoxJListItem {
 	private ImageIcon portrait;
@@ -12,6 +13,7 @@ public abstract class NoxJListItem {
 	private String sign;
 	private ID UUID;
 	protected ItemStatus stat;
+	private Advertisement adv;
 
 	NoxJListItem(ImageIcon portr, String nick, String signstr, ID uuid) {
 		this.portrait = portr;
@@ -41,8 +43,8 @@ public abstract class NoxJListItem {
 }
 
 class PeerItem extends NoxJListItem{
-	PeerItem(ImageIcon portr, String nick, String signstr, ID uuid){
-		super(portr, nick, signstr, uuid);
+	PeerItem(ImageIcon portr, PeerAdvertisement adv){
+		super(portr, adv.getName(), adv.getDescription(), adv.getPeerID());
 	}
 
 	/**

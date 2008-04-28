@@ -37,11 +37,13 @@ import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
 
+import net.jxta.document.Advertisement;
 import net.jxta.id.ID;
 import net.jxta.peer.PeerID;
 import net.jxta.peergroup.PeerGroupID;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
+import net.jxta.util.JxtaBiDiPipe;
 import net.nox.NoxToolkit;
 /**
  * 
@@ -98,6 +100,7 @@ public class Cheyenne extends NoxFrame {
 				"resrc\\buttons\\normalize.png", "resrc\\buttons\\normalize_rollover.png",
 				"resrc\\buttons\\close.png", "resrc\\buttons\\close_rollover.png", true);
 
+		new NoxToolkit().setCheyenne(this);
 		friendlist = flist;
 		grouplist = glist;
 		blacklist = blist;
@@ -141,16 +144,20 @@ public class Cheyenne extends NoxFrame {
 	/**
 	 * 将广告所代表的peer添加到好友列表中
 	 * @param adv 要添加的peer的广告 
-	 * @return 成功:返回false; 如果已经处于好友列表中: 返回true.
+	 * @return 好友的列表元素 
+	 *-1:已经存在于好友列表中; 0-N:成功, 返回index
 	 */
-	public boolean add2Friendlist(PeerAdvertisement adv){
+	public PeerItem add2Friendlist(PeerAdvertisement adv){
 		//TODO 将广告所代表的peer添加到好友列表中
-		PeerItem newFriend = new PeerItem(new ImageIcon(
-		"resrc\\portrait\\user.png"), adv.getName(), adv.getDescription(), adv.getPeerID());
 		
-		friendlist.addItem(newFriend);
+		PeerItem newFriend = new PeerItem(new ImageIcon(
+		"resrc\\portrait\\user.png"), adv);
+		
+		//这样的赋值目前没有必要,
+		//不过在已经存在好友, 且头像有变化的时候有用;
+		newFriend = (PeerItem) friendlist.addItem(newFriend);
 		tabs.repaint();
-		return false;
+		return newFriend;
 	}
 	/**
 	 * 将广告所代表的peer添加到好友列表中
@@ -163,7 +170,19 @@ public class Cheyenne extends NoxFrame {
 		tabs.repaint();
 		return false;
 	}
-	
+	public Chatroom setupChatroomWith(PeerAdvertisement adv, JxtaBiDiPipe outbidipipe){
+		//添加到好友列表
+		PeerItem friend = add2Friendlist(adv);
+		//打开聊天室
+		Chatroom chatroom = new Chatroom(friend, outbidipipe);
+		chatroom.setVisible(true);
+		return chatroom;
+	}
+	public boolean setupGroupChatroom(PeerGroupAdvertisement adv){
+		//打开群聊窗口
+		//do something
+		return true;
+	}
 	/**
 	 * 设置托盘
 	 */
@@ -658,7 +677,7 @@ class ListsPane extends JTabbedPane {
 		Chatroom room = new NoxToolkit().getChatroom(id);
 		if(room == null)//不存在
 		{
-			room = new Chatroom((PeerItem)listItem);
+			room = new Chatroom((PeerItem)listItem, null);
 			new NoxToolkit().addChatroom(room);
 		}
 		room.pack();

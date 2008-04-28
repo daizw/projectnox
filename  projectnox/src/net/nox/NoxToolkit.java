@@ -11,6 +11,7 @@ import net.jxta.document.Advertisement;
 import net.jxta.id.ID;
 import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
+import noxUI.Cheyenne;
 import noxUI.NoxJListItem;
 import noxUI.SearchingFrame.AdvTable;
 import noxUI.Chatroom;
@@ -79,6 +80,7 @@ public class NoxToolkit {
 	//private static AdvHunter advhunter;
 	private static HuntingEventHandler hehandler;
 	private static CheckStatusEventHandler cshandler;
+	private static Cheyenne cheyenne;
 	private static Set<Chatroom> chatrooms;
 	
 	public NoxToolkit(){
@@ -94,6 +96,7 @@ public class NoxToolkit {
 		chatrooms = new HashSet<Chatroom>();
 		chatrooms.clear();
 	}
+	
 	public JXTANetwork getNetwork(){
 		return network;
 	}
@@ -112,6 +115,14 @@ public class NoxToolkit {
 	public CheckStatusEventHandler getCheckStatusEventHandler(){
 		return cshandler;
 	}
+	
+	public void setCheyenne(Cheyenne chy){
+		cheyenne = chy;
+	}
+	public Cheyenne getCheyenne(){
+		return cheyenne;
+	}
+	
 	public void addChatroom(Chatroom room){
 		chatrooms.add(room);
 	}
@@ -121,15 +132,18 @@ public class NoxToolkit {
 		while (it.hasNext())
 		{// ±éÀú¼¯ºÏ
 			room = (Chatroom)(it.next());
-			System.out.println("Iterator here : " + room.getRoomID());
+			System.out.println("Chatroom Iterator here : " + room.getRoomID());
 			if(room.getRoomID() == null || id == null){
-				System.err.println("Error	: This room has no ID or you want to get a Chatroom without any id, it's very strange!!");
+				System.out.println("Error	: This room has no ID or you want to get a Chatroom without any id, it's very strange!!");
 				System.exit(-1);
 			}
 			if(id.equals(room.getRoomID())){
+				System.out.println("I find the room, it exist already");
 				return room;
-			}
+			}else
+				System.out.println("Unfortunately, this room is not what we're look for.");
 		}
+		System.out.println("Unfortunately, the room doesn't exist yet, I find nothing here.");
 		return null;
 	}
 }

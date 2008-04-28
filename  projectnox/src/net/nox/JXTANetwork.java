@@ -2,6 +2,7 @@ package net.nox;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Date;
 
@@ -9,10 +10,17 @@ import javax.security.cert.CertificateException;
 import javax.swing.JOptionPane;
 
 import net.jxta.discovery.DiscoveryListener;
+import net.jxta.document.AdvertisementFactory;
 import net.jxta.exception.PeerGroupException;
+import net.jxta.id.IDFactory;
 import net.jxta.peergroup.PeerGroup;
+import net.jxta.pipe.PipeID;
+import net.jxta.pipe.PipeService;
 import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
+import net.jxta.protocol.PipeAdvertisement;
+import net.jxta.util.JxtaBiDiPipe;
+import net.jxta.util.JxtaServerPipe;
 import net.nox.NoxToolkit.CheckStatusEventHandler;
 import net.nox.NoxToolkit.HuntingEventHandler;
 
@@ -22,9 +30,9 @@ public class JXTANetwork {
 	public static final String Local_Network_Manager_Name = "Local NoX Network Manager";
 
 	String locpeername = "";
-	NetworkManager TheNetworkManager;
-	NetworkConfigurator TheConfig;
-	PeerGroup TheNetPeerGroup;
+	static NetworkManager TheNetworkManager;
+	static NetworkConfigurator TheConfig;
+	static PeerGroup TheNetPeerGroup;
 	AdvHunter disocveryClient;
 	NoxToolkit toolkit;
 	HuntingEventHandler hehandler;
@@ -113,7 +121,8 @@ public class JXTANetwork {
 		 */
 		hehandler = new NoxToolkit().new HuntingEventHandler(null);
 		cshandler = new NoxToolkit().new CheckStatusEventHandler(null);
-		toolkit = new NoxToolkit(this, TheNetworkManager, TheConfig, hehandler, cshandler);
+		toolkit = new NoxToolkit(this, TheNetworkManager, TheConfig, hehandler,
+				cshandler);
 	}
 
 	private String GetPrincipal() {
@@ -134,17 +143,20 @@ public class JXTANetwork {
 			System.out.println("JXTA Started");
 
 			System.out.println("Peer name	: " + TheNetPeerGroup.getPeerName());
-			System.out.println("Description	: " + TheNetPeerGroup.getPeerAdvertisement().getDescription());
+			System.out.println("Description	: "
+					+ TheNetPeerGroup.getPeerAdvertisement().getDescription());
 			System.out.println("(Group) Peer ID		: "
 					+ TheNetPeerGroup.getPeerID().toString());
-			System.out.println("(Config) Peer ID		: "	 + TheConfig.getPeerID().toString());
-			System.out.println("(Manager) Peer ID		: "	 + TheNetworkManager.getPeerID().toString());
-			
+			System.out.println("(Config) Peer ID		: "
+					+ TheConfig.getPeerID().toString());
+			System.out.println("(Manager) Peer ID		: "
+					+ TheNetworkManager.getPeerID().toString());
+
 			System.out.println("Peer Group name	: "
 					+ TheNetPeerGroup.getPeerGroupName());
 			System.out.println("Peer Group ID	: "
 					+ TheNetPeerGroup.getPeerGroupID().toString());
-			
+
 		} catch (PeerGroupException ex) {
 			// Cannot initialize peer group
 			ex.printStackTrace();
@@ -155,9 +167,10 @@ public class JXTANetwork {
 		}
 
 		long waittime = 2 * 1000;
-		System.out.println("Waiting for a rendezvous connection for " + (waittime/1000) + " seconds "
-				+ "(maximum)");
-		boolean connected = TheNetworkManager.waitForRendezvousConnection(waittime);
+		System.out.println("Waiting for a rendezvous connection for "
+				+ (waittime / 1000) + " seconds " + "(maximum)");
+		boolean connected = TheNetworkManager
+				.waitForRendezvousConnection(waittime);
 		System.out.println(MessageFormat.format("Connected :{0}", connected));
 	}
 
@@ -196,5 +209,76 @@ public class JXTANetwork {
 	public void StopNetwork() {
 		System.out.println("Stopping JXTA");
 		TheNetworkManager.stopNetwork();
+	}
+
+	public void Start() {
+		SeekRendezVousConnection();
+		/**
+		 * 添加外来bidipipe连接监听器
+		 */
+		Thread inconn = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				addInwardConnectionListener();
+			}
+		}, "Inward Connection Listener");
+		inconn.start();
+	}
+
+	private void addInwardConnectionListener() {
+		PipeAdvertisement serverPipeAdv = getPipeAdvertisement();
+		try {
+			System.out.println("Publishing pipe adv...");
+			TheNetworkManager.getNetPeerGroup().getDiscoveryService().publish(serverPipeAdv);
+			TheNetworkManager.getNetPeerGroup().getDiscoveryService().remotePublish(serverPipeAdv);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		JxtaServerPipe serverPipe;
+		try {
+			serverPipe = new JxtaServerPipe(
+					TheNetworkManager.getNetPeerGroup(), serverPipeAdv);
+
+			serverPipe.setPipeTimeout(0);
+			System.out
+					.println("Waiting for JxtaBidiPipe connections on JxtaServerPipe :\n\t"
+							+ serverPipeAdv.getPipeID());
+			while (true) {
+				JxtaBiDiPipe outbidipipe = serverPipe.accept();
+				if (outbidipipe != null) {
+					System.out.println("JxtaBidiPipe accepted from: "
+							+ outbidipipe.getRemotePeerAdvertisement().getName());
+					// Send messages
+					Thread thread = new Thread(new ConnectionHandler(outbidipipe),
+							"Incoming Connection Handler");
+					thread.start();
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Gets a new pipeAdvertisement
+	 * 
+	 * @return The pipeAdvertisement
+	 */
+	public static PipeAdvertisement getPipeAdvertisement() {
+		PipeAdvertisement advertisement = (PipeAdvertisement) AdvertisementFactory
+				.newAdvertisement(PipeAdvertisement.getAdvertisementType());
+
+		PipeID BIDI_PIPEID = (PipeID)IDFactory.newPipeID(
+				new NoxToolkit().getNetworkManager().getNetPeerGroup().getPeerGroupID());
+		System.out.println("BIDI_PIPEID built(using it): " + BIDI_PIPEID);
+		
+		/*PipeID BIDI_TUTORIAL_PIPEID = PipeID.create(URI.create("urn:jxta:uuid-59616261646162614E50472050325033251CBAB70EC44D04BB66F83CEB93747F04"));*/
+		
+		advertisement.setPipeID(BIDI_PIPEID);
+		advertisement.setType(PipeService.UnicastType);
+		advertisement.setName(TheNetPeerGroup.getPeerID().toString());
+
+		return advertisement;
 	}
 }
