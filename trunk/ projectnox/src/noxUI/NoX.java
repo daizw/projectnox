@@ -9,7 +9,7 @@ public class NoX {
 		
 		JXTANetwork MyLogin;
 		MyLogin = new JXTANetwork();
-		MyLogin.SeekRendezVousConnection();
+		MyLogin.Start();
 		
 		/**
 		 * 好友列表
@@ -26,16 +26,16 @@ public class NoX {
 					+ flistItems[i], "uuid:jxta:xxxxxxxxxxxxxxxxxxxxxxx");
 		}
 		ObjectList flist = new ObjectList(friends);*/
-		String[] flistItems = {"Chris", "Joshua"};
+		String[] flistItems = {};
 
 		PeerItem[] friends = new PeerItem[flistItems.length];
 		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
 
-		for (int i = 0; i < flistItems.length; i++) {
+		/*for (int i = 0; i < flistItems.length; i++) {
 			friends[i] = new PeerItem(new ImageIcon(
 					"resrc\\portrait\\user.png"), flistItems[i], "Hi, 我是"
 					+ flistItems[i], null);
-		}
+		}*/
 		ObjectList flist = new ObjectList(friends);
 		/**
 		 * 组列表
@@ -54,15 +54,15 @@ public class NoX {
 		/**
 		 * 黑名单
 		 */
-		String[] blistItems = { "Ben", "Laden", "Hitler", "Bush", "陈水扁" };
+		String[] blistItems = {};
 
 		PeerItem[] badguys = new PeerItem[blistItems.length];
 		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
 
-		for (int i = 0; i < blistItems.length; i++) {
+		/*for (int i = 0; i < blistItems.length; i++) {
 			badguys[i] = new PeerItem(new ImageIcon("resrc\\icons\\blacklist.png"),
 					blistItems[i], "Hi, 我是" + blistItems[i], null);
-		}
+		}*/
 		ObjectList blist = new ObjectList(badguys);
 		
 		Cheyenne chyn = new Cheyenne(flist, glist, blist);

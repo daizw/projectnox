@@ -313,7 +313,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 				 */
 				if (keyCode == KeyEvent.VK_ENTER && event.isControlDown()) {
 					System.out.println("You press the combo-key : Ctrl+Enter");
-					appendMyMsg2HMsg();
+					sendMessage();
 				}
 			}
 
@@ -726,7 +726,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	/**
 	 * 将用户输入的消息发送到历史消息窗口 (还有,要发送到服务器)
 	 */
-	private void appendMyMsg2HMsg() {
+	private void sendMessage() {
 		/**
 		 * 格式化日期
 		 */
@@ -834,7 +834,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		if (srcButton.getActionCommand().equals("Send")) {
 			System.out.println("You clicked the button : Send");
 			// insert(getText(), null);
-			appendMyMsg2HMsg();
+			sendMessage();
 		} else if (srcButton.getActionCommand().equals("Emotion")) {
 			/**
 			 * 插入表情: 目前只能插入到输入框中, 插入到历史消息框中还没有实现. 如果没有直接拷贝的方法, 那么只好用另外一个方法:

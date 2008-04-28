@@ -13,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -48,7 +50,7 @@ public class SearchingFrame extends JFrame {
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
-		Vector<Advertisement> advs = new Vector<Advertisement>();
+		Vector<Advertisement> advVector = new Vector<Advertisement>();
 
 		AdvTable(AdvTableModel model) {
 			super(model);
@@ -73,12 +75,20 @@ public class SearchingFrame extends JFrame {
 		public void addRow(Advertisement adv, Object src, long delay) {
 			/**
 			 * 如果已经添加过或者是自己的adv, 就不添加, 直接返回
+			 * 暂时cast为PeerAdv类型
 			 */
+			if(adv instanceof PeerAdvertisement)
+				;
+			else{
+				System.out.println("Just got a Adv which's not a PeerAdv, omitting it...");
+				return;
+			}
+			
 			if(((PeerAdvertisement) adv).getPeerID()
 					.equals(new NoxToolkit().getNetworkConfigurator().getPeerID()))
 				return;
-			System.out.println("Got:	" + ((PeerAdvertisement) adv).getPeerID());
-			System.out.println("Me:	" + new NoxToolkit().getNetworkConfigurator().getPeerID());
+			//System.out.println("Got:	" + ((PeerAdvertisement) adv).getPeerID());
+			//System.out.println("Me:	" + new NoxToolkit().getNetworkConfigurator().getPeerID());
 			
 			int rows = model.getRowCount();
 			for (int i = 0; i < rows; i++) {
@@ -99,15 +109,15 @@ public class SearchingFrame extends JFrame {
 			/**
 			 * 同步广告向量
 			 */
-			advs.add(adv);
-			System.out.println("Add a Adv to the vector:" + advs.size());
+			advVector.add(adv);
+			//System.out.println("Add a Adv to the vector:" + advVector.size());
 		}
 
 		public Advertisement getAdvAt(int row) {
 			System.out.println("Fetch a Adv from the vector, which has "
-					+ advs.size() + " Advertisements: ");
-			System.out.println(advs.get(row));
-			return advs.get(row);
+					+ advVector.size() + " Advertisements: ");
+			//System.out.println(advs.get(row));
+			return advVector.get(row);
 		}
 	}
 
@@ -166,8 +176,7 @@ public class SearchingFrame extends JFrame {
 					searchResultTable.getSelectionModel()
 							.setLeadSelectionIndex(row);
 
-					ResultOprMenu.add(new AbstractAction(
-							"Add him/her to my friendlist") {
+					ResultOprMenu.add(new AbstractAction("Add him/her to my friendlist") {
 						/**
 						 * 
 						 */
@@ -180,8 +189,7 @@ public class SearchingFrame extends JFrame {
 							for (int i = 0; i < selected.length; i++) {
 								Advertisement adv = (Advertisement) searchResultTable
 										.getAdvAt(selected[i]);
-								// TODO 把选中的元素添加到好友, 目前只是输出所选行的adv
-								System.out.println(adv);
+								//System.out.println(adv);
 								// TODO 根据广告标签确定添加好友是否需要验证; 暂时直接添加
 								// adv.getID();
 								parent.add2Friendlist((PeerAdvertisement) adv);
@@ -235,8 +243,33 @@ public class SearchingFrame extends JFrame {
 		rootpane.add(BorderLayout.CENTER, scrollPane);
 
 		this.setContentPane(rootpane);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		this.addWindowListener(new WindowListener(){
+			@Override
+			public void windowActivated(WindowEvent arg0) {
+			}
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				MyLogin.StopHunting();
+			}
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				MyLogin.StopHunting();
+			}
+			@Override
+			public void windowDeactivated(WindowEvent arg0) {
+			}
+			@Override
+			public void windowDeiconified(WindowEvent arg0) {
+			}
+			@Override
+			public void windowIconified(WindowEvent arg0) {
+			}
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+			}
+		});
 		//this.pack();
 	}
 
@@ -275,7 +308,7 @@ public class SearchingFrame extends JFrame {
 				if (en != null) {
 					while (en.hasMoreElements()) {
 						adv = (Advertisement) en.nextElement();
-						System.out.println("AdvID: " + adv.getID());
+						//System.out.println("AdvID: " + adv.getID());
 						new NoxToolkit().getHuntingEventHandler()
 								.eventOccured(searchResultTable, adv, event.getSource(), curTime - startTime);
 					}
@@ -320,22 +353,6 @@ public class SearchingFrame extends JFrame {
 		pane.add(BorderLayout.EAST, searchPeersBtn);
 		pane.setBackground(Color.WHITE);
 		return pane;
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-
-		JXTANetwork MyLogin;
-		MyLogin = new JXTANetwork();
-		MyLogin.SeekRendezVousConnection();
-
-		SearchingFrame sfrm = new SearchingFrame(null);
-		sfrm.setLocation(0, 0);
-		sfrm.setSize(new Dimension(1000, 350));
-		// sfrm.pack();
-		sfrm.setVisible(true);
 	}
 }
 

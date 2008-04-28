@@ -106,8 +106,16 @@ public class ObjectList extends JList {
 		super.setModel(m);
 	}
 
-	public void addItem(Object o) {
+	public Object addItem(Object o) {
+		//TODO 加之前应该先判断是否已有!!
+		int size =  ((FilterModel) getModel()).getSize();
+		for(int index = 0; index <  size; index++){
+			//如果已经有了, 则返回
+			if(((FilterModel) getModel()).getElementAt(index).equals(o))
+					return o;
+		}
 		((FilterModel) getModel()).addElement((NoxJListItem) o);
+		return o;
 	}
 
 	public class NoxJListCellRender extends JPanel implements ListCellRenderer {
