@@ -135,6 +135,7 @@ public class NoxToolkit {
 			System.out.println("Chatroom Iterator here : " + room.getRoomID());
 			if(room.getRoomID() == null || id == null){
 				System.out.println("Error	: This room has no ID or you want to get a Chatroom without any id, it's very strange!!");
+				network.StopNetwork();
 				System.exit(-1);
 			}
 			if(id.equals(room.getRoomID())){

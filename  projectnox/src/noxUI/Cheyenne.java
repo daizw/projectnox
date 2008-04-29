@@ -225,6 +225,7 @@ public class Cheyenne extends NoxFrame {
             //mi.setShortcut(new MenuShortcut(KeyEvent.VK_X, true));
             traymenu.add(new MenuItem("Exit")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
+                	new NoxToolkit().getNetwork().StopNetwork();
                     System.exit(0);
                 }
             });
@@ -292,6 +293,7 @@ class MiniProfilePane extends JPanel {
 	 */
 	MiniProfilePane(final Cheyenne parent, String path_portrait, String nickname, String sign) {
 		myPortrait = new JButton(new ImageIcon(path_portrait));
+		myPortrait.setToolTipText(getHtmlText("This is Me"));
 		myPortrait.setSize(new Dimension(50, 50));
 		myPortrait.setPreferredSize(new Dimension(50, 50));
 		myPortrait.setMaximumSize(new Dimension(50, 50));
@@ -337,14 +339,16 @@ class MiniProfilePane extends JPanel {
 		miniProfilePane = new JPanel();
 		nickAndStat = new JPanel();
 		nick = new JLabel(nickname);
+		nick.setToolTipText(getHtmlText("My nickname"));
 		myStatus = new JComboBox();
 		// myStatus.setOpaque(false);
 		mySign = new JTextField(sign);
-		mySign.setOpaque(false);
+		
 		myStatus.addItem("Online");
 		myStatus.addItem("Busy");
 		myStatus.addItem("Invisible");
 		myStatus.addItem("Offline");
+		myStatus.setToolTipText(getHtmlText("My Status"));
 		myStatus.setSize(new Dimension(75, 20));
 		myStatus.setPreferredSize(new Dimension(75, 20));
 		myStatus.setMaximumSize(new Dimension(75, 20));
@@ -363,11 +367,13 @@ class MiniProfilePane extends JPanel {
 		nickAndStat.add(Box.createHorizontalStrut(10));
 		nickAndStat.add(myStatus);
 
+		mySign.setOpaque(false);
+		mySign.setToolTipText(getHtmlText("My Description"));
 		mySign.setSize(new Dimension(Cheyenne.WIDTH_DEFLT, 20));
 		mySign.setPreferredSize(new Dimension(Cheyenne.WIDTH_PREF, 20));
 		mySign.setMaximumSize(new Dimension(Cheyenne.WIDTH_MAX, 20));
 		mySign.setMinimumSize(new Dimension(Cheyenne.WIDTH_MIN, 20));
-
+		
 		// miniProfilePane.setAlignmentX(JComponent.TOP_ALIGNMENT);
 		miniProfilePane.setLayout(new BoxLayout(miniProfilePane,
 				BoxLayout.Y_AXIS));
@@ -384,6 +390,14 @@ class MiniProfilePane extends JPanel {
 	public void setForegroundColor(Color color){
 		nick.setForeground(color);
 		mySign.setForeground(color);
+	}
+	/**
+	 * 返回TooltipTxt的html形式
+	 * @param text
+	 * @return
+	 */
+	private String getHtmlText(String text) {
+		return ("<html><BODY bgColor=#ffffff><Font color=black>" + text + "</Font></BODY></html>");
 	}
 }
 
@@ -459,7 +473,13 @@ class ListsPane extends JTabbedPane {
 				blist.getFilterField().setVisible(false);
 				blkListScrPane.setVisible(false);
 				ListsPane.this.repaint();
-				//playAudio();
+				Thread playThd = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						playAudio();
+					}
+				}, "Beeper");
+				playThd.start();
 			}
 		});
 		blacklist.addActionListener(new ActionListener(){
@@ -470,7 +490,13 @@ class ListsPane extends JTabbedPane {
 				blist.getFilterField().setVisible(true);
 				blkListScrPane.setVisible(true);
 				ListsPane.this.repaint();
-				//playAudio();
+				Thread playThd = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						playAudio();
+					}
+				}, "Beeper");
+				playThd.start();
 			}
 		});
 		
@@ -669,8 +695,18 @@ class ListsPane extends JTabbedPane {
 		this.setForeground(Color.WHITE);
 		this.addTab(null, new ImageIcon(path_flist), frdlistpane);
 		this.addTab(null, new ImageIcon(path_glist), grplistpane);
+		this.setToolTipTextAt(0, getHtmlText("Friends"));
+		this.setToolTipTextAt(1, getHtmlText("Groups"));
 		//this.addTab(null, new ImageIcon(path_blist), blklistpane);
 		this.setOpaque(false);
+	}
+	/**
+	 * 返回TooltipTxt的html形式
+	 * @param text
+	 * @return
+	 */
+	private String getHtmlText(String text) {
+		return ("<html><BODY bgColor=#ffffff><Font color=black>" + text + "</Font></BODY></html>");
 	}
 	private void showChatRoom(NoxJListItem listItem) {
 		ID id = listItem.getUUID();
@@ -680,6 +716,7 @@ class ListsPane extends JTabbedPane {
 			room = new Chatroom((PeerItem)listItem, null);
 			new NoxToolkit().addChatroom(room);
 		}
+		//room.TryToConnectAgain(5*1000);
 		room.pack();
 		room.setVisible(true);
 	}
@@ -694,7 +731,7 @@ class ListsPane extends JTabbedPane {
 			// codeBase = new URL("file:" + System.getProperty("user.dir") +
 			// "/");
 			URL url = new URL("file:\\" + System.getProperty("user.dir")
-					+ "\\resrc\\audio\\type.wav");
+					+ "\\resrc\\audio\\folderwpcm.wav");
 			playsound = Applet.newAudioClip(url);
 			// System.out.println(url);
 			playsound.play();

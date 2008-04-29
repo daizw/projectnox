@@ -279,9 +279,13 @@ public class ObjectList extends JList {
 
 		public FilterField(int width) {
 			super(width);
-			this.setToolTipText("输入关键字以搜索列表");
+			this.setToolTipText(getHtmlText("输入关键字以搜索列表"));
 			getDocument().addDocumentListener(this);
 		}
+
+		private String getHtmlText(String text) {
+			return ("<html><BODY bgColor=#ffffff><Font color=black>" + text + "</Font></BODY></html>");
+	}
 
 		public void changedUpdate(DocumentEvent e) {
 			((FilterModel) getModel()).refilter();

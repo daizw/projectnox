@@ -116,10 +116,10 @@ class ScreenCapturer extends JPanel implements MouseListener,
 		b_cancel.setMaximumSize(bsize);
 		b_cancel.setMinimumSize(bsize);
 		
-		b_send.setToolTipText("Send");
-		b_copy.setToolTipText("Copy");
-		b_save.setToolTipText("Save");
-		b_cancel.setToolTipText("Cancel");
+		b_send.setToolTipText(getHtmlText("Send"));
+		b_copy.setToolTipText(getHtmlText("Copy"));
+		b_save.setToolTipText(getHtmlText("Save"));
+		b_cancel.setToolTipText(getHtmlText("Cancel"));
 		
 		b_send.addActionListener(new ActionListener(){
 			@Override
@@ -259,6 +259,10 @@ class ScreenCapturer extends JPanel implements MouseListener,
 		});
 
 		initRecs();
+	}
+
+	private String getHtmlText(String text) {
+		return ("<html><BODY bgColor=#ffffff><Font color=black>" + text + "</Font></BODY></html>");
 	}
 
 	public BufferedImage getWhatWeGot() {

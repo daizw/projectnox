@@ -203,6 +203,7 @@ public class JXTANetwork {
 	}
 
 	public void StopHunting() {
+		System.out.println("Stop Hunting...");
 		StopDiscovery = true;
 	}
 

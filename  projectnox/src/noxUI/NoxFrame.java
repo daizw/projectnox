@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -17,6 +18,8 @@ import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import net.nox.NoxToolkit;
 
 import com.sun.jna.examples.WindowUtils;
 
@@ -376,6 +379,7 @@ class Titlebar extends JPanel {
 
 		Dimension btnsize = new Dimension(NoxFrame.TITLE_HEIGHT, NoxFrame.TITLE_HEIGHT); 
 		blogo = new JButton(new ImageIcon(path_logo));
+		blogo.setToolTipText(getHtmlText("About NoX"));
 		blogo.setSize(btnsize);
 		blogo.setPreferredSize(btnsize);
 		blogo.setMaximumSize(btnsize);
@@ -460,8 +464,10 @@ class Titlebar extends JPanel {
 					private static final long serialVersionUID = 1L;
 
 					public void actionPerformed(ActionEvent e) {
-						if(IAmBase)
+						if(IAmBase){
+							new NoxToolkit().getNetwork().StopNetwork();
 							System.exit(0);
+						}
 						else
 							parent.dispose();
 					}
@@ -500,6 +506,7 @@ class Titlebar extends JPanel {
 		 */
 		bminimize = new JButton(new ImageIcon(path_minimize));
 		bminimize.setRolloverIcon(new ImageIcon(path_minimize_rollover));
+		bminimize.setToolTipText(getHtmlText("Minimize"));
 		bminimize.setSize(btnsize);
 		bminimize.setPreferredSize(btnsize);
 		bminimize.setMaximumSize(btnsize);
@@ -522,6 +529,7 @@ class Titlebar extends JPanel {
 
 		bmaximize = new JButton(new ImageIcon(path_maximize));
 		bmaximize.setRolloverIcon(new ImageIcon(path_maximize_rollover));
+		bmaximize.setToolTipText(getHtmlText("Maximize"));
 		bmaximize.setSize(btnsize);
 		bmaximize.setPreferredSize(btnsize);
 		bmaximize.setMaximumSize(btnsize);
@@ -564,6 +572,7 @@ class Titlebar extends JPanel {
 
 		bclose = new JButton(new ImageIcon(path_close));
 		bclose.setRolloverIcon(new ImageIcon(path_close_rollover));
+		bclose.setToolTipText(getHtmlText("Close"));
 		bclose.setSize(btnsize);
 		bclose.setPreferredSize(btnsize);
 		bclose.setMaximumSize(btnsize);
@@ -573,10 +582,14 @@ class Titlebar extends JPanel {
 		bclose.setOpaque(false);
 		bclose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parent.dispose();
+				//parent.dispose();
+				parent.setVisible(false);
 				/*if (IAmBase)// 如果是根窗口
+				{
+					new NoxToolkit().getNetwork().StopNetwork();
 					System.exit(0);// .............
-*/			}
+				}*/
+			}
 		});
 
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -593,6 +606,15 @@ class Titlebar extends JPanel {
 		this.add(bmaximize);
 		this.add(bclose);
 		this.setOpaque(false);
+	}
+	
+	/**
+	 * 返回TooltipTxt的html形式
+	 * @param text
+	 * @return
+	 */
+	private String getHtmlText(String text) {
+		return ("<html><BODY bgColor=#ffffff><Font color=black>" + text + "</Font></BODY></html>");
 	}
 
 	public void setToMaximizeIcon() {
@@ -640,6 +662,7 @@ class FootPane extends JPanel {
 		resizeButn.setMaximumSize(btnsize);
 		resizeButn.setMinimumSize(btnsize);
 		// resizeButn.setOpaque(false);
+		//resizeButn.setMargin(new Insets(0,0,0,0));
 
 		resizer = new ResizeListener(parent, resizeButn);
 		resizeButn.addMouseListener(resizer);

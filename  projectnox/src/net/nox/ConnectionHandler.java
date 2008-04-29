@@ -97,7 +97,7 @@ import xml.XmlMsgFormat;
  * response from the initiator for each message.
  * 
  */
-public class ConnectionHandler implements Runnable, PipeMsgListener{
+public class ConnectionHandler implements Runnable, PipeMsgListener {
 
 	private final JxtaBiDiPipe outbidipipe;
 	/**
@@ -153,24 +153,24 @@ public class ConnectionHandler implements Runnable, PipeMsgListener{
 
 		// get the message element named SenderMessage
 		MessageElement senderEle = msg.getMessageElement(
-		// XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null, XmlMsgFormat.SENDER_ELEMENT_NAME);
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
+				XmlMsgFormat.SENDER_ELEMENT_NAME);
 		MessageElement senderIDEle = msg.getMessageElement(
-		// XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null, XmlMsgFormat.SENDERID_ELEMENT_NAME);
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
+				XmlMsgFormat.SENDERID_ELEMENT_NAME);
 
 		MessageElement receiverEle = msg.getMessageElement(
-		// XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null, XmlMsgFormat.RECEIVER_ELEMENT_NAME);
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
+				XmlMsgFormat.RECEIVER_ELEMENT_NAME);
 		MessageElement receiverIDEle = msg.getMessageElement(
-		// XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null, XmlMsgFormat.RECEIVERID_ELEMENT_NAME);
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
+				XmlMsgFormat.RECEIVERID_ELEMENT_NAME);
 		MessageElement timeEle = msg.getMessageElement(
-		// XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null, XmlMsgFormat.TIME_ELEMENT_NAME);
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
+				XmlMsgFormat.TIME_ELEMENT_NAME);
 		MessageElement msgEle = msg.getMessageElement(
-		// XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null, XmlMsgFormat.MESSAGE_ELEMENT_NAME);
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
+				XmlMsgFormat.MESSAGE_ELEMENT_NAME);
 
 		System.out.println("Detecting if the msg elements is null");
 
@@ -218,16 +218,17 @@ public class ConnectionHandler implements Runnable, PipeMsgListener{
 								senderIDEle.toString());
 				System.out.println("Local Discovery Done!");
 				if (locAdvEnum != null) {
-					System.out.println("We got some in local cache!:" + locAdvEnum.hasMoreElements());
+					System.out.println("We got some in local cache!:"
+							+ locAdvEnum.hasMoreElements());
 					while (locAdvEnum.hasMoreElements()) {
-						incomingPeerAdv = (Advertisement) locAdvEnum.nextElement();
+						incomingPeerAdv = (Advertisement) locAdvEnum
+								.nextElement();
 						System.out
 								.println("Here is a loc adv of the peer who made the incoming call:\n"
 										+ incomingPeerAdv);
 					}
-				} 
-				if(incomingPeerAdv == null)
-				{
+				}
+				if (incomingPeerAdv == null) {
 					// ‘∂≥Ã≤È’“
 					System.out
 							.println("Can't find the peer's adv in local cache, try to find it remotely...");
@@ -292,22 +293,33 @@ public class ConnectionHandler implements Runnable, PipeMsgListener{
 	 *             Thrown for errors sending messages.
 	 */
 	private void sendGreetingMessages(JxtaBiDiPipe bidipipe) throws IOException {
-		Message msg;
-
-		System.out.println("Sending message");
+		System.out.println("Sending greeting message");
 		// create the message
-		msg = new Message();
+		Message msg = new Message();
 		Date date = new Date(System.currentTimeMillis());
 		// add a string message element with the current date
-		StringMessageElement stns = new StringMessageElement(
-				XmlMsgFormat.TIME_ELEMENT_NAME, date.toString(), null);
-		String hellomsg = "Say Hello, [F: 100]In BiDiPipe MsgReceiver!\n from "
+		String hellomsg = "Greetings!! [F:100]\nIn ConnectionHandler sendGreetingMessages() from "
 				+ new NoxToolkit().getNetworkConfigurator().getName();
-		StringMessageElement mns = new StringMessageElement(
+
+		StringMessageElement senderEle = new StringMessageElement(
+				XmlMsgFormat.SENDER_ELEMENT_NAME, new NoxToolkit().getNetworkConfigurator().getName(), null);
+		StringMessageElement senderIDEle = new StringMessageElement(
+				XmlMsgFormat.SENDERID_ELEMENT_NAME, new NoxToolkit().getNetworkConfigurator().getPeerID().toString(), null);
+		StringMessageElement receiverEle = new StringMessageElement(
+				XmlMsgFormat.RECEIVER_ELEMENT_NAME, bidipipe.getRemotePeerAdvertisement().getName(), null);
+		StringMessageElement receiverIDEle = new StringMessageElement(
+				XmlMsgFormat.RECEIVERID_ELEMENT_NAME, bidipipe.getRemotePeerAdvertisement().getPeerID().toString(), null);
+		StringMessageElement timeEle = new StringMessageElement(
+				XmlMsgFormat.TIME_ELEMENT_NAME, date.toString(), null);
+		StringMessageElement msgEle = new StringMessageElement(
 				XmlMsgFormat.MESSAGE_ELEMENT_NAME, hellomsg, null);
 
-		msg.addMessageElement(null, stns);
-		msg.addMessageElement(null, mns);
+		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderEle);
+		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderIDEle);
+		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverEle);
+		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverIDEle);
+		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, timeEle);
+		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, msgEle);
 
 		bidipipe.sendMessage(msg);
 	}

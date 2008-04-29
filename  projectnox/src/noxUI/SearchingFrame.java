@@ -251,10 +251,14 @@ public class SearchingFrame extends JFrame {
 			}
 			@Override
 			public void windowClosed(WindowEvent arg0) {
+				glassPane.stop();
+				searchPeersBtn.setText("Search");
 				MyLogin.StopHunting();
 			}
 			@Override
 			public void windowClosing(WindowEvent arg0) {
+				glassPane.stop();
+				searchPeersBtn.setText("Search");
 				MyLogin.StopHunting();
 			}
 			@Override
