@@ -11,13 +11,10 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -25,13 +22,11 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -110,6 +105,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 闪屏振动
 	 */
 	private JButton b_shake;
+	private static final String shakeMsg = "[F:999]"; 
 	/**
 	 * 发送图片按钮
 	 */
@@ -152,6 +148,14 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 蓝色
 	 */
 	Style blue;
+	/**
+	 * 绿色
+	 */
+	Style green;
+	/**
+	 * 灰色
+	 */
+	Style gray;
 	/**
 	 * 红色
 	 */
@@ -260,6 +264,12 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		blue = styledDoc.addStyle("blue", normal);
 		StyleConstants.setForeground(blue, Color.blue);
 
+		green = styledDoc.addStyle("green", normal);
+		StyleConstants.setForeground(green, Color.GREEN.darker());
+
+		gray = styledDoc.addStyle("gray", normal);
+		StyleConstants.setForeground(gray, Color.GRAY);
+
 		red = styledDoc.addStyle("red", normal);
 		StyleConstants.setForeground(red, Color.red);
 
@@ -300,7 +310,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		tp_input = new JTextPane();
 		// tp_msg.setText(sayHello);
 		tp_input
-				.setToolTipText("Input your message and press \"Send\" or type Ctrl+Enter");
+		.setToolTipText(getHtmlText("Input your message and press \"Send\" <br>or press Ctrl+Enter"));
 
 		/**
 		 * 键盘事件监听器/事件处理
@@ -335,7 +345,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		Dimension buttonSize = new Dimension(26, 26);
 
 		b_emotion = new JButton(new ImageIcon(path_icon + "emotion.png"));
-		b_emotion.setToolTipText("Insert a emotion image");
+		b_emotion.setToolTipText(getHtmlText("Insert a emotion image"));
 		b_emotion.setActionCommand("Emotion");
 		b_emotion.addActionListener(this);
 		// b_InsertImg.setContentAreaFilled(false);
@@ -355,7 +365,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		selFace.pack();
 
 		b_shake = new JButton(new ImageIcon(path_icon + "shake.png"));
-		b_shake.setToolTipText("Rock and Roll !");
+		b_shake.setToolTipText(getHtmlText("Rock and Roll !"));
 		b_shake.setActionCommand("Shake");
 		b_shake.addActionListener(this);
 		b_shake.setSize(buttonSize);
@@ -364,7 +374,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		b_shake.setMinimumSize(buttonSize);
 
 		b_sendPic = new JButton(new ImageIcon(path_icon + "sendpic.png"));
-		b_sendPic.setToolTipText("Send a picture");
+		b_sendPic.setToolTipText(getHtmlText("Send a picture"));
 		b_sendPic.setActionCommand("SendPic");
 		b_sendPic.addActionListener(this);
 		b_sendPic.setSize(buttonSize);
@@ -373,7 +383,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		b_sendPic.setMinimumSize(buttonSize);
 
 		b_snapshot = new JButton(new ImageIcon(path_icon + "snapshot.png"));
-		b_snapshot.setToolTipText("Snap it !");
+		b_snapshot.setToolTipText(getHtmlText("Snap it !"));
 		b_snapshot.setActionCommand("Snapshot");
 		b_snapshot.addActionListener(this);
 		b_snapshot.setSize(buttonSize);
@@ -457,6 +467,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		b_send.setMnemonic('S');
 		// b_send.setPreferredSize(new Dimension(100,40));
 		b_send.setActionCommand("Send");
+		b_send.setToolTipText(getHtmlText("Send"));
 		b_send.addActionListener(this);
 		// b_send.setContentAreaFilled(false);
 		b_send.setSize(buttonSize);
@@ -500,6 +511,10 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		// this.setOpaque(false);//在当前使用的背景下, 设为透明似乎不太好看...
 	}
 
+	private String getHtmlText(String text) {
+		return ("<html><BODY bgColor=#ffffff><Font color=black>" + text + "</Font></BODY></html>");
+	}
+
 	/**
 	 * 显示系统消息
 	 * 
@@ -517,7 +532,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * @param strs
 	 *            1:sender;2:receiver;3:time;4:msg
 	 */
-	public void receiveMsgAndAccess(String[] strs) {// 1:sender;2:receiver;3:time;4:msg
+	public void incomingMsgProcessor(final String[] strs) {// 1:sender;2:receiver;3:time;4:msg
 		System.out.println("playAudio()...");
 		// System.out.println("public void receiveMsgAndAccess(String[] strs)");
 		// System.out.println("currentUsername :" + currentUsername);
@@ -539,14 +554,18 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		if (strs[2].equals(whoami))// 此处要获取当前用户的用户名
 		{
 			String label = strs[1] + " say to me at " + strs[3];
-			appendToHMsg(label, strbuf_msg.toString(), true);
-			Thread playThd = new Thread(new Runnable(){
+			Thread playThd = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					playAudio();
+					if (strs[4].equals(shakeMsg))
+						playShakeAudio();
+					else
+						playAudio();
 				}
 			}, "Beeper");
 			playThd.start();
+			appendToHMsg(label, strbuf_msg.toString(), true, false);
+
 		} else if (strs[0].equals("fromAll"))// 群聊消息
 		{
 			System.out.println("noDisturb " + noDisturb);
@@ -554,15 +573,18 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			// appendToHMsg(label, strbuf_msg.toString(), !noDisturb);
 			if (noDisturb)// 且 防打扰打开
 			{
-				appendToHMsg(label, strbuf_msg.toString(), false);
+				appendToHMsg(label, strbuf_msg.toString(), false, false);
 				return;
 			} else// 防打扰未打开
 			{
-				appendToHMsg(label, strbuf_msg.toString(), true);
-				Thread playThd = new Thread(new Runnable(){
+				appendToHMsg(label, strbuf_msg.toString(), true, false);
+				Thread playThd = new Thread(new Runnable() {
 					@Override
 					public void run() {
-						playAudio();
+						if (strs[4].equals(shakeMsg))
+							playShakeAudio();
+						else
+							playAudio();
 					}
 				}, "Beeper");
 				playThd.start();
@@ -581,7 +603,28 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			// codeBase = new URL("file:" + System.getProperty("user.dir") +
 			// "/");
 			URL url = new URL("file:\\" + System.getProperty("user.dir")
-					+ "\\resrc\\audio\\type.wav");
+					+ "\\resrc\\audio\\typewpcm.wav");
+			msgBeep = Applet.newAudioClip(url);
+			msgBeep.play();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(e.toString());
+		}
+	}
+ 
+	/**
+	 * 接收消息时播放提示音
+	 * 
+	 */
+	public void playShakeAudio() {
+		final AudioClip msgBeep;
+		try {
+			// AudioClip audioClip = Applet.newAudioClip(completeURL)
+			// codeBase = new URL("file:" + System.getProperty("user.dir") +
+			// "/");
+			URL url = new URL("file:\\" + System.getProperty("user.dir")
+					+ "\\resrc\\audio\\nudgewpcm.wav");
 			msgBeep = Applet.newAudioClip(url);
 			msgBeep.play();
 		} catch (MalformedURLException e) {
@@ -597,15 +640,21 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 注意:如果ckb_nodisturb 为 true,表示防打扰模式开启, 此时从服务器传来的群聊消息只会被添加到历史消息字符串
 	 * 而不会被添加到窗口中 只有私聊对象的消息才会被添加到窗口中
 	 * 
+	 * @param label
+	 *            发送者/接收者/发送时间 标签
 	 * @param msg
 	 *            要添加到消息记录的字符串
 	 * @param visible
 	 *            是否要添加到历史消息窗口中(可见)
+	 * @param isFromMe
+	 *            是否是自己向外发送的消息
 	 * 
 	 * 原来这个函数的功能是将消息输入框的字符串插入到历史消息窗口, 显然这是不够的.
-	 * 添加参数后,从服务器接受到的历史消息可以通过调用这个函数来插入到历史消息窗口 简言之,增强了这个函数的通用性 将消息添加到消息记录的功能从中移出,
+	 * 添加参数后,从服务器接受到的历史消息可以通过调用这个函数来插入到历史消息窗口.
+	 * 简言之,增强了这个函数的通用性.将消息添加到消息记录的功能从中移出.
 	 */
-	public void appendToHMsg(String label, String msg, boolean visible) {
+	public void appendToHMsg(String label, String msg, boolean visible,
+			boolean isFromMe) {
 		StringBuffer label_buf = new StringBuffer(label);
 		StringBuffer msg_buf = new StringBuffer(msg);
 
@@ -613,12 +662,35 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		// System.out.println("msg_buf :" + msg_buf);
 
 		// playAudio();
+		// 如果是将自己的消息添加到窗口则为绿标签, 否则为蓝色.
+		Style labelStyle = isFromMe ? green : blue;
 
 		/**
 		 * 将消息添加到消息记录
 		 */
 		historymsg_save += (label_buf + "\n");
 		historymsg_save += (msg_buf + "\n");
+		/**
+		 * 是否是闪屏振动消息
+		 */
+		if (msg.equals(shakeMsg)) {
+			// 使用灰色标签
+			labelStyle = gray;
+
+			DialogEarthquakeCenter dec = new DialogEarthquakeCenter(parent);
+			dec.startShake();
+			tp_historymsg.setEditable(true);
+			tp_historymsg.setCaretPosition(styledDoc.getLength());
+			styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(),
+					labelStyle);
+			tp_historymsg.replaceSelection(label + '\n');
+			tp_historymsg.setCaretPosition(styledDoc.getLength());// !!!
+			styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(), italic);
+			tp_historymsg
+					.replaceSelection("YOU JUST RECEIVED A SHAKE EMOTION\n");
+			tp_historymsg.setEditable(false);
+			return;
+		}
 
 		/**
 		 * if 判断是否应该添加此消息到历史消息窗口
@@ -631,7 +703,8 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			// 消息发送人/对象/发送时间 信息
 			// 插入信息标签
 			tp_historymsg.setCaretPosition(styledDoc.getLength());
-			styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(), blue);
+			styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(),
+					labelStyle);
 			tp_historymsg.replaceSelection(label + '\n');
 			System.out.println("label :" + label);
 			System.out.println("msg :" + msg);
@@ -732,9 +805,10 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		 */
 		Date date = new Date();
 		// fmDate = new SimpleDateFormat("yyyy/MM/dd E HH:mm:ss");
-		String label = "I say to someone, at " + fmDate.format(date) + " :";
+		String label = "I say to " + parent.getRoomName() + ", at "
+				+ fmDate.format(date) + " :";
 
-		appendToHMsg(label, tp_input.getText(), true);
+		appendToHMsg(label, tp_input.getText(), true, true);
 		/**
 		 * 向对方发送消息
 		 */
@@ -753,6 +827,22 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		tp_input.setText("");// 输入框清空
 	}
 
+	private void sendAShakeEmotion() {
+		/**
+		 * 格式化日期
+		 */
+		Date date = new Date();
+		// fmDate = new SimpleDateFormat("yyyy/MM/dd E HH:mm:ss");
+		String label = "Sending a Shake Emotion to " + parent.getRoomName()
+				+ ", at " + fmDate.format(date) + " :";
+
+		appendToHMsg(label, tp_input.getText(), true, true);
+		/**
+		 * 向对方发送消息 999:表示表情索引
+		 */
+		parent.SendMsg(shakeMsg);
+	}
+
 	/**
 	 * 根据索引获取表情图片
 	 * 
@@ -768,6 +858,10 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					+ ".png");
 	}
 
+	/**
+	 * 用于选择图片发送, 或许可以扩展为发送文件
+	 * @param imgPath 图片路径
+	 */
 	private void sendAPicture(String imgPath) {
 		Date date = new Date();
 		String label = "I send a picture to someone, at " + fmDate.format(date)
@@ -797,6 +891,10 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		tp_historymsg.setEditable(false);// 重新设为不可编辑
 	}
 
+	/**
+	 * 用于发送截屏图片
+	 * @param img 截屏图片
+	 */
 	private void sendAPicture(ImageIcon img) {
 		Date date = new Date();
 		String label = "I send a picture to someone, at " + fmDate.format(date)
@@ -862,6 +960,12 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		} else if (srcButton.getActionCommand().equals("Shake")) {
 			DialogEarthquakeCenter dec = new DialogEarthquakeCenter(parent);
 			dec.startShake();// 对话框必须setModal (false)才可以抖动, 否则不行
+			//TODO 这里应该播放声音, 调试时禁止, 防止重叠, 冲突.
+			// playShakeAudio();
+			/**
+			 * 发送一个闪屏振动
+			 */
+			sendAShakeEmotion();
 		} else if (srcButton.getActionCommand().equals("SendPic")) {
 			JFileChooser chooser = new JFileChooser();
 			FileFilter filter = new FileFilter() {

@@ -2,7 +2,7 @@ package noxUI;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
@@ -15,8 +15,8 @@ import net.jxta.discovery.DiscoveryEvent;
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
-import net.jxta.document.AdvertisementFactory;
 import net.jxta.document.MimeMediaType;
+import net.jxta.endpoint.ByteArrayMessageElement;
 import net.jxta.endpoint.Message;
 import net.jxta.endpoint.MessageElement;
 import net.jxta.endpoint.StringMessageElement;
@@ -25,19 +25,12 @@ import net.jxta.endpoint.WireFormatMessageFactory;
 import net.jxta.endpoint.Message.ElementIterator;
 import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroup;
-import net.jxta.pipe.InputPipe;
-import net.jxta.pipe.OutputPipe;
-import net.jxta.pipe.OutputPipeEvent;
-import net.jxta.pipe.OutputPipeListener;
 import net.jxta.pipe.PipeMsgEvent;
 import net.jxta.pipe.PipeMsgListener;
-import net.jxta.pipe.PipeService;
-import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PipeAdvertisement;
 import net.jxta.util.CountingOutputStream;
 import net.jxta.util.DevNullOutputStream;
 import net.jxta.util.JxtaBiDiPipe;
-import net.nox.ConnectionHandler;
 import net.nox.NoxToolkit;
 import xml.XmlMsgFormat;
 /**
@@ -74,6 +67,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 	JSplitPane rootpane;
 	ChatRoomPane chatroompane;
 	protected InfiniteProgressPanel glassPane;
+	private Thread connector;
 	boolean connected = false;
 	boolean gotPipeAdv = false;
 
@@ -148,7 +142,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 				- NoxFrame.TITLE_HEIGHT * 2);
 		glassPane.start();
 
-		Thread connector = new Thread(new Runnable() {
+		connector = new Thread(new Runnable() {
 			public void run() {
 				/**
 				 * 与该peer建立连接
@@ -205,6 +199,9 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 	public ID getRoomID() {
 		return roomID;
 	}
+	public String getRoomName() {
+		return roomname;
+	}
 	public void setOutBidipipe(JxtaBiDiPipe pipe){
 		if(pipe != null){
 			outbidipipe = pipe;
@@ -212,6 +209,13 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 			System.out.println("In setOutBidipipe(), the parameter 'pipe' is not null, good!");
 		}else
 			System.out.println("Unbelievable! the parameter 'pipe' is null!!");
+	}
+	
+	public void TryToConnectAgain(long waittime){
+		connector.start();
+		rootpane.setVisible(false);
+		glassPane.setVisible(true);
+		glassPane.start();
 	}
 
 	/**
@@ -276,7 +280,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 			Message msg;
 
 			System.out.println("[" + Thread.currentThread().getName()
-					+ "] Sending message...");
+					+ "] Saying hello ...");
 			// create the message
 			msg = new Message();
 			Date date = new Date(System.currentTimeMillis());
@@ -327,7 +331,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 	 *            dumps message element content if true
 	 */
 	public void processIncomingMsg(Message msg, boolean verbose) {
-		String inputMsg = "++";
+		String inputMsg = "";
 		try {
 			CountingOutputStream cnt;
 			ElementIterator it = msg.getMessageElements();
@@ -349,8 +353,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 			}
 			
 			MessageElement msgEle = msg.getMessageElement(
-					//XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-					null,
+					XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 					XmlMsgFormat.MESSAGE_ELEMENT_NAME);
 			inputMsg += msgEle.toString();
 			
@@ -366,7 +369,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 		String whoami = "ME";
 		whoami = new NoxToolkit().getNetworkConfigurator().getName();
 		String[] strArrayMsg = { "", roomname, whoami, new Date().toString(), inputMsg };
-		chatroompane.receiveMsgAndAccess(strArrayMsg);
+		chatroompane.incomingMsgProcessor(strArrayMsg);
 		System.out.println("Have you see the message?");
 		if(!this.isVisible()){
 			//TODO 应该是提示有消息, 而不是强行显示窗口
@@ -415,13 +418,24 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 					XmlMsgFormat.TIME_ELEMENT_NAME, date.toString(), null);
 			StringMessageElement msgEle = new StringMessageElement(
 					XmlMsgFormat.MESSAGE_ELEMENT_NAME, strmsg, null);
+			
+			/**
+			 * TODO 将图片或者ImageIcon转为byte[]
+			 */
+			//File thePicFile = new File("file:\\E:\\faces.PNG");
+			ImageIcon thePicFile = new ImageIcon("file:\\E:\\faces.PNG");
+			byte[] picture = thePicFile.getImage().toString().getBytes();
+			
+			ByteArrayMessageElement picEle = new ByteArrayMessageElement(
+					XmlMsgFormat.PICTURE_ELEMENT_NAME, MimeMediaType.AOS, picture, null);
 
-			msg.addMessageElement(null, senderEle);
-			msg.addMessageElement(null, senderIDEle);
-			msg.addMessageElement(null, receiverEle);
-			msg.addMessageElement(null, receiverIDEle);
-			msg.addMessageElement(null, timeEle);
-			msg.addMessageElement(null, msgEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderIDEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverIDEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, timeEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, msgEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, picEle);
 
 			outbidipipe.sendMessage(msg);
 			System.out.println("message sent");
@@ -448,35 +462,29 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 
 		// get the message element named SenderMessage
 		MessageElement senderEle = msg.getMessageElement(
-				//XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null,
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 				XmlMsgFormat.SENDER_ELEMENT_NAME);
 		MessageElement senderIDEle = msg.getMessageElement(
-				//XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null,
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 				XmlMsgFormat.SENDERID_ELEMENT_NAME);
 		MessageElement receiverEle = msg.getMessageElement(
-				//XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null,
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 				XmlMsgFormat.RECEIVER_ELEMENT_NAME);
 		MessageElement receiverIDEle = msg.getMessageElement(
-				//XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null,
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 				XmlMsgFormat.RECEIVERID_ELEMENT_NAME);
 		MessageElement timeEle = msg.getMessageElement(
-				//XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null,
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 				XmlMsgFormat.TIME_ELEMENT_NAME);
 		MessageElement msgEle = msg.getMessageElement(
-				//XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				null,
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 				XmlMsgFormat.MESSAGE_ELEMENT_NAME);
 		
 		System.out.println("Detecting if the msg elements is null");
 
 		if (null == senderEle || receiverEle == null || timeEle == null
 				|| msgEle == null){
-			System.out.println("Msg is empty, it's weird.");
+			System.out.println("Some msg element is empty, it's weird.");
 			return;
 		}
 		System.out.println("Incoming call: From: " + senderEle.toString());
