@@ -77,7 +77,7 @@ import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
 import noxUI.Chatroom;
-import xml.XmlMsgFormat;
+import xml.nox.XmlMsgFormat;
 
 /**
  * This is the server (receiver) side of the Bi-directional Pipe Tutorial. <p/>
