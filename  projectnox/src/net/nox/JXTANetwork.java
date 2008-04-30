@@ -220,13 +220,13 @@ public class JXTANetwork {
 		Thread inconn = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				addInwardConnectionListener();
+				addIncomingConnectionListener();
 			}
-		}, "Inward Connection Listener");
+		}, "Incoming Connection Listener");
 		inconn.start();
 	}
 
-	private void addInwardConnectionListener() {
+	private void addIncomingConnectionListener() {
 		PipeAdvertisement serverPipeAdv = getPipeAdvertisement();
 		try {
 			System.out.println("Publishing pipe adv...");

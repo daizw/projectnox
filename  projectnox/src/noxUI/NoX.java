@@ -40,8 +40,8 @@ public class NoX {
 		/**
 		 * 组列表
 		 */
-		String[] glistItems = { "group1", "group2", "group3", "group4", "三年二班",
-				"三年三班" };
+		String[] glistItems = { /*"group1", "group2", "group3", "group4", "三年二班",
+				"三年三班" */};
 
 		GroupItem[] groups = new GroupItem[glistItems.length];
 

@@ -24,19 +24,31 @@ public abstract class NoxJListItem {
 	
 	public abstract void setStatus(Advertisement adv);
 	public abstract ItemStatus getStatus();
-
+	/**
+	 * 获取头像
+	 * @return 头像ImageIcon
+	 */
 	protected ImageIcon getPortrait() {
 		return portrait;
 	}
-
+	/**
+	 * 获取昵称
+	 * @return 昵称Text
+	 */
 	protected String getNick() {
 		return nickname;
 	}
-
+	/**
+	 * 获取签名档
+	 * @return 签名档Text
+	 */
 	protected String getSign() {
 		return sign;
 	}
-	
+	/**
+	 * 获取该Item的ID
+	 * @return 组的PeerGroupID,或者Peer的PeerID
+	 */
 	protected ID getUUID(){
 		return UUID;
 	}

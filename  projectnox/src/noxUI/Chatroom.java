@@ -2,11 +2,16 @@ package noxUI;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JSplitPane;
@@ -84,7 +89,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 	private JxtaBiDiPipe outbidipipe = null;
 
 	PipeAdvertisement serverPipeAdv;
-
+	
 	/**
 	 * 最终应该从主窗口继承颜色, 透明度 考虑实现---------主窗口和从属窗口同步调节颜色和透明度
 	 * 在实例化从属窗口的时候将引用保存在一个Vector中, 调节颜色及透明度时对 Vector中实例依次调用调节函数
@@ -127,9 +132,11 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 
 	public Chatroom(final PeerItem friend, JxtaBiDiPipe bidipipe) {
 		this(friend.getNick());
-		this.outbidipipe = bidipipe;
+		if(bidipipe != null)
+			this.outbidipipe = bidipipe;
 		if(outbidipipe != null)
 			outbidipipe.setMessageListener(this);
+		roomID = friend.getUUID();
 		
 		SingleChatRoomSidePane portraits = new SingleChatRoomSidePane(friend
 				.getNick(), friend.getPortrait(), new ImageIcon(
@@ -180,7 +187,6 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 		this.getContainer().add(rootpane/* , BorderLayout.SOUTH */);
 		rootpane.setVisible(false);
 
-		roomID = friend.getUUID();
 		this.setVisible(true);
 	}
 
@@ -207,6 +213,9 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 			outbidipipe = pipe;
 			outbidipipe.setMessageListener(this);
 			System.out.println("In setOutBidipipe(), the parameter 'pipe' is not null, good!");
+			rootpane.setVisible(true);
+			glassPane.setVisible(false);
+			glassPane.stop();
 		}else
 			System.out.println("Unbelievable! the parameter 'pipe' is null!!");
 	}
@@ -250,30 +259,62 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 					getRoomID().toString(), 10, pipeListener);
 			long unittime = 500;
 			long timecount = waittime/unittime;
-			while(!gotPipeAdv && timecount-- > 0){
+			//如果没找到gotPipeAdv或者超时或者在此时间内仍然没有外来连接
+			//(这里有个同步的问题, 在查找过程中, 如果对方主动连接, 而没有修改gotPipeAdv, 则这里会仍然导致超时)
+			while(!gotPipeAdv && timecount-- > 0 && outbidipipe == null){
 				try {
-					Thread.sleep(500);
+					Thread.sleep(unittime);
 					System.out.println("[" + Thread.currentThread().getName()
 							+ "] timecount:	"+timecount);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			if(newOutBidipipeAdv == null){
-				return;
+			//1: 得到了pipe adv;
+			//2: timecount <= 0;
+			//3: outbidipipe != null: 搜索过程中对方连接过来, 于是ConnectionHandler修改了outbidipipe.
+			if(outbidipipe == null){
+				//不是第三种情况
+				//有两种可能:
+				//1: 得到了pipe adv;
+				//2: 超时
+				if(newOutBidipipeAdv == null){
+					//2: 超时, 返回
+					System.out.println("Failed to fetch a remote pipe adv: newOutBidipipeAdv == null.");
+					return;
+				}
+				//1: 得到pipe adv
+				System.out.println("I have got a remote pipe adv.");
+				
+				System.out.println("[" + Thread.currentThread().getName()
+						+ "] Attempting to establish a connection on pipe : "
+						+ newOutBidipipeAdv.getPipeID());
+				System.out.println("timeout: "+(int) ((timecount+1)*unittime));
+				while(outbidipipe == null && timecount > 0){
+					//Try again and again
+					try{
+						//用四个单位的时间作为超时时间//timecount -= 4;
+						timecount -= 2;
+						outbidipipe = new JxtaBiDiPipe(group, newOutBidipipeAdv, (int) unittime * 4,
+							this, true);
+						if(outbidipipe == null){
+							//这个if似乎没必要
+							throw new IOException(" tryToConnect() failed: outbidipipe == null.");
+						}
+					}catch(IOException exc){
+						System.out.println("timecount: " + timecount + " -->failed: IOException occured.");
+						exc.printStackTrace();
+					}
+				}
+				
+				System.out.println("[" + Thread.currentThread().getName()
+						+ "] JxtaBiDiPipe pipe created");
+				System.out.println("[" + Thread.currentThread().getName()
+						+ "] Pipe name	: " + newOutBidipipeAdv.getName());
 			}
-			System.out.println("May have got a remote pipe adv...");
+			//3: outbidipipe != null: 搜索过程中对方连接过来, 于是ConnectionHandler修改了outbidipipe.
+			//或者经过以上过程得到了新的pipe
 			
-			System.out.println("[" + Thread.currentThread().getName()
-					+ "] Attempting to establish a connection on pipe : "
-					+ newOutBidipipeAdv.getPipeID());
-			System.out.println("timeout: "+(int) ((timecount+1)*unittime));
-			outbidipipe = new JxtaBiDiPipe(group, newOutBidipipeAdv, (int) ((timecount+1)*unittime),
-					this, true);
-			System.out.println("[" + Thread.currentThread().getName()
-					+ "] JxtaBiDiPipe pipe created");
-
 			// We registered ourself as the msg listener for the pipe. We now
 			// just need to wait until the transmission is finished.
 			connected = true;
@@ -300,12 +341,12 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 			StringMessageElement msgEle = new StringMessageElement(
 					XmlMsgFormat.MESSAGE_ELEMENT_NAME, hellomsg, null);
 
-			msg.addMessageElement(null, senderEle);
-			msg.addMessageElement(null, senderIDEle);
-			msg.addMessageElement(null, receiverEle);
-			msg.addMessageElement(null, receiverIDEle);
-			msg.addMessageElement(null, timeEle);
-			msg.addMessageElement(null, msgEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderIDEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverIDEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, timeEle);
+			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, msgEle);
 
 			outbidipipe.sendMessage(msg);
 
@@ -313,10 +354,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 					+ "] Done!");
 		} catch (IOException failure) {
 			failure.printStackTrace();
-		}
-
-		System.out.println("[" + Thread.currentThread().getName()
-				+ "] Pipe name	: " + newOutBidipipeAdv.getName());
+		}		
 		System.out.println("[" + Thread.currentThread().getName()
 				+ "] Room ID	: " + getRoomID());
 		System.out.println("+++++++++++End of TryToConnect()+++++++++++");
@@ -331,7 +369,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 	 *            dumps message element content if true
 	 */
 	public void processIncomingMsg(Message msg, boolean verbose) {
-		String inputMsg = "";
+		String incomingMsg = "";
 		try {
 			CountingOutputStream cnt;
 			ElementIterator it = msg.getMessageElements();
@@ -355,7 +393,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 			MessageElement msgEle = msg.getMessageElement(
 					XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 					XmlMsgFormat.MESSAGE_ELEMENT_NAME);
-			inputMsg += msgEle.toString();
+			incomingMsg += msgEle.toString();
 			
 			System.out
 					.println("---------[F:100]----------End Message----------[F:035]------------");
@@ -368,9 +406,28 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 		System.out.println("Put the message to the Chatroom window...");
 		String whoami = "ME";
 		whoami = new NoxToolkit().getNetworkConfigurator().getName();
-		String[] strArrayMsg = { "", roomname, whoami, new Date().toString(), inputMsg };
-		chatroompane.incomingMsgProcessor(strArrayMsg);
-		System.out.println("Have you see the message?");
+		String[] strArrayMsg = { "", roomname, whoami, new Date().toString(), incomingMsg};
+		
+		ByteArrayMessageElement picEle = (ByteArrayMessageElement) msg.getMessageElement(
+				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
+				XmlMsgFormat.PICTURE_ELEMENT_NAME);
+		
+		ImageIcon incomingPic = null;
+		if(picEle != null)
+		{
+			// 将byte[]转化为图片形式
+			try {
+				ByteArrayInputStream byteArrayIS = new ByteArrayInputStream(picEle.getBytes());
+				BufferedImage bufImg = javax.imageio.ImageIO.read(byteArrayIS);
+				incomingPic = new ImageIcon(bufImg);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		chatroompane.incomingMsgProcessor(strArrayMsg, incomingPic);
+		
+		
+		System.out.println("Did you see the message?");
 		if(!this.isVisible()){
 			//TODO 应该是提示有消息, 而不是强行显示窗口
 			this.setVisible(true);
@@ -396,9 +453,11 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 	 * @param strmsg string msg
 	 * @return succeed or not
 	 */
-	public boolean SendMsg(String strmsg) {
-		if (outbidipipe == null)
+	public boolean SendMsg(String strmsg, BufferedImage bufImg) {
+		if (outbidipipe == null){
+			System.out.println("outBiDiPipe is null now, canceling sending msg.");
 			return false;
+		}
 		Message msg;
 		try {
 			System.out.println("Sending message:\n" + strmsg);
@@ -418,16 +477,6 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 					XmlMsgFormat.TIME_ELEMENT_NAME, date.toString(), null);
 			StringMessageElement msgEle = new StringMessageElement(
 					XmlMsgFormat.MESSAGE_ELEMENT_NAME, strmsg, null);
-			
-			/**
-			 * TODO 将图片或者ImageIcon转为byte[]
-			 */
-			//File thePicFile = new File("file:\\E:\\faces.PNG");
-			ImageIcon thePicFile = new ImageIcon("file:\\E:\\faces.PNG");
-			byte[] picture = thePicFile.getImage().toString().getBytes();
-			
-			ByteArrayMessageElement picEle = new ByteArrayMessageElement(
-					XmlMsgFormat.PICTURE_ELEMENT_NAME, MimeMediaType.AOS, picture, null);
 
 			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderEle);
 			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderIDEle);
@@ -435,7 +484,38 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverIDEle);
 			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, timeEle);
 			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, msgEle);
-			msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, picEle);
+			
+			if(bufImg != null){
+				/**
+				 * TODO 将图片或者ImageIcon转为byte[]
+				 */
+				ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+				javax.imageio.ImageIO.write(bufImg, "PNG", byteArrayOS);
+				byte[] picture = byteArrayOS.toByteArray();
+					
+				ByteArrayMessageElement picEle = new ByteArrayMessageElement(
+							XmlMsgFormat.PICTURE_ELEMENT_NAME, MimeMediaType.AOS, picture, null);
+				msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, picEle);
+			}
+			/*if(picPath != null){
+				*//**
+				 * TODO 将图片或者ImageIcon转为byte[]
+				 *//*
+				//File thePicFile = new File(System.getProperty("user.dir")+ "/resrc/images/faces.PNG");
+				File thePicFile = new File(picPath);
+				if(thePicFile.exists()){
+					BufferedImage bufImg = javax.imageio.ImageIO.read(thePicFile);
+					ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+					javax.imageio.ImageIO.write(bufImg, "PNG", byteArrayOS);
+					byte[] picture = byteArrayOS.toByteArray();
+					
+					ByteArrayMessageElement picEle = new ByteArrayMessageElement(
+							XmlMsgFormat.PICTURE_ELEMENT_NAME, MimeMediaType.AOS, picture, null);
+					msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, picEle);
+				}else{
+					System.out.println("Failed to append the picture to the end of the msg");
+				}
+			}*/
 
 			outbidipipe.sendMessage(msg);
 			System.out.println("message sent");
@@ -479,7 +559,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 		MessageElement msgEle = msg.getMessageElement(
 				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 				XmlMsgFormat.MESSAGE_ELEMENT_NAME);
-		
+
 		System.out.println("Detecting if the msg elements is null");
 
 		if (null == senderEle || receiverEle == null || timeEle == null
@@ -501,7 +581,7 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 			System.out.println("Msg.toString() is empty, it's weird even more.");
 			return;
 		}
-		this.processIncomingMsg(msg, true);
+		this.processIncomingMsg(msg, false);
 		System.out.println("+++End Chatroom pipeMsgEvent()...+++");
 	}
 
@@ -509,6 +589,10 @@ public class Chatroom extends NoxFrame implements 	PipeMsgListener {
 		public void discoveryEvent(DiscoveryEvent e) {
 			PipeAdvertisement pipeAdv = null;
 			Enumeration<Advertisement> responses = e.getSearchResults();
+			/**
+			 * TODO 事实上这里似乎不需要while循环;
+			 * 但是有可能存在广告过期的问题
+			 */
 			while (responses.hasMoreElements()) {
 				try {
 					pipeAdv = (PipeAdvertisement) responses.nextElement();
