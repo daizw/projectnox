@@ -196,7 +196,7 @@ public class ConfigCenterFrame extends NoxFrame {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
+		//System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
 		ConfigCenterFrame ccf = new ConfigCenterFrame(null);
 		ccf.setVisible(true);
 	}

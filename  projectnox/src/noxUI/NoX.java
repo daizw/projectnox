@@ -6,7 +6,10 @@ import net.nox.JXTANetwork;
 public class NoX {
 	public static void main(String args[]) {	
 		System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
-		
+		System.setProperty("net.jxta.logging.Logging", "INFO");
+		System.setProperty("net.jxta.level", "INFO");
+		System.setProperty("java.util.logging.config.file", "logging.properties");
+		 
 		JXTANetwork MyLogin;
 		MyLogin = new JXTANetwork();
 		MyLogin.Start();

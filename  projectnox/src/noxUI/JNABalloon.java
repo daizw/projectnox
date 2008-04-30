@@ -97,7 +97,7 @@ public class JNABalloon {
 	}
 
 	public JNABalloon(String BALLOON_TEXT, JComponent owner, int X, int Y) {
-		System.setProperty("sun.java2d.noddraw", "true");
+		//System.setProperty("sun.java2d.noddraw", "true");
 		content = new JLabel(BALLOON_TEXT);
 		content.setIconTextGap(10);
 		content.setBorder(new EmptyBorder(0, 8, 0, 8));

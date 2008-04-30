@@ -1,4 +1,4 @@
-package xml;
+package xml.nox;
 
 public class XmlParser {
 

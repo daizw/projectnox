@@ -1,4 +1,4 @@
-package xml;
+package xml.nox;
 
 public class XmlMsgFormat {
 	public final static String MESSAGE_NAMESPACE_NAME = "NoXMessage";

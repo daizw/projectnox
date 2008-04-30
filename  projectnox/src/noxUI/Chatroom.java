@@ -37,7 +37,7 @@ import net.jxta.util.CountingOutputStream;
 import net.jxta.util.DevNullOutputStream;
 import net.jxta.util.JxtaBiDiPipe;
 import net.nox.NoxToolkit;
-import xml.XmlMsgFormat;
+import xml.nox.XmlMsgFormat;
 /**
  * 
  * @author shinysky
