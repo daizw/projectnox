@@ -757,13 +757,11 @@ class FrameConfigDialog extends JDialog {
 		slider.addFocusListener(new FocusListener() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				// TODO Auto-generated method stub
 				System.out.println("slider get focusssssssssss");
 			}
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				// TODO Auto-generated method stub
 				System.out.println("slider lost focusssssssssss");
 				FrameConfigDialog.this.setVisible(false);
 			}

@@ -158,7 +158,6 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 		MessageElement senderIDEle = msg.getMessageElement(
 				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 				XmlMsgFormat.SENDERID_ELEMENT_NAME);
-
 		MessageElement receiverEle = msg.getMessageElement(
 				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 				XmlMsgFormat.RECEIVER_ELEMENT_NAME);
@@ -198,6 +197,17 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 		System.out.println("Connection-Handler got Message :"
 				+ msgEle.toString());
 		// TODO 处理收到的消息
+		System.out.println("Try to setup a chatroom...");
+		showChatroom(senderIDEle, msg, true);
+		System.out.println("===End ConnectionHandler PipeMsgEvent()===");
+	}
+
+	/**
+	 * 建立与该Peer的聊天室
+	 * @param senderIDEle 消息中含对方ID的messageElement
+	 * @param msg 对方发过来的消息本身
+	 */
+	private void showChatroom(MessageElement senderIDEle, Message msg, boolean visible) {
 		ID chatroomID;
 		try {
 			chatroomID = (PeerID) IDFactory.fromURI(new URI(senderIDEle
@@ -258,17 +268,19 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 				}
 				if (incomingPeerAdv != null) {
 					System.out.println("Find the adv locally.");
-					System.out.println("Establishing a chatroom with "
+					System.out.println("Establishing a new chatroom with "
 							+ ((PeerAdvertisement) incomingPeerAdv).getName());
-					room = new NoxToolkit().getCheyenne().setupChatroomWith(
+					room = new NoxToolkit().getCheyenne().setupNewChatroomWith(
 							(PeerAdvertisement) incomingPeerAdv, outbidipipe);
 				}
 			}
 			if (room != null) {
 				room.setOutBidipipe(outbidipipe);
-				room.pack();
-				room.setVisible(true);
-				room.processIncomingMsg(msg, true);
+				if(visible){
+					room.pack();
+					room.setVisible(true);
+				}
+				room.processIncomingMsg(msg, false);
 			} else {
 				// TODO 说明没有发现该peer的广告, 是陌生人消息;可能是远程发现timeout设得太小了.
 				// 需要获取该公告;
@@ -281,7 +293,6 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("===End ConnectionHandler PipeMsgEvent()===");
 	}
 
 	/**
@@ -298,7 +309,7 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 		Message msg = new Message();
 		Date date = new Date(System.currentTimeMillis());
 		// add a string message element with the current date
-		String hellomsg = "Greetings!! [F:100]\nIn ConnectionHandler sendGreetingMessages() from "
+		String hellomsg = "What's up? [F:100]\nIn ConnectionHandler sendGreetingMessages() from "
 				+ new NoxToolkit().getNetworkConfigurator().getName();
 
 		StringMessageElement senderEle = new StringMessageElement(

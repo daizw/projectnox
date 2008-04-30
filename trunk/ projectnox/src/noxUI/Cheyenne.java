@@ -121,7 +121,7 @@ public class Cheyenne extends NoxFrame {
 		 * mini profile 组件 含: 头像, 昵称, 状态, 签名
 		 */
 		profile = new MiniProfilePane(this, "resrc\\portrait\\portrait.png",
-				"Shinysky", "Hello, everyone~");
+				new NoxToolkit().getNetworkConfigurator().getName(), new NoxToolkit().getNetworkManager().getNetPeerGroup().getPeerAdvertisement().getDescription());
 		// profile.setBackground(new Color(0, 255, 0));
 		profile.setSize(new Dimension(WIDTH_DEFLT, 50));
 		profile.setPreferredSize(new Dimension(WIDTH_PREF, 50));
@@ -170,7 +170,7 @@ public class Cheyenne extends NoxFrame {
 		tabs.repaint();
 		return false;
 	}
-	public Chatroom setupChatroomWith(PeerAdvertisement adv, JxtaBiDiPipe outbidipipe){
+	public Chatroom setupNewChatroomWith(PeerAdvertisement adv, JxtaBiDiPipe outbidipipe){
 		//添加到好友列表
 		PeerItem friend = add2Friendlist(adv);
 		//打开聊天室

@@ -21,6 +21,8 @@ import javax.swing.ListModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import net.jxta.id.ID;
+
 public class ObjectList extends JList {
 	/**
 	 * 好友列表
@@ -110,8 +112,10 @@ public class ObjectList extends JList {
 		//TODO 加之前应该先判断是否已有!!
 		int size =  ((FilterModel) getModel()).getSize();
 		for(int index = 0; index <  size; index++){
-			//如果已经有了, 则返回
-			if(((FilterModel) getModel()).getElementAt(index).equals(o))
+			//如果已经有了, 则返回.
+			ID newID = ((NoxJListItem)o).getUUID();
+			ID curID = ((NoxJListItem)(((FilterModel) getModel()).getElementAt(index))).getUUID();
+			if(newID.equals(curID))
 					return o;
 		}
 		((FilterModel) getModel()).addElement((NoxJListItem) o);
@@ -169,7 +173,9 @@ public class ObjectList extends JList {
 			if (item.getClass().toString().endsWith("PeerItem")) {
 				this
 						.setToolTipText("<html><BODY bgColor=#ffffff>"
-								+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
+								+ "<img width=64 height=64 src=\"file:///"
+								+ System.getProperty("user.dir")
+								+"/resrc/portrait/chat.png\"><br>"
 								+ "<Font color=black>昵称:</Font> <Font color=blue>"
 								+ item.getNick()
 								+ "<br></Font>"

@@ -15,6 +15,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -232,7 +233,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 */
 	// ********************************************************
 	Chatroom parent;
-
+	
 	/**
 	 * JSplitPane 聊天组件, 含输入框/消息窗口/表情按钮/闪屏按钮/.../发送按钮 等
 	 * 
@@ -447,7 +448,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					parent.setState(JFrame.NORMAL);
 					buffImg = temp.getWhatWeGot();
 					if (buffImg != null) {
-						ChatRoomPane.this.sendAPicture(new ImageIcon(buffImg));
+						ChatRoomPane.this.sendAPicture(buffImg);
 					} else {
 						System.out.println("phew~we got nothing.");
 					}
@@ -531,8 +532,9 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 
 	 * @param strs
 	 *            1:sender;2:receiver;3:time;4:msg
+	 * @param incomingPic 外来图片
 	 */
-	public void incomingMsgProcessor(final String[] strs) {// 1:sender;2:receiver;3:time;4:msg
+	public void incomingMsgProcessor(final String[] strs, ImageIcon incomingPic) {// 1:sender;2:receiver;3:time;4:msg
 		System.out.println("playAudio()...");
 		// System.out.println("public void receiveMsgAndAccess(String[] strs)");
 		// System.out.println("currentUsername :" + currentUsername);
@@ -564,8 +566,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 				}
 			}, "Beeper");
 			playThd.start();
-			appendToHMsg(label, strbuf_msg.toString(), true, false);
-
+			appendToHMsg(label, strbuf_msg.toString(), incomingPic, true, false);
 		} else if (strs[0].equals("fromAll"))// 群聊消息
 		{
 			System.out.println("noDisturb " + noDisturb);
@@ -573,11 +574,11 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			// appendToHMsg(label, strbuf_msg.toString(), !noDisturb);
 			if (noDisturb)// 且 防打扰打开
 			{
-				appendToHMsg(label, strbuf_msg.toString(), false, false);
+				appendToHMsg(label, strbuf_msg.toString(), incomingPic, false, false);
 				return;
 			} else// 防打扰未打开
 			{
-				appendToHMsg(label, strbuf_msg.toString(), true, false);
+				appendToHMsg(label, strbuf_msg.toString(), incomingPic, true, false);
 				Thread playThd = new Thread(new Runnable() {
 					@Override
 					public void run() {
@@ -607,7 +608,6 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			msgBeep = Applet.newAudioClip(url);
 			msgBeep.play();
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println(e.toString());
 		}
@@ -628,7 +628,6 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			msgBeep = Applet.newAudioClip(url);
 			msgBeep.play();
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println(e.toString());
 		}
@@ -644,6 +643,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 *            发送者/接收者/发送时间 标签
 	 * @param msg
 	 *            要添加到消息记录的字符串
+	 * @param incomingPic 外来图片
 	 * @param visible
 	 *            是否要添加到历史消息窗口中(可见)
 	 * @param isFromMe
@@ -653,7 +653,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 添加参数后,从服务器接受到的历史消息可以通过调用这个函数来插入到历史消息窗口.
 	 * 简言之,增强了这个函数的通用性.将消息添加到消息记录的功能从中移出.
 	 */
-	public void appendToHMsg(String label, String msg, boolean visible,
+	public void appendToHMsg(String label, String msg, ImageIcon incomingPic, boolean visible,
 			boolean isFromMe) {
 		StringBuffer label_buf = new StringBuffer(label);
 		StringBuffer msg_buf = new StringBuffer(msg);
@@ -699,7 +699,6 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		{
 			tp_historymsg.setEditable(true);
 
-			// System.out.println("label :" + label);
 			// 消息发送人/对象/发送时间 信息
 			// 插入信息标签
 			tp_historymsg.setCaretPosition(styledDoc.getLength());
@@ -707,49 +706,61 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					labelStyle);
 			tp_historymsg.replaceSelection(label + '\n');
 			System.out.println("label :" + label);
-			System.out.println("msg :" + msg);
-
-			tp_historymsg.setCaretPosition(styledDoc.getLength());// !!!
-			styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(), bold);
-			// *****************************************************
-			/**
-			 * 将字符串表情图片化,然后插入HMsg中 同时维护一个字符串HMsg.
-			 */
-			int position = 0, caretPos = 0;
-
-			// 从position开始寻找字符串"[F:",找到返回'['的位置,找不到"[F:"返回-1
-			for (; (caretPos = msg_buf.indexOf("[F:", position)) >= 0;) {
-				// System.out.println("caretPos : " + caretPos);
-				// StringBuffer msgpiece = new
-				// StringBuffer(msg_buf.substring(caretPos, caretPos + 6));
-				// System.out.println("msgpiece : " + msgpiece);
-
-				// 7: 代表表情的字符串的长度
-				if (msg_buf.substring(caretPos, caretPos + 7).matches(
-						"\\[F\\:[0-9][0-9][0-9]\\]")) {// 如果符合正则表达式
-					// 插入从position到caretPos前一个字符的子字符串
-					tp_historymsg.setCaretPosition(styledDoc.getLength());
-					tp_historymsg.replaceSelection(msg_buf.substring(position,
-							caretPos));
-					// 插入接下来的长度为7的子字符串所表示的表情图片
-					tp_historymsg.setCaretPosition(styledDoc.getLength());
-					int faceindex = Integer.parseInt(msg_buf.substring(
-							caretPos + 3, caretPos + 6));
-					tp_historymsg.insertIcon(getImageIconFace(faceindex));
-					// 后移position
-					position = caretPos + 7;
-				} else {// 如果不符合正则表达式
-					// 插入从position到caretPos+3前一个字符的子字符串
-					tp_historymsg.setCaretPosition(styledDoc.getLength());
-					tp_historymsg.replaceSelection(msg_buf.substring(position,
-							caretPos + 3));
-					// 后移position
-					position = caretPos + 3;
+			
+			if(!msg.equals("")){
+				//用户发送空消息已被禁止, 所以如果发过来的是空消息,
+				//则说明发送过来的是图片.
+				//所以当msg不为空的时候需要显示消息
+				System.out.println("msg :" + msg);
+	
+				tp_historymsg.setCaretPosition(styledDoc.getLength());// !!!
+				styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(), bold);
+				// *****************************************************
+				/**
+				 * 将字符串表情图片化,然后插入HMsg中 同时维护一个字符串HMsg.
+				 */
+				int position = 0, caretPos = 0;
+	
+				// 从position开始寻找字符串"[F:",找到返回'['的位置,找不到"[F:"返回-1
+				for (; (caretPos = msg_buf.indexOf("[F:", position)) >= 0;) {
+					// System.out.println("caretPos : " + caretPos);
+					// StringBuffer msgpiece = new
+					// StringBuffer(msg_buf.substring(caretPos, caretPos + 6));
+					// System.out.println("msgpiece : " + msgpiece);
+	
+					// 7: 代表表情的字符串的长度
+					if (msg_buf.substring(caretPos, caretPos + 7).matches(
+							"\\[F\\:[0-9][0-9][0-9]\\]")) {// 如果符合正则表达式
+						// 插入从position到caretPos前一个字符的子字符串
+						tp_historymsg.setCaretPosition(styledDoc.getLength());
+						tp_historymsg.replaceSelection(msg_buf.substring(position,
+								caretPos));
+						// 插入接下来的长度为7的子字符串所表示的表情图片
+						tp_historymsg.setCaretPosition(styledDoc.getLength());
+						int faceindex = Integer.parseInt(msg_buf.substring(
+								caretPos + 3, caretPos + 6));
+						tp_historymsg.insertIcon(getImageIconFace(faceindex));
+						// 后移position
+						position = caretPos + 7;
+					} else {// 如果不符合正则表达式
+						// 插入从position到caretPos+3前一个字符的子字符串
+						tp_historymsg.setCaretPosition(styledDoc.getLength());
+						tp_historymsg.replaceSelection(msg_buf.substring(position,
+								caretPos + 3));
+						// 后移position
+						position = caretPos + 3;
+					}
 				}
+				// 插入剩余子字符串
+				tp_historymsg.setCaretPosition(styledDoc.getLength());
+				tp_historymsg.replaceSelection(msg_buf.substring(position) + '\n');
 			}
-			// 插入剩余子字符串
-			tp_historymsg.setCaretPosition(styledDoc.getLength());
-			tp_historymsg.replaceSelection(msg_buf.substring(position) + '\n');
+			if(incomingPic != null){
+				tp_historymsg.setCaretPosition(styledDoc.getLength());
+				tp_historymsg.insertIcon(incomingPic);
+				tp_historymsg.setCaretPosition(styledDoc.getLength());
+				tp_historymsg.replaceSelection("\n");
+			}
 			// System.out.println("msg_buf.substring(position) :" +
 			// msg_buf.substring(position));
 			// *****************************************************
@@ -800,6 +811,28 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 将用户输入的消息发送到历史消息窗口 (还有,要发送到服务器)
 	 */
 	private void sendMessage() {
+		//System.out.println("sendMessage(): >" + tp_input.getText() + "<");
+		if(tp_input.getText().equals("")){
+			System.out.println("You're trying to send a empty message, it's not suggested.");
+			//TODO 可以尝试弹出气泡提示
+			final String BALLOON_TEXT = "<html><center>"
+	            + "You're trying to send an empty message<br>"
+	            + "which is not suggested/supported.<br>"
+	            + "(Click to dismiss this balloon)</center></html>";
+			JNABalloon balloon = new JNABalloon(BALLOON_TEXT, tp_input, 100, 20);
+			balloon.showBalloon();
+			
+			/*Popup popup;
+			final JLabel content = new JLabel(BALLOON_TEXT);
+	        content.setIconTextGap(10);
+	        content.setBorder(new EmptyBorder(0, 8, 0, 8));
+	        content.setSize(content.getPreferredSize());
+	        //content.setIcon(new InfoIcon());
+	        popup = BalloonManager.getBalloon(tp_input, content, 100, 20);
+	        popup.show();*/
+	        
+			return;
+		}
 		/**
 		 * 格式化日期
 		 */
@@ -808,7 +841,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		String label = "I say to " + parent.getRoomName() + ", at "
 				+ fmDate.format(date) + " :";
 
-		appendToHMsg(label, tp_input.getText(), true, true);
+		appendToHMsg(label, tp_input.getText(), null, true, true);
 		/**
 		 * 向对方发送消息
 		 */
@@ -822,7 +855,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		}
 		System.out.println("strbuf_msg :" + strbuf_msg);
 
-		parent.SendMsg(new String(strbuf_msg));
+		parent.SendMsg(new String(strbuf_msg), null);
 
 		tp_input.setText("");// 输入框清空
 	}
@@ -836,11 +869,11 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		String label = "Sending a Shake Emotion to " + parent.getRoomName()
 				+ ", at " + fmDate.format(date) + " :";
 
-		appendToHMsg(label, tp_input.getText(), true, true);
+		appendToHMsg(label, tp_input.getText(), null, true, true);
 		/**
 		 * 向对方发送消息 999:表示表情索引
 		 */
-		parent.SendMsg(shakeMsg);
+		parent.SendMsg(shakeMsg, null);
 	}
 
 	/**
@@ -863,15 +896,15 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * @param imgPath 图片路径
 	 */
 	private void sendAPicture(String imgPath) {
-		Date date = new Date();
+		/*Date date = new Date();
 		String label = "I send a picture to someone, at " + fmDate.format(date)
 				+ " :";
 		StringBuffer label_buf = new StringBuffer(label);
 		StringBuffer msg_buf = new StringBuffer(imgPath);
 
-		/**
+		*//**
 		 * 将消息添加到消息记录
-		 */
+		 *//*
 		historymsg_save += (label_buf + "\n");
 		historymsg_save += (msg_buf + "\n");
 
@@ -889,13 +922,28 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		tp_historymsg.setCaretPosition(styledDoc.getLength());
 		tp_historymsg.replaceSelection("\n");
 		tp_historymsg.setEditable(false);// 重新设为不可编辑
+		parent.SendMsg(null, imgPath);*/
+		File thePicFile = new File(imgPath);
+		if(thePicFile.exists()){
+			BufferedImage bufImg = null;
+			try {
+				bufImg = javax.imageio.ImageIO.read(thePicFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			sendAPicture(bufImg);
+		}
 	}
 
 	/**
 	 * 用于发送截屏图片
 	 * @param img 截屏图片
 	 */
-	private void sendAPicture(ImageIcon img) {
+	private void sendAPicture(BufferedImage bufImg) {
+		if(bufImg == null){
+			System.out.println("bufImg is null in sendAPicture()");
+			return;
+		}
 		Date date = new Date();
 		String label = "I send a picture to someone, at " + fmDate.format(date)
 				+ " :";
@@ -917,11 +965,13 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		tp_historymsg.replaceSelection(label + '\n');
 		System.out.println("label :" + label);
 
+		ImageIcon img = new ImageIcon(bufImg);
 		tp_historymsg.setCaretPosition(styledDoc.getLength());// !!!
 		tp_historymsg.insertIcon(img);
 		tp_historymsg.setCaretPosition(styledDoc.getLength());
 		tp_historymsg.replaceSelection("\n");
 		tp_historymsg.setEditable(false);// 重新设为不可编辑
+		parent.SendMsg("", bufImg);
 	}
 
 	/**
@@ -983,7 +1033,6 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 
 				@Override
 				public String getDescription() {
-					// TODO Auto-generated method stub
 					return "BMP, JPG, PNG, or GIF";
 				}
 			};
@@ -1000,50 +1049,4 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			menuSnap.show((Component) e.getSource(), 0, 26);
 		}
 	}
-
-	/*
-	 * // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-	 * public String[] getText() { List<String> array = new ArrayList<String>();
-	 * Map<Integer, String> mp = new HashMap<Integer, String>(); String t =
-	 * tp_input.getText(); System.out.println("t--->" + t);
-	 * 
-	 * List<Element> els = getAllElements(); for (Element el : els) { Icon icon =
-	 * StyleConstants.getIcon(el.getAttributes()); if (icon != null) { String
-	 * tmp = Chatroom.ICON_PREFIX.concat(new File( ((ImageIcon)
-	 * icon).getDescription()).getName()); mp.put(el.getStartOffset(), tmp); } }
-	 * 
-	 * for (int c = 0; c < t.length(); c++) { String s = t.substring(c, c + 1);
-	 * String v = mp.get(new Integer(c)); if (v == null) array.add(s); else
-	 * array.add(v); } String[] tmp = new String[array.size()];
-	 * array.toArray(tmp); return tmp; } // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-	 * List<Element> getAllElements() { Element[] roots =
-	 * tp_input.getStyledDocument().getRootElements(); return
-	 * getAllElements(roots); }
-	 * 
-	 * private List<Element> getAllElements(Element[] roots) { List<Element>
-	 * icons = new LinkedList<Element>(); for (int a = 0; a < roots.length;
-	 * a++) { if (roots[a] == null) continue; icons.add(roots[a]); for (int c =
-	 * 0; c < roots[a].getElementCount(); c++) { Element element =
-	 * roots[a].getElement(c); icons.addAll(getAllElements(new Element[] {
-	 * element })); } } return icons; } // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-	 * public void insert(String[] str, AttributeSet attr) { List<String> strs =
-	 * new ArrayList<String>(); if (str.length == 0) {
-	 * System.out.println("str.length == 0"); return; } boolean b =
-	 * str[str.length - 1].endsWith("\n"); for (String s : str) {
-	 * strs.add(s.replaceAll("\r", "").replaceAll("\n", "")); } if (b)
-	 * strs.add("\n");
-	 * 
-	 * Document doc = tp_historymsg.getStyledDocument(); String tmp = "";
-	 * System.out.println("--->--->" + str.length); for (String s : strs) { if
-	 * (s.length() > 0) { if
-	 * (s.matches(path_faces.concat(Chatroom.ICON_SUFFIX_REGEX))) { try { if
-	 * (tmp.length() > 0) doc.insertString(doc.getLength(), tmp, attr);
-	 * tp_historymsg.setSelectionStart(doc.getLength());
-	 * tp_historymsg.insertIcon(new ImageIcon(
-	 * Chatroom.ICON_RESOURCES_PATH.concat(s))); tmp = ""; } catch (Exception
-	 * ex) { } } else { tmp = tmp.concat(s); } }
-	 * 
-	 * //System.out.println("--->" + s); } try { if (tmp.length() > 0)
-	 * doc.insertString(doc.getLength(), tmp, attr); } catch (Exception ex) { } } // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-	 */
 }
