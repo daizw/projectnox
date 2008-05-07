@@ -38,6 +38,7 @@
 	<target name="ant-usage" description="Simply execute 'ant' to discover the most useful targets.">
 		<echo message="Useful ant commands for Project NoX:" />
 		<echo message="'ant build' to compile the source directory" />
+		<echo message="'ant nox' to run NoX GUI" />
 		<echo message="'ant run -DAPP [classname]' to run the class" />
 		<echo message="'ant jar' to build the jar package(s)" />
 		<echo message="'ant release' to build a release package" />
@@ -117,7 +118,7 @@
 	<!-- =================================================================== -->
 	<target name="source-zip" depends="prepare-dirs" description="Creates source zip file">
 		<zip destfile="${release.dir}/${application.name}-src-${build.version}.zip">
-			<zipfileset dir="${basedir}" prefix="jxse-tutorials-${build.version}">
+			<zipfileset dir="${basedir}" prefix="NoX-src-${build.version}">
 				<include name="src/**" />
 				<include name="*.xml" />
 				<include name="*.properties" />
@@ -142,7 +143,7 @@
 		<delete file="${release.dir}/${application.name}-src-${build.version}.tar.gz" />
 
 		<tar destfile="${release.dir}/${application.name}-src-${build.version}.tar.gz" compression="gzip" longfile="gnu">
-			<tarfileset dir="${basedir}" prefix="jxse-tutorials-${build.version}">
+			<tarfileset dir="${basedir}" prefix="NoX-src-${build.version}">
 				<include name="src/**" />
 				<include name="*.xml" />
 				<include name="*.properties" />

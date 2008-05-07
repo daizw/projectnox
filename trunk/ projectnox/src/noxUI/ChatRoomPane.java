@@ -6,6 +6,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -28,6 +29,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -115,6 +117,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 截屏按钮
 	 */
 	private JButton b_snapshot;
+	private JButton b_snapconfig;
 	JPopupMenu menuSnap;
 	JMenuItem doSnap;
 	JCheckBoxMenuItem hideFrame;
@@ -196,14 +199,6 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 防打扰
 	 */
 	private boolean noDisturb = false;
-	/**
-	 * 图标路径
-	 */
-	private String path_icon = new String("resrc\\icons\\");
-	/**
-	 * 表情图片路径
-	 */
-	private String path_faces = new String("resrc\\faces\\");
 
 	/***************************************************************************
 	 * //
@@ -345,7 +340,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 
 		Dimension buttonSize = new Dimension(26, 26);
 
-		b_emotion = new JButton(new ImageIcon(path_icon + "emotion.png"));
+		b_emotion = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "emotion.png"));
 		b_emotion.setToolTipText(getHtmlText("Insert a emotion image"));
 		b_emotion.setActionCommand("Emotion");
 		b_emotion.addActionListener(this);
@@ -358,14 +353,14 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		/**
 		 * 如果不阻塞其他窗口的话, 会出现无法获取已选择的表情的情况.
 		 */
-		selFace = new FaceDialog("Insert a face", true, path_faces);
+		selFace = new FaceDialog("Insert a face", true, SystemPath.FACES_RESOURCE_PATH);
 		// 和FaceDialog.setDefaultLookAndFeelDecorated(true);不能同时使用
 		selFace.setBounds(450, 350, FaceDialog.FACECELLWIDTH
 				* FaceDialog.FACECOLUMNS, FaceDialog.FACECELLHEIGHT
 				* FaceDialog.FACEROWS + 30);// 30为b_cr_cancel的高度
 		selFace.pack();
 
-		b_shake = new JButton(new ImageIcon(path_icon + "shake.png"));
+		b_shake = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "shake.png"));
 		b_shake.setToolTipText(getHtmlText("Rock and Roll !"));
 		b_shake.setActionCommand("Shake");
 		b_shake.addActionListener(this);
@@ -374,7 +369,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		b_shake.setMaximumSize(buttonSize);
 		b_shake.setMinimumSize(buttonSize);
 
-		b_sendPic = new JButton(new ImageIcon(path_icon + "sendpic.png"));
+		b_sendPic = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "sendpic.png"));
 		b_sendPic.setToolTipText(getHtmlText("Send a picture"));
 		b_sendPic.setActionCommand("SendPic");
 		b_sendPic.addActionListener(this);
@@ -383,7 +378,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		b_sendPic.setMaximumSize(buttonSize);
 		b_sendPic.setMinimumSize(buttonSize);
 
-		b_snapshot = new JButton(new ImageIcon(path_icon + "snapshot.png"));
+		b_snapshot = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "snapshot.png"));
 		b_snapshot.setToolTipText(getHtmlText("Snap it !"));
 		b_snapshot.setActionCommand("Snapshot");
 		b_snapshot.addActionListener(this);
@@ -391,13 +386,22 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		b_snapshot.setPreferredSize(buttonSize);
 		b_snapshot.setMaximumSize(buttonSize);
 		b_snapshot.setMinimumSize(buttonSize);
+		
+		b_snapconfig = new JButton("v");
+		b_snapconfig.setMargin(new Insets(0,0,0,0));
+		b_snapconfig.setToolTipText(getHtmlText("Snap Config"));
+		b_snapconfig.setActionCommand("SnapshotConfig");
+		b_snapconfig.addActionListener(this);
+		b_snapconfig.setSize(new Dimension(buttonSize.width/2, buttonSize.height));
+		b_snapconfig.setPreferredSize(new Dimension(buttonSize.width/2, buttonSize.height));
+		b_snapconfig.setMaximumSize(new Dimension(buttonSize.width/2, buttonSize.height));
+		b_snapconfig.setMinimumSize(new Dimension(buttonSize.width/2, buttonSize.height));
 
 		menuSnap = new JPopupMenu();
 		doSnap = new JMenuItem("Let's GO!");
 		hideFrame = new JCheckBoxMenuItem("Hide this window while snapping",
 				true);
 		doSnap.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (hideFrame.getState())// 如果用户选择隐藏窗口, 则隐藏
@@ -464,7 +468,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		menuSnap.pack();
 
 		// b_send = new JButton("Send");
-		b_send = new JButton(new ImageIcon(path_icon + "send.png"));
+		b_send = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "send.png"));
 		b_send.setMnemonic('S');
 		// b_send.setPreferredSize(new Dimension(100,40));
 		b_send.setActionCommand("Send");
@@ -482,6 +486,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		p_buttons.add(b_shake);
 		p_buttons.add(b_sendPic);
 		p_buttons.add(b_snapshot);
+		p_buttons.add(b_snapconfig);
 		p_buttons.add(Box.createHorizontalGlue());
 		p_buttons.add(b_send);
 		// p_buttons.add(p_side, BorderLayout.CENTER);
@@ -603,8 +608,10 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			// AudioClip audioClip = Applet.newAudioClip(completeURL)
 			// codeBase = new URL("file:" + System.getProperty("user.dir") +
 			// "/");
-			URL url = new URL("file:\\" + System.getProperty("user.dir")
-					+ "\\resrc\\audio\\typewpcm.wav");
+			URL url = new URL("file:/" + System.getProperty("user.dir")
+					+ System.getProperty("file.separator")
+					+ SystemPath.AUDIO_RESOURCE_PATH
+					+ "typewpcm.wav");
 			msgBeep = Applet.newAudioClip(url);
 			msgBeep.play();
 		} catch (MalformedURLException e) {
@@ -614,8 +621,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	}
  
 	/**
-	 * 接收消息时播放提示音
-	 * 
+	 * 接收/发送闪屏时播放提示音
 	 */
 	public void playShakeAudio() {
 		final AudioClip msgBeep;
@@ -623,8 +629,10 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			// AudioClip audioClip = Applet.newAudioClip(completeURL)
 			// codeBase = new URL("file:" + System.getProperty("user.dir") +
 			// "/");
-			URL url = new URL("file:\\" + System.getProperty("user.dir")
-					+ "\\resrc\\audio\\nudgewpcm.wav");
+			URL url = new URL("file:/" + System.getProperty("user.dir")
+					+ System.getProperty("file.separator")
+					+ SystemPath.AUDIO_RESOURCE_PATH
+					+ "nudgewpcm.wav");
 			msgBeep = Applet.newAudioClip(url);
 			msgBeep.play();
 		} catch (MalformedURLException e) {
@@ -789,6 +797,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * @param selectedFace
 	 *            被选择的图片
 	 */
+	@SuppressWarnings("unused")
 	private void appendFaceToInputPane(ImageIcon selectedFace) {
 		tp_input.setEditable(true);
 		/**
@@ -822,15 +831,6 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			JNABalloon balloon = new JNABalloon(BALLOON_TEXT, tp_input, 100, 20);
 			balloon.showBalloon();
 			
-			/*Popup popup;
-			final JLabel content = new JLabel(BALLOON_TEXT);
-	        content.setIconTextGap(10);
-	        content.setBorder(new EmptyBorder(0, 8, 0, 8));
-	        content.setSize(content.getPreferredSize());
-	        //content.setIcon(new InfoIcon());
-	        popup = BalloonManager.getBalloon(tp_input, content, 100, 20);
-	        popup.show();*/
-	        
 			return;
 		}
 		/**
@@ -885,9 +885,9 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 */
 	private ImageIcon getImageIconFace(int index) {
 		if (index < 105)
-			return new ImageIcon(path_faces + index + ".gif");
+			return new ImageIcon(SystemPath.FACES_RESOURCE_PATH + index + ".gif");
 		else
-			return new ImageIcon(path_faces + "newFace\\" + (int) (index - 105)
+			return new ImageIcon(SystemPath.FACES_RESOURCE_PATH + "newFace\\" + (int) (index - 105)
 					+ ".png");
 	}
 
@@ -896,33 +896,6 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * @param imgPath 图片路径
 	 */
 	private void sendAPicture(String imgPath) {
-		/*Date date = new Date();
-		String label = "I send a picture to someone, at " + fmDate.format(date)
-				+ " :";
-		StringBuffer label_buf = new StringBuffer(label);
-		StringBuffer msg_buf = new StringBuffer(imgPath);
-
-		*//**
-		 * 将消息添加到消息记录
-		 *//*
-		historymsg_save += (label_buf + "\n");
-		historymsg_save += (msg_buf + "\n");
-
-		tp_historymsg.setEditable(true);
-
-		// 消息发送人/对象/发送时间 信息
-		// 插入信息标签
-		tp_historymsg.setCaretPosition(styledDoc.getLength());
-		styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(), blue);
-		tp_historymsg.replaceSelection(label + '\n');
-		System.out.println("label :" + label);
-
-		tp_historymsg.setCaretPosition(styledDoc.getLength());// !!!
-		tp_historymsg.insertIcon(new ImageIcon(imgPath));
-		tp_historymsg.setCaretPosition(styledDoc.getLength());
-		tp_historymsg.replaceSelection("\n");
-		tp_historymsg.setEditable(false);// 重新设为不可编辑
-		parent.SendMsg(null, imgPath);*/
 		File thePicFile = new File(imgPath);
 		if(thePicFile.exists()){
 			BufferedImage bufImg = null;
@@ -936,8 +909,8 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	}
 
 	/**
-	 * 用于发送截屏图片
-	 * @param img 截屏图片
+	 * 用于发送图片文件/截屏图片
+	 * @param img 图片buffer
 	 */
 	private void sendAPicture(BufferedImage bufImg) {
 		if(bufImg == null){
@@ -945,8 +918,10 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 			return;
 		}
 		Date date = new Date();
-		String label = "I send a picture to someone, at " + fmDate.format(date)
-				+ " :";
+		String label = "I send a picture to "
+			+ parent.getRoomName()
+			+ ", at " + fmDate.format(date)
+			+ " :";
 		StringBuffer label_buf = new StringBuffer(label);
 		StringBuffer msg_buf = new StringBuffer("A Screen Snapshot");
 
@@ -1045,6 +1020,10 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 				sendAPicture(chooser.getSelectedFile().getPath());
 			}
 		} else if (srcButton.getActionCommand().equals("Snapshot")) {
+			// 位置应该是相对于JButton的位置
+			//menuSnap.show((Component) e.getSource(), 0, 26);
+			doSnap.doClick();
+		}else if (srcButton.getActionCommand().equals("SnapshotConfig")) {
 			// 位置应该是相对于JButton的位置
 			menuSnap.show((Component) e.getSource(), 0, 26);
 		}

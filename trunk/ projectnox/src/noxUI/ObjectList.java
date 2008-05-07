@@ -173,9 +173,11 @@ public class ObjectList extends JList {
 			if (item.getClass().toString().endsWith("PeerItem")) {
 				this
 						.setToolTipText("<html><BODY bgColor=#ffffff>"
-								+ "<img width=64 height=64 src=\"file:///"
+								+ "<img width=64 height=64 src=\"file:/"
 								+ System.getProperty("user.dir")
-								+"/resrc/portrait/chat.png\"><br>"
+								+ System.getProperty("file.separator")
+								+ SystemPath.PORTRAIT_RESOURCE_PATH
+								+"chat.png\"><br>"
 								+ "<Font color=black>êÇ³Æ:</Font> <Font color=blue>"
 								+ item.getNick()
 								+ "<br></Font>"
@@ -194,7 +196,11 @@ public class ObjectList extends JList {
 			} else if (item.getClass().toString().endsWith("GroupItem")) {
 				this
 						.setToolTipText("<html><BODY bgColor=#ffffff>"
-								+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
+								+ "<img width=64 height=64 src=\"file:/"
+								+ System.getProperty("user.dir")
+								+ System.getProperty("file.separator")
+								+ SystemPath.PORTRAIT_RESOURCE_PATH
+								+ "chat.png\"><br>"
 								+ "<Font color=black>×éÃû:</Font> <Font color=blue>"
 								+ item.getNick()
 								+ "<br></Font>"

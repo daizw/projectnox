@@ -13,7 +13,6 @@ public abstract class NoxJListItem {
 	private String sign;
 	private ID UUID;
 	protected ItemStatus stat;
-	private Advertisement adv;
 
 	NoxJListItem(ImageIcon portr, String nick, String signstr, ID uuid) {
 		this.portrait = portr;

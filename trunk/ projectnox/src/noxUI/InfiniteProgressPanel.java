@@ -60,7 +60,11 @@ import javax.swing.JComponent;
 
 public class InfiniteProgressPanel extends JComponent implements MouseListener
 {
-    /** Contains the bars composing the circular shape. */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/** Contains the bars composing the circular shape. */
     protected Area[]  ticker     = null;
     /** The animation thread is responsible for fade in/out and rotation. */
     protected Thread  animation  = null;
@@ -263,7 +267,6 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener
         if (started)
         {
             int width  = getWidth();
-            int height = getHeight();
             double maxY = 0.0; 
 
             Graphics2D g2 = (Graphics2D) g;

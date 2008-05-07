@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="lib/javax.servlet.jar"/>
 	<classpathentry kind="lib" path="lib/org.mortbay.jetty.jar"/>
 	<classpathentry kind="lib" path="lib/hsqldb.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-2.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
