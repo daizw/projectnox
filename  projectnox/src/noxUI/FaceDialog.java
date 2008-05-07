@@ -137,7 +137,7 @@ class FaceDialog extends JDialog implements ActionListener, MouseListener {
 		p_buttons.add(b_cr_cancel);
 		p_buttons.setOpaque(false);
 
-		rootpane = new JImgPanel(tk.getImage("resrc\\images\\faces.PNG"));
+		rootpane = new JImgPanel(tk.getImage(SystemPath.IMAGES_RESOURCE_PATH + "faces.PNG"));
 
 		rootpane.setLayout(new BoxLayout(rootpane, BoxLayout.Y_AXIS));
 		rootpane.add(tb_cr_faces);
@@ -324,8 +324,6 @@ class FaceDialog extends JDialog implements ActionListener, MouseListener {
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -334,8 +332,6 @@ class FaceDialog extends JDialog implements ActionListener, MouseListener {
 	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
 	 */
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -344,8 +340,6 @@ class FaceDialog extends JDialog implements ActionListener, MouseListener {
 	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
 	 */
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*

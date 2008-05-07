@@ -13,6 +13,10 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -37,14 +41,13 @@ import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
 
-import net.jxta.document.Advertisement;
 import net.jxta.id.ID;
-import net.jxta.peer.PeerID;
 import net.jxta.peergroup.PeerGroupID;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
 import net.nox.NoxToolkit;
+import net.nox.NoxToolkit.ChatroomUnit;
 /**
  * 
  * @author shinysky
@@ -93,12 +96,10 @@ public class Cheyenne extends NoxFrame {
 	 * @param blist
 	 */
 	Cheyenne(ObjectList flist, ObjectList glist, ObjectList blist) {
-		super("NoX: a IM system", "resrc\\images\\bkgrd.png", 
-				"resrc\\logo\\NoXlogo_20.png", "resrc\\logo\\nox.png",
-				"resrc\\buttons\\minimize.png", "resrc\\buttons\\minimize_rollover.png",
-				"resrc\\buttons\\maximize.png", "resrc\\buttons\\maximize_rollover.png",
-				"resrc\\buttons\\normalize.png", "resrc\\buttons\\normalize_rollover.png",
-				"resrc\\buttons\\close.png", "resrc\\buttons\\close_rollover.png", true);
+		super("NoX: a IM system", SystemPath.IMAGES_RESOURCE_PATH + "bkgrd.png", 
+				SystemPath.LOGO_RESOURCE_PATH + "NoXlogo_20.png",
+				SystemPath.LOGO_RESOURCE_PATH + "NoXlogo_48.png",
+				SystemPath.LOGO_RESOURCE_PATH + "nox.png", true);
 
 		new NoxToolkit().setCheyenne(this);
 		friendlist = flist;
@@ -120,7 +121,7 @@ public class Cheyenne extends NoxFrame {
 		/**
 		 * mini profile 组件 含: 头像, 昵称, 状态, 签名
 		 */
-		profile = new MiniProfilePane(this, "resrc\\portrait\\portrait.png",
+		profile = new MiniProfilePane(this, SystemPath.PORTRAIT_RESOURCE_PATH + "portrait.png",
 				new NoxToolkit().getNetworkConfigurator().getName(), new NoxToolkit().getNetworkManager().getNetPeerGroup().getPeerAdvertisement().getDescription());
 		// profile.setBackground(new Color(0, 255, 0));
 		profile.setSize(new Dimension(WIDTH_DEFLT, 50));
@@ -128,8 +129,7 @@ public class Cheyenne extends NoxFrame {
 		profile.setMaximumSize(new Dimension(WIDTH_MAX, 50));
 		profile.setMinimumSize(new Dimension(WIDTH_MIN, 50));
 
-		tabs = new ListsPane(friendlist, grouplist, blacklist, "resrc\\icons\\chat.png",
-				"resrc\\icons\\chatroom.png", "resrc\\icons\\blacklist.png");
+		tabs = new ListsPane(this, friendlist, grouplist, blacklist);
 
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 		contentPane.add(profile);
@@ -138,20 +138,19 @@ public class Cheyenne extends NoxFrame {
 		setForegroundColor();
 		initTrayIcon();
 		
-		sfrm.setLocation(0, 0);
-		sfrm.setSize(new Dimension(1000, 350));
+		sfrm.setLocation(100, 60);
+		sfrm.setSize(new Dimension(500, 350));
 	}
 	/**
 	 * 将广告所代表的peer添加到好友列表中
 	 * @param adv 要添加的peer的广告 
-	 * @return 好友的列表元素 
-	 *-1:已经存在于好友列表中; 0-N:成功, 返回index
+	 * @return 好友的列表元素
 	 */
 	public PeerItem add2Friendlist(PeerAdvertisement adv){
 		//TODO 将广告所代表的peer添加到好友列表中
 		
 		PeerItem newFriend = new PeerItem(new ImageIcon(
-		"resrc\\portrait\\user.png"), adv);
+				SystemPath.PORTRAIT_RESOURCE_PATH + "user.png"), adv);
 		
 		//这样的赋值目前没有必要,
 		//不过在已经存在好友, 且头像有变化的时候有用;
@@ -170,12 +169,26 @@ public class Cheyenne extends NoxFrame {
 		tabs.repaint();
 		return false;
 	}
-	public Chatroom setupNewChatroomWith(PeerAdvertisement adv, JxtaBiDiPipe outbidipipe){
+	/**
+	 * 在存在对应ID-Pipe对, 而不存在对应聊天室的情况下:
+	 * <li>如果是好友的消息, 则(暂时)建立聊天室显示之.
+	 * (应当)提示有新消息</li>
+	 * <li>如果不是好友的消息, 则(暂时)将之添加为好友建立聊天室并显示之.
+	 * (应当)提示有来自陌生人的新消息</li>
+	 * @param connhandler 用于管理连接的ConnectionHandler
+	 * @return 新建立的chatroom, 用于注册到NoxToolkit
+	 */
+	public Chatroom setupNewChatroomOver(JxtaBiDiPipe pipe){
 		//添加到好友列表
-		PeerItem friend = add2Friendlist(adv);
+		//如果已经添加, 则在做无用功.
+		PeerItem friend = add2Friendlist(pipe.getRemotePeerAdvertisement());
 		//打开聊天室
-		Chatroom chatroom = new Chatroom(friend, outbidipipe);
+		Chatroom chatroom = new Chatroom(friend, pipe);
+		//注册之
+		new NoxToolkit().registerChatroom(friend.getUUID(), chatroom);
+		//TODO comment this
 		chatroom.setVisible(true);
+		
 		return chatroom;
 	}
 	public boolean setupGroupChatroom(PeerGroupAdvertisement adv){
@@ -183,13 +196,16 @@ public class Cheyenne extends NoxFrame {
 		//do something
 		return true;
 	}
+	public void showSearchingFrame(){
+		sfrm.setVisible(true);
+	}
 	/**
 	 * 设置托盘
 	 */
 	private void initTrayIcon(){
         try{
             SystemTray tray=SystemTray.getSystemTray();
-            Image trayImg=ImageIO.read(new File("resrc\\logo\\NoXlogo_16.png"));
+            Image trayImg=ImageIO.read(new File(SystemPath.LOGO_RESOURCE_PATH + "NoXlogo_16.png"));
             PopupMenu traymenu=new PopupMenu("Tray Menu");
             traymenu.add(new MenuItem("Configure")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
@@ -263,7 +279,7 @@ public class Cheyenne extends NoxFrame {
 	/**
 	 * 显示个人/系统设置窗口
 	 */
-	void ShowConfigCenter(){
+	public void ShowConfigCenter(){
 		ccf.setVisible(true);
 	}
 }
@@ -373,6 +389,23 @@ class MiniProfilePane extends JPanel {
 		mySign.setPreferredSize(new Dimension(Cheyenne.WIDTH_PREF, 20));
 		mySign.setMaximumSize(new Dimension(Cheyenne.WIDTH_MAX, 20));
 		mySign.setMinimumSize(new Dimension(Cheyenne.WIDTH_MIN, 20));
+		//mySign.setEnabled(false);
+		mySign.setEditable(false);
+		mySign.addFocusListener(new FocusListener(){
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				mySign.setEditable(true);
+				mySign.setOpaque(true);
+				if(mySign.getForeground().equals(Color.WHITE))
+						mySign.setForeground(Color.BLACK);
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				mySign.setEditable(false);
+				mySign.setOpaque(false);
+				mySign.setForeground(nick.getForeground());
+			}
+		});
 		
 		// miniProfilePane.setAlignmentX(JComponent.TOP_ALIGNMENT);
 		miniProfilePane.setLayout(new BoxLayout(miniProfilePane,
@@ -416,14 +449,13 @@ class ListsPane extends JTabbedPane {
 	JButton myFriends = new JButton("My Friends("+7+'/'+15+')');
 	JButton blacklist = new JButton("Blacklist");
 
-	Dimension btnsize = new Dimension(Cheyenne.WIDTH_PREF, 20);
-
 	NoxJListItem listItem = null;
+	Cheyenne parent;
 	
-	ListsPane(final ObjectList flist, final ObjectList glist, final ObjectList blist,
-			String path_flist, String path_glist, String path_blist) {
+	ListsPane(Cheyenne par, final ObjectList flist, final ObjectList glist, final ObjectList blist) {
 		frdlistpane = new JPanel();
 		grplistpane = new JPanel();
+		parent = par;
 		
 		myFriends.setSize(new Dimension(Cheyenne.WIDTH_DEFLT, 20));
 		myFriends.setPreferredSize(new Dimension(Cheyenne.WIDTH_PREF, 20));
@@ -541,7 +573,10 @@ class ListsPane extends JTabbedPane {
 						public void actionPerformed(ActionEvent e) {
 							JOptionPane.showMessageDialog((Component) null, 
 									"<html>"//<BODY bgColor=#ffffff>"
-									+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
+									+ "<img width=64 height=64 src=\"file:/"
+									+ System.getProperty("user.dir")
+									+ SystemPath.PORTRAIT_RESOURCE_PATH
+									+ "chat.png\"><br>"
 									+"<Font color=black>昵称:</Font> <Font color=blue>"
 									+ listItem.getNick()
 									+"<br></Font>"
@@ -569,15 +604,12 @@ class ListsPane extends JTabbedPane {
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 			}
-
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 			}
-
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 			}
-
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 			}
@@ -602,8 +634,8 @@ class ListsPane extends JTabbedPane {
 		//TODO 得到grouproom 的ID, 然后传值;
 		for (int i = 0; i < flistItems.length; i++) {
 			gmembers[i] = new GroupItem(new ImageIcon(
-					"resrc\\portrait\\user.png"), flistItems[i], "欢迎加入我们: "
-					+ flistItems[i], groupID, 0, 0);
+					SystemPath.PORTRAIT_RESOURCE_PATH + "user.png"),
+					flistItems[i], "欢迎加入我们: " + flistItems[i], groupID, 0, 0);
 		}
 		
 		glist.addMouseListener(new MouseListener(){
@@ -644,7 +676,10 @@ class ListsPane extends JTabbedPane {
 						public void actionPerformed(ActionEvent e) {
 							JOptionPane.showMessageDialog((Component) null, 
 									"<html>"//<BODY bgColor=#ffffff>"
-									+ "<img width=64 height=64 src=\"file:///E:/Java/NoX/resrc/dump/edit_user.png\"><br>"
+									+ "<img width=64 height=64 src=\"file:/"
+									+ System.getProperty("user.dir")
+									+ SystemPath.PORTRAIT_RESOURCE_PATH
+									+"chat.png\"><br>"
 									+"<Font color=black>组名:</Font> <Font color=blue>"
 									+ listItem.getNick()
 									+"<br></Font>"
@@ -693,10 +728,50 @@ class ListsPane extends JTabbedPane {
 		// tabs.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);//多行标签
 		this.setBackground(Color.BLACK);
 		this.setForeground(Color.WHITE);
-		this.addTab(null, new ImageIcon(path_flist), frdlistpane);
-		this.addTab(null, new ImageIcon(path_glist), grplistpane);
+
+		this.addTab(null, new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "chat.png"), frdlistpane);
+		this.addTab(null, new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "chatroom.png"), grplistpane);
 		this.setToolTipTextAt(0, getHtmlText("Friends"));
 		this.setToolTipTextAt(1, getHtmlText("Groups"));
+		
+		JPanel searchPane = new JPanel();
+		searchPane.setBackground(Color.WHITE);
+		this.addTab(null, new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "search_25.png"), searchPane);
+		this.setToolTipTextAt(2, getHtmlText("Search"));
+		searchPane.addComponentListener(new ComponentListener(){
+			@Override
+			public void componentHidden(ComponentEvent arg0) {
+			}
+			@Override
+			public void componentMoved(ComponentEvent arg0) {
+			}
+			@Override
+			public void componentResized(ComponentEvent arg0) {
+			}
+			@Override
+			public void componentShown(ComponentEvent arg0) {
+				parent.showSearchingFrame();
+			}
+		});
+		JPanel configPane = new JPanel();
+		configPane.setBackground(Color.WHITE);
+		this.addTab(null, new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "config_25.png"), configPane);
+		this.setToolTipTextAt(3, getHtmlText("Configuration"));
+		configPane.addComponentListener(new ComponentListener(){
+			@Override
+			public void componentHidden(ComponentEvent arg0) {
+			}
+			@Override
+			public void componentMoved(ComponentEvent arg0) {
+			}
+			@Override
+			public void componentResized(ComponentEvent arg0) {
+			}
+			@Override
+			public void componentShown(ComponentEvent arg0) {
+				parent.ShowConfigCenter();
+			}
+		});
 		//this.addTab(null, new ImageIcon(path_blist), blklistpane);
 		this.setOpaque(false);
 	}
@@ -708,17 +783,33 @@ class ListsPane extends JTabbedPane {
 	private String getHtmlText(String text) {
 		return ("<html><BODY bgColor=#ffffff><Font color=black>" + text + "</Font></BODY></html>");
 	}
+	/**
+	 * (在主界面双击好友或者组时被调用)弹出聊天窗口.
+	 * @param listItem
+	 */
 	private void showChatRoom(NoxJListItem listItem) {
 		ID id = listItem.getUUID();
-		Chatroom room = new NoxToolkit().getChatroom(id);
-		if(room == null)//不存在
-		{
+		ChatroomUnit roomunit = new NoxToolkit().getChatroomUnit(id);
+		Chatroom room;
+		
+		if(roomunit == null){
+			//未注册pipe, 更无chatroom.
+			//新建聊天室, 会试图连接.
+			//如果连接不上....
+			//如果连接成功....
 			room = new Chatroom((PeerItem)listItem, null);
-			new NoxToolkit().addChatroom(room);
+		}else{
+			//已注册pipe
+			room = roomunit.getChatroom();
+			if(room == null)
+			{//不存在, 开新窗口
+				room = parent.setupNewChatroomOver(roomunit.getOutPipe());
+				//new NoxToolkit().registerChatroom(id, room);
+			}else{
+				room.pack();
+				room.setVisible(true);
+			}
 		}
-		//room.TryToConnectAgain(5*1000);
-		room.pack();
-		room.setVisible(true);
 	}
 	/**
 	 * 切换列表时播放提示音
@@ -730,8 +821,10 @@ class ListsPane extends JTabbedPane {
 			// AudioClip audioClip = Applet.newAudioClip(completeURL)
 			// codeBase = new URL("file:" + System.getProperty("user.dir") +
 			// "/");
-			URL url = new URL("file:\\" + System.getProperty("user.dir")
-					+ "\\resrc\\audio\\folderwpcm.wav");
+			URL url = new URL("file:/" + System.getProperty("user.dir")
+					+ System.getProperty("file.separator")
+					+ SystemPath.AUDIO_RESOURCE_PATH
+					+ "folderwpcm.wav");
 			playsound = Applet.newAudioClip(url);
 			// System.out.println(url);
 			playsound.play();

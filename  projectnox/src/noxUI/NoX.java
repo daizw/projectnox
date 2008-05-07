@@ -49,7 +49,7 @@ public class NoX {
 		GroupItem[] groups = new GroupItem[glistItems.length];
 
 		for (int i = 0; i < glistItems.length; i++) {
-			groups[i] = new GroupItem(new ImageIcon("resrc\\icons\\chatroom.png"),
+			groups[i] = new GroupItem(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "chatroom.png"),
 					glistItems[i], "Hi, 这是" + glistItems[i] + "的聊天室", 
 					null, 0, 0);
 		}
@@ -71,8 +71,5 @@ public class NoX {
 		Cheyenne chyn = new Cheyenne(flist, glist, blist);
 		chyn.pack();
 		chyn.setVisible(true);
-		/*Chatroom room = new Chatroom("Groupname or Friendsname here");
-		room.pack();
-		room.setVisible(true);*/
 	}
 }

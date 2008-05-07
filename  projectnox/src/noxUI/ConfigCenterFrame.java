@@ -28,7 +28,7 @@ import javax.swing.UIManager;
 /**
  * 设置中心窗口. 在这里可以设置个人及系统的各项参数: 例如: 个人设置: 昵称; 签名档; 个人资料; 头像; 身份验证; 其它. 系统设置:
  * 代理服务器; 数据保存文件夹; 修改密码; 自动登录; 隐身登录; 其它. (有些细节可以以后实现)
- * 启动后隐藏界面.
+ * 启动后隐藏界面,保持在最顶端.
  * 
  * @author shinysky
  */
@@ -54,16 +54,9 @@ public class ConfigCenterFrame extends NoxFrame {
 	JPanel rootPane;
 	Cheyenne parent;
 	ConfigCenterFrame(Cheyenne prt) {
-		super("Configuration Center", "resrc\\images\\bkgrd.png",
-				"resrc\\logo\\NoXlogo_20.png", "NoX Configuration Center",
-				"resrc\\buttons\\minimize.png",
-				"resrc\\buttons\\minimize_rollover.png",
-				"resrc\\buttons\\maximize.png",
-				"resrc\\buttons\\maximize_rollover.png",
-				"resrc\\buttons\\normalize.png",
-				"resrc\\buttons\\normalize_rollover.png",
-				"resrc\\buttons\\close.png",
-				"resrc\\buttons\\close_rollover.png", false);
+		super("Configuration Center", SystemPath.IMAGES_RESOURCE_PATH + "bkgrd.png",
+				SystemPath.ICONS_RESOURCE_PATH + "config_20.png",
+				SystemPath.ICONS_RESOURCE_PATH + "config_48.png", "NoX Configuration Center", false);
 		/**
 		 * TODO: 尽管super设为false, 关闭按钮还是可以exit, 让我很诧异, 先不管这个
 		 */
@@ -180,6 +173,11 @@ public class ConfigCenterFrame extends NoxFrame {
 		rootPane.setLayout(new BoxLayout(rootPane, BoxLayout.X_AXIS));
 		rootPane.add(menuPane);
 		SysBasicConfigPane rightPane = new SysBasicConfigPane(parent);
+		rightPane.setSize(new Dimension(WIDTH-MenuItemWidth, HEIGHT-NoxFrame.TITLE_HEIGHT-NoxFrame.FOOT_HEIGHT));
+		rightPane.setPreferredSize(new Dimension(WIDTH-MenuItemWidth, HEIGHT-NoxFrame.TITLE_HEIGHT-NoxFrame.FOOT_HEIGHT));
+		rightPane.setMaximumSize(new Dimension(WIDTH-MenuItemWidth, HEIGHT-NoxFrame.TITLE_HEIGHT-NoxFrame.FOOT_HEIGHT));
+		rightPane.setMinimumSize(new Dimension(WIDTH-MenuItemWidth, HEIGHT-NoxFrame.TITLE_HEIGHT-NoxFrame.FOOT_HEIGHT));
+		
 		rootPane.add(rightPane);
 		// rootPane.add(Box.createHorizontalGlue());
 

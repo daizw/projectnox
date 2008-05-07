@@ -18,12 +18,6 @@ public class AboutDialog extends JDialog {
 	 * 显示关于信息JEditorPane
 	 */
 	private JEditorPane aboutDoc;
-	/**
-	 * 用户文件夹路径
-	 */
-	private String userDirProfix = new String("file:///"
-			+ System.getProperty("user.dir")
-			+ System.getProperty("file.separator"));
 
 	AboutDialog() {
 		this.setTitle("Welcome to NoX's world!");
@@ -34,7 +28,9 @@ public class AboutDialog extends JDialog {
 		aboutDoc.setEditable(false);
 		// aboutDoc.setBounds(0, 0, 300, 200);
 		try {
-			String url = userDirProfix + "resrc\\docs\\About.htm";
+			String url = "file:/" + System.getProperty("user.dir")
+			+ System.getProperty("file.separator")
+			+ SystemPath.DOCS_RESOURCE_PATH + "About.htm";
 			aboutDoc.setPage(url);
 		} catch (IOException e1) {
 		}

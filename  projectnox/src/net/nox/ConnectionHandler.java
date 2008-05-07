@@ -1,151 +1,98 @@
-/*
- * Copyright (c) 2006-2007 Sun Microsystems, Inc.  All rights reserved.
- *
- *  The Sun Project JXTA(TM) Software License
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *
- *  1. Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *  2. Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *
- *  3. The end-user documentation included with the redistribution, if any, must
- *     include the following acknowledgment: "This product includes software
- *     developed by Sun Microsystems, Inc. for JXTA(TM) technology."
- *     Alternately, this acknowledgment may appear in the software itself, if
- *     and wherever such third-party acknowledgments normally appear.
- *
- *  4. The names "Sun", "Sun Microsystems, Inc.", "JXTA" and "Project JXTA" must
- *     not be used to endorse or promote products derived from this software
- *     without prior written permission. For written permission, please contact
- *     Project JXTA at http://www.jxta.org.
- *
- *  5. Products derived from this software may not be called "JXTA", nor may
- *     "JXTA" appear in their name, without prior written permission of Sun.
- *
- *  THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
- *  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SUN
- *  MICROSYSTEMS OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- *  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  JXTA is a registered trademark of Sun Microsystems, Inc. in the United
- *  States and other countries.
- *
- *  Please see the license information page at :
- *  <http://www.jxta.org/project/www/license.html> for instructions on use of
- *  the license in source files.
- *
- *  ====================================================================
- *
- *  This software consists of voluntary contributions made by many individuals
- *  on behalf of Project JXTA. For more information on Project JXTA, please see
- *  http://www.jxta.org.
- *
- *  This license is based on the BSD license adopted by the Apache Foundation.
- */
 package net.nox;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.Enumeration;
 
-import net.jxta.discovery.DiscoveryEvent;
-import net.jxta.discovery.DiscoveryListener;
-import net.jxta.discovery.DiscoveryService;
-import net.jxta.document.Advertisement;
 import net.jxta.endpoint.Message;
 import net.jxta.endpoint.MessageElement;
 import net.jxta.endpoint.StringMessageElement;
 import net.jxta.id.ID;
-import net.jxta.id.IDFactory;
-import net.jxta.peer.PeerID;
 import net.jxta.pipe.PipeMsgEvent;
 import net.jxta.pipe.PipeMsgListener;
-import net.jxta.protocol.DiscoveryResponseMsg;
-import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
+import net.nox.NoxToolkit.ChatroomUnit;
 import noxUI.Chatroom;
 import xml.nox.XmlMsgFormat;
 
 /**
- * This is the server (receiver) side of the Bi-directional Pipe Tutorial. <p/>
- * This example does the following :
+ * This is the server (receiver) side of the Bi-directional Pipe<p/>
+ * This class does the following :
  * <ol>
- * <li>Open a server pipe.</li>
- * <li>Listen for connect requests via {@code accept()}.</li>
- * <li>For each connect request spawn a thread which:
+ * <li>Open the received outpipe.</li>
+ * <li>Sends {@code greeting} messages to the connection.</li>
+ * <li>Waits responses.</li>
+ * <li>For each incoming message does the following:
  * <ol>
- * <li>Sends {@code ITERATIONS} messages to the connection.</li>
- * <li>Waits {@code ITERATIONS} responses.</li>
+ * <li>Identify if the caller is a friend, if so, setup a chatroom, and show the message.</li>
+ * <li>If no, just ignore it, or add him/her to the friend list, depends on the configuration of the user.</li>
  * </ol>
  * </li>
  * </ol>
  * 
- * Connection wrapper. Once started, it sends ITERATIONS messages and receives a
- * response from the initiator for each message.
- * 
  */
 public class ConnectionHandler implements Runnable, PipeMsgListener {
-
-	private final JxtaBiDiPipe outbidipipe;
 	/**
-	 * 远程发现
+	 * 实际上是双向管道, 即既可以收也可以发.
+	 * 这里的命名只是为了强调发.
 	 */
-	private boolean remoteFound = false;
+	private JxtaBiDiPipe outbidipipe;
 	/**
-	 * 对方的adv
+	 * 对应的ChatroomUnit
 	 */
-	private Advertisement incomingPeerAdv = null;
+	private ChatroomUnit roomunit;
 	/**
-	 * 发现ID监听器
-	 */
-	final DiscoveryListener listener = new DiscoveryListener() {
-		@Override
-		public void discoveryEvent(DiscoveryEvent event) {
-			System.out.println("In ConnectionHandler: Begin discoveryEvent()");
-			remoteFound = true;
-			Enumeration<Advertisement> remAdvEnum = event.getSearchResults();
-			if (remAdvEnum != null) {
-				while (remAdvEnum.hasMoreElements()) {
-					incomingPeerAdv = (Advertisement) remAdvEnum.nextElement();
-					System.out
-							.println("Here is a loc adv of the peer who made the incoming call:\n"
-									+ incomingPeerAdv);
-				}
-			}
-			System.out.println("In ConnectionHandler: End discoveryEvent()");
-		}
-	};
-
-	/**
-	 * Constructor for the MsgReceiver object
-	 * 
+	 * <ol>
+	 * <li>Constructor for the ConnectionHandler object.
+	 * Do these things:</li>
+	 * <ol>
+	 * <li>register the outbidipipe;</li>
+	 * <li>set the message listener.</li>
+	 * </ol>
+	 * <li>该构造函数由系统检测到外来连接时调用.注册并监听该pipe, 但并不实例化chatroom</li>
+	 * <li>在此之后, 如果监听到有消息到达, 则寻找/建立对应的chatroom, 并将消息传递给chatroom</li>
+	 * </ol>
 	 * @param pipe
 	 *            message pipe
 	 */
 	public ConnectionHandler(JxtaBiDiPipe pipe) {
 		this.outbidipipe = pipe;
 		outbidipipe.setMessageListener(this);
+		//TODO register the chatroom.
+		//if it has exist, then refresh the outpipe(?).
+		//if not, handle the connection considering the condition.
+		registerPipe(outbidipipe);
 	}
-
+	/**
+	 * 负责建立和维护ID-Pipe对, 同时更新此处成员变量room.
+	 * <ol>
+	 * <li>如果对应pipe的ChatroomUnit不存在, 则注册一个对应的ID-Pipe对.</li>
+	 * <li>如果存在则更新pipe.</li>
+	 * </ol>
+	 * <li>以上这两种情况都不会试图去实例化Chatroom.</li>
+	 * 
+	 * @param pipe
+	 * @see ChatroomUnit
+	 */
+	private void registerPipe(JxtaBiDiPipe pipe) {
+		ID roomID = pipe.getRemotePeerAdvertisement().getPeerID();
+		roomunit = new NoxToolkit().getChatroomUnit(roomID);
+		if (roomunit == null)// 该ID对应的ChatroomUnit不存在
+		{
+			//注册该pipe
+			System.out.println("The chatroom doesn't exist yet, I will register the pipe.");
+			roomunit = new NoxToolkit().registerChatroomUnit(roomID, pipe);
+		}else{
+			//重设pipe
+			roomunit.setOutPipe(pipe);
+		}
+	}	
 	/**
 	 * {@inheritDoc}
 	 */
 	public void pipeMsgEvent(PipeMsgEvent event) {
 		System.out.println("===Begin ConnectionHandler PipeMsgEvent()===");
 		// TODO 处理消息
+		// 做得细致的话, 应该消息分多种, 对不同消息调用不同处理函数.
 		// grab the message from the event
 		Message msg = event.getMessage();
 
@@ -196,107 +143,52 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 
 		System.out.println("Connection-Handler got Message :"
 				+ msgEle.toString());
-		// TODO 处理收到的消息
-		System.out.println("Try to setup a chatroom...");
-		showChatroom(senderIDEle, msg, true);
+		
+		// TODO 将经过处理的消息传给对应的Chatroom.
+		System.out.println("Trying to setup a chatroom...");
+		//registerChatroom(senderIDEle, msg, true);
+		//提示收到的消息
+		promptIncomingMsg(msg);
+		
 		System.out.println("===End ConnectionHandler PipeMsgEvent()===");
 	}
 
 	/**
-	 * 建立与该Peer的聊天室
-	 * @param senderIDEle 消息中含对方ID的messageElement
-	 * @param msg 对方发过来的消息本身
+	 * 消息处理函数, 提示收到消息
+	 * <ol>
+	 * <li>如果聊天室已经存在, 则将消息传递给对应聊天室;</li>
+	 * <li>如果聊天室尚不存在:
+	 * <ol>
+	 * <li>如果是好友的消息, 则(暂时)建立聊天室显示之.</li>
+	 * <li>如果不是好友的消息, 则(暂时)将之添加为好友建立聊天室并显示之.</li>
+	 * </ol>
+	 * </ol>
+	 * @param msg 收到的消息
 	 */
-	private void showChatroom(MessageElement senderIDEle, Message msg, boolean visible) {
-		ID chatroomID;
-		try {
-			chatroomID = (PeerID) IDFactory.fromURI(new URI(senderIDEle
-					.toString()));
-			Chatroom room = new NoxToolkit().getChatroom(chatroomID);
-			if (room == null)// 不存在
-			{
-				// room = new Chatroom((PeerItem)listItem);
-				// new NoxToolkit().addChatroom(room);
-				System.out
-						.println("The room doesn't exist, find the peer adv in local cache");
-				// TODO 查找该ID的adv, 向用户提示该消息, 根据adv创建对应的Chatroom
-				// 在本地查找
-				Enumeration<Advertisement> locAdvEnum = new NoxToolkit()
-						.getNetworkManager().getNetPeerGroup()
-						.getDiscoveryService().getLocalAdvertisements(
-								DiscoveryService.PEER, "PID",
-								senderIDEle.toString());
-				System.out.println("Local Discovery Done!");
-				if (locAdvEnum != null) {
-					System.out.println("We got some in local cache!:"
-							+ locAdvEnum.hasMoreElements());
-					while (locAdvEnum.hasMoreElements()) {
-						incomingPeerAdv = (Advertisement) locAdvEnum
-								.nextElement();
-						System.out
-								.println("Here is a loc adv of the peer who made the incoming call:\n"
-										+ incomingPeerAdv);
-					}
-				}
-				if (incomingPeerAdv == null) {
-					// 远程查找
-					System.out
-							.println("Can't find the peer's adv in local cache, try to find it remotely...");
-					new NoxToolkit().getNetworkManager().getNetPeerGroup()
-							.getDiscoveryService().getRemoteAdvertisements(
-									null, DiscoveryService.PEER, "PID",
-									senderIDEle.toString(), 1, listener);
-					int unittime = 500;
-					int waittime = 5 * 1000;
-					int timecount = waittime / unittime;
-					while (!remoteFound && timecount-- > 0) {
-						try {
-							Thread.sleep(unittime);
-							System.out.println("remoteDiscovery timecount:"
-									+ timecount);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					if (!remoteFound) {
-						// 仍然没发现
-						System.out
-								.println("I still can't find the peer's adv, is it a ghost?");
-						return;
-					}
-				}
-				if (incomingPeerAdv != null) {
-					System.out.println("Find the adv locally.");
-					System.out.println("Establishing a new chatroom with "
-							+ ((PeerAdvertisement) incomingPeerAdv).getName());
-					room = new NoxToolkit().getCheyenne().setupNewChatroomWith(
-							(PeerAdvertisement) incomingPeerAdv, outbidipipe);
-				}
-			}
-			if (room != null) {
-				room.setOutBidipipe(outbidipipe);
-				if(visible){
-					room.pack();
-					room.setVisible(true);
-				}
-				room.processIncomingMsg(msg, false);
-			} else {
-				// TODO 说明没有发现该peer的广告, 是陌生人消息;可能是远程发现timeout设得太小了.
-				// 需要获取该公告;
-				// 然后建立chatroom;
-				System.out.println("可能是远程发现timeout设得太小了...");
-			}
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	private void promptIncomingMsg(Message msg) {
+		if (roomunit.getChatroom() != null){
+			//传递消息
+			roomunit.getChatroom().processIncomingMsg(msg, false);
+			return;
+		}else{
+			//如果聊天室尚不存在:
+			//如果是好友的消息, 则(暂时)建立聊天室显示之.
+			//(应当)提示有新消息
+			//如果不是好友的消息, 则(暂时)将之添加为好友建立聊天室并显示之.
+			//然后注册该chatroom.
+			
+			//建立新聊天室
+			Chatroom room = new NoxToolkit().getCheyenne().setupNewChatroomOver(outbidipipe);
+			//注册聊天室
+			roomunit.setChatroom(room);
+			//new NoxToolkit().registerChatroom(room.getRoomID(), room);
+			//处理消息
+			room.processIncomingMsg(msg, false);
 		}
 	}
 
 	/**
-	 * Send a series of messages over a pipe
+	 * Send a greeting message over the pipe
 	 * 
 	 * @param bidipipe
 	 *            the pipe to send messages over
@@ -309,7 +201,7 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 		Message msg = new Message();
 		Date date = new Date(System.currentTimeMillis());
 		// add a string message element with the current date
-		String hellomsg = "What's up? [F:100]\nIn ConnectionHandler sendGreetingMessages() from "
+		String hellomsg = "Greetings! [F:100]\nIn ConnectionHandler sendGreetingMessages() from "
 				+ new NoxToolkit().getNetworkConfigurator().getName();
 
 		StringMessageElement senderEle = new StringMessageElement(
@@ -336,18 +228,14 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 	}
 
 	/**
-	 * Main processing method for the ConnectionHandler object
+	 * Send greeting message when receive incoming connection.
+	 * TODO comment this
 	 */
 	public void run() {
 		try {
 			sendGreetingMessages(outbidipipe);
-			// TODO what
 		} catch (Throwable all) {
 			all.printStackTrace();
 		}
-		// TODO 根据bidipipe获取remote peerID, 判断是否是好友;
-		// 如果是好友就显示消息提示; 不是, 则进行相应处理...
-		// PeerID remotePeerID =
-		// bidipipe.getRemotePeerAdvertisement().getPeerID();
 	}
 }

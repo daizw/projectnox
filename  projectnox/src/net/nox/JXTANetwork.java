@@ -2,7 +2,6 @@ package net.nox;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Date;
 
@@ -23,7 +22,24 @@ import net.jxta.util.JxtaBiDiPipe;
 import net.jxta.util.JxtaServerPipe;
 import net.nox.NoxToolkit.CheckStatusEventHandler;
 import net.nox.NoxToolkit.HuntingEventHandler;
-
+/**
+ * This is the JXTANetwork class<p/>
+ * This class does the following :
+ * <ol>
+ * <li>Start the JXTA network.</li>
+ * <li>Loading configuration if exist.</li>
+ * <li>Listen for connect requests via {@code accept()}.</li>
+ * <li>For each connect request spawn a thread which:
+ * <ol>
+ * <li>Sends {@code greeting} messages to the connection.</li>
+ * <li>Waits responses.</li>
+ * </ol>
+ * </li>
+ * </ol>
+ * 
+ * @author shinysky
+ *
+ */
 public class JXTANetwork {
 
 	public static final String Local_Peer_Name = "Local NoX Peer";
@@ -251,13 +267,12 @@ public class JXTANetwork {
 					System.out.println("JxtaBidiPipe accepted from: "
 							+ outbidipipe.getRemotePeerAdvertisement().getName());
 					// Send messages
-					Thread thread = new Thread(new ConnectionHandler(outbidipipe),
+					Thread thread = new Thread(	new ConnectionHandler(	outbidipipe),
 							"Incoming Connection Handler");
 					thread.start();
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -279,7 +294,10 @@ public class JXTANetwork {
 		advertisement.setPipeID(BIDI_PIPEID);
 		advertisement.setType(PipeService.UnicastType);
 		advertisement.setName(TheNetPeerGroup.getPeerID().toString());
+		advertisement.setDescription(new Date().getTime() + "");
 
+		//System.out.println(advertisement);
+		
 		return advertisement;
 	}
 }

@@ -11,6 +11,7 @@ import net.jxta.document.Advertisement;
 import net.jxta.id.ID;
 import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
+import net.jxta.util.JxtaBiDiPipe;
 import noxUI.Cheyenne;
 import noxUI.NoxJListItem;
 import noxUI.SearchingFrame.AdvTable;
@@ -74,6 +75,49 @@ public class NoxToolkit {
 			}
 		}
 	}
+	/**
+	 * Chatroom单元结构,
+	 * 用于保存roomID, outpipe, 和chatroom的对应关系.
+	 * 
+	 * @author shinysky
+	 *
+	 */
+	public class ChatroomUnit{
+		private ID roomID = null;
+		private JxtaBiDiPipe outbidipipe = null;
+		private Chatroom room = null;
+		
+		public ChatroomUnit(ID id, JxtaBiDiPipe pipe){
+			this(id, pipe, null);
+		}
+		public ChatroomUnit(ID id, JxtaBiDiPipe pipe, Chatroom rm){
+			roomID = id;
+			outbidipipe = pipe;
+			room = rm;
+		}
+		public ID getRoomID(){
+			return roomID;
+		}
+		public JxtaBiDiPipe getOutPipe(){
+			return outbidipipe;
+		}
+		/**
+		 * 设置ChatroomUnit的outbidipipe, 并同步更新Chatroom(如果存在)的outbidipipe
+		 * @param pipe
+		 */
+		public void setOutPipe(JxtaBiDiPipe pipe){
+			outbidipipe = pipe;
+			//同步room的outpipe
+			if(room != null)
+				room.setOutBidipipe(pipe);
+		}
+		public Chatroom getChatroom(){
+			return room;
+		}
+		public void setChatroom(Chatroom rm){
+			room = rm;
+		}
+	}
 	private static JXTANetwork network;
 	private static NetworkManager manager;
 	private static NetworkConfigurator configer;
@@ -81,7 +125,8 @@ public class NoxToolkit {
 	private static HuntingEventHandler hehandler;
 	private static CheckStatusEventHandler cshandler;
 	private static Cheyenne cheyenne;
-	private static Set<Chatroom> chatrooms;
+	private static Set<ChatroomUnit> chatrooms;
+	private static float Opacity = 100;
 	
 	public NoxToolkit(){
 	}
@@ -93,7 +138,7 @@ public class NoxToolkit {
 		//advhunter = ah;
 		hehandler = heh;
 		cshandler = csh;
-		chatrooms = new HashSet<Chatroom>();
+		chatrooms = new HashSet<ChatroomUnit>();
 		chatrooms.clear();
 	}
 	
@@ -122,25 +167,72 @@ public class NoxToolkit {
 	public Cheyenne getCheyenne(){
 		return cheyenne;
 	}
-	
-	public void addChatroom(Chatroom room){
-		chatrooms.add(room);
+	public float getOpacity(){
+		return Opacity;
 	}
-	public Chatroom getChatroom(ID id){
-		Iterator<Chatroom> it = chatrooms.iterator();
-		Chatroom room;
+	public void setOpacity(float opa){
+		Opacity = opa;
+	}
+	/**
+	 * 注册ID和Pipe的对应关系
+	 * @param id
+	 * @param pipe
+	 */
+	public ChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe){
+		ChatroomUnit newRoomUnit = new ChatroomUnit(id, pipe);
+		chatrooms.add(newRoomUnit);
+		return newRoomUnit;
+	}
+	public ChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe, Chatroom room){
+		ChatroomUnit newRoomUnit = new ChatroomUnit(id, pipe, room);
+		chatrooms.add(newRoomUnit);
+		return newRoomUnit;
+	}
+	/**
+	 * 为ID添加对应的room
+	 * @param id
+	 * @param room
+	 */
+	public void registerChatroom(ID id, Chatroom room){
+		Iterator<ChatroomUnit> it = chatrooms.iterator();
+		ChatroomUnit roomunit;
+
 		while (it.hasNext())
 		{// 遍历集合
-			room = (Chatroom)(it.next());
-			System.out.println("Chatroom Iterator here : " + room.getRoomID());
-			if(room.getRoomID() == null || id == null){
+			roomunit = (ChatroomUnit)(it.next());
+			System.out.println("Chatroom Iterator here : " + roomunit.getRoomID());
+			if(roomunit.getRoomID() == null || id == null){
 				System.out.println("Error	: This room has no ID or you want to get a Chatroom without any id, it's very strange!!");
 				network.StopNetwork();
 				System.exit(-1);
 			}
-			if(id.equals(room.getRoomID())){
+			if(roomunit.getChatroom() != null){
+				System.out.println("Error: That's bad, the room already exist! It's unusual!");
+			}
+			if(id.equals(roomunit.getRoomID())){
+				System.out.println("I find the ID, now I will set the chatroom");
+				roomunit.setChatroom(room);
+				return;
+			}
+		}
+		System.out.println("If you see this message, it's bad. Please check the NoxToolkit.registerChatroom()");
+	}
+	public ChatroomUnit getChatroomUnit(ID id){
+		Iterator<ChatroomUnit> it = chatrooms.iterator();
+		ChatroomUnit roomunit;
+
+		while (it.hasNext())
+		{// 遍历集合
+			roomunit = (ChatroomUnit)(it.next());
+			System.out.println("Chatroom Iterator here : " + roomunit.getRoomID());
+			if(roomunit.getRoomID() == null || id == null){
+				System.out.println("Error	: This room has no ID or you want to get a Chatroom without any id, it's very strange!!");
+				network.StopNetwork();
+				System.exit(-1);
+			}
+			if(id.equals(roomunit.getRoomID())){
 				System.out.println("I find the room, it exist already");
-				return room;
+				return roomunit;
 			}else
 				System.out.println("Unfortunately, this room is not what we're look for.");
 		}

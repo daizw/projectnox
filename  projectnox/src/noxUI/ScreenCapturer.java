@@ -78,10 +78,10 @@ class ScreenCapturer extends JPanel implements MouseListener,
 
 	//边界工具条
 	JPanel editPane = new JPanel();
-	JButton b_send = new JButton(new ImageIcon("resrc\\buttons\\send.png"));
-	JButton b_copy = new JButton(new ImageIcon("resrc\\buttons\\copy.png"));
-	JButton b_save = new JButton(new ImageIcon("resrc\\buttons\\save.png"));
-	JButton b_cancel = new JButton(new ImageIcon("resrc\\buttons\\cancel.png"));
+	JButton b_send = new JButton(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "send.png"));
+	JButton b_copy = new JButton(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "copy.png"));
+	JButton b_save = new JButton(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "save.png"));
+	JButton b_cancel = new JButton(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "cancel.png"));
 	// 右键菜单
 	JPopupMenu menuSnap = new JPopupMenu();
 	JMenuItem send = new JMenuItem("Send");
@@ -174,32 +174,24 @@ class ScreenCapturer extends JPanel implements MouseListener,
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
 				editPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
 				doMouseMoved(e);
 			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 		});

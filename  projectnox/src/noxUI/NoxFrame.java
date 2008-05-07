@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -14,7 +13,21 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.geom.RoundRectangle2D;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSlider;
+import javax.swing.MenuElement;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -103,12 +116,9 @@ public class NoxFrame extends JFrame {
 	 * @see Titlebar
 	 * @see JFrame
 	 */
-	NoxFrame(String title, String path_background, String path_logo,
-			String path_title, String path_minimize,
-			String path_minimize_rollover, String path_maximize,
-			String path_maximize_rollover, String path_normalize,
-			String path_normalize_rollover, String path_close,
-			String path_close_rollover, final boolean IAmBase) {
+	NoxFrame(String title, String path_background, 
+			String path_logo, String path_logo_big,
+			String path_title, final boolean IAmBase) {
 		super(title);
 		/*
 		 * try{
@@ -125,7 +135,8 @@ public class NoxFrame extends JFrame {
 
 		tk = Toolkit.getDefaultToolkit();
 		background = tk.getImage(path_background);
-		img_logo = tk.getImage(path_logo);
+		img_logo = tk.getImage(path_logo_big);
+		//程序图标
 		this.setIconImage(img_logo);
 
 		// 准备图片
@@ -137,10 +148,7 @@ public class NoxFrame extends JFrame {
 		/**
 		 * 标题栏组件
 		 */
-		titlebar = new Titlebar(this, path_logo, path_title, path_minimize,
-				path_minimize_rollover, path_maximize, path_maximize_rollover,
-				path_normalize, path_normalize_rollover, path_close,
-				path_close_rollover, IAmBase);
+		titlebar = new Titlebar(this, path_logo, path_title, IAmBase);
 		/**
 		 * 中部容器
 		 */
@@ -329,10 +337,6 @@ class Titlebar extends JPanel {
 	FrameConfigDialog transparencyConfigBar;
 
 	String ttl;
-	String path_max;
-	String path_max_rollover;
-	String path_norm;
-	String path_norm_rollover;
 
 	// boolean windowStateIsMax;
 
@@ -365,16 +369,7 @@ class Titlebar extends JPanel {
 	 *            true: 是根窗口, 关闭按钮推出整个系统并且标题栏显示图片; false: 不是根窗口,
 	 *            关闭按钮只关闭本窗口并且标题栏显示文字.
 	 */
-	Titlebar(final NoxFrame parent, String path_logo, String title,
-			String path_minimize, String path_minimize_rollover,
-			final String path_maximize, final String path_maximize_rollover,
-			final String path_normalize, final String path_normalize_rollover,
-			String path_close, String path_close_rollover, final boolean IAmBase) {
-		path_max = path_maximize;
-		path_max_rollover = path_maximize_rollover;
-		path_norm = path_normalize;
-		path_norm_rollover = path_normalize_rollover;
-
+	Titlebar(final NoxFrame parent, String path_logo, String title, final boolean IAmBase) {
 		transparencyConfigBar = new FrameConfigDialog(parent);
 
 		Dimension btnsize = new Dimension(NoxFrame.TITLE_HEIGHT, NoxFrame.TITLE_HEIGHT); 
@@ -504,8 +499,8 @@ class Titlebar extends JPanel {
 		 * btitle.setBorderPainted(false); btitle.setContentAreaFilled(false);
 		 * btitle.setOpaque(false);
 		 */
-		bminimize = new JButton(new ImageIcon(path_minimize));
-		bminimize.setRolloverIcon(new ImageIcon(path_minimize_rollover));
+		bminimize = new JButton(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "minimize.png"));
+		bminimize.setRolloverIcon(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "minimize_rollover.png"));
 		bminimize.setToolTipText(getHtmlText("Minimize"));
 		bminimize.setSize(btnsize);
 		bminimize.setPreferredSize(btnsize);
@@ -527,8 +522,8 @@ class Titlebar extends JPanel {
 			}
 		});
 
-		bmaximize = new JButton(new ImageIcon(path_maximize));
-		bmaximize.setRolloverIcon(new ImageIcon(path_maximize_rollover));
+		bmaximize = new JButton(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "maximize.png"));
+		bmaximize.setRolloverIcon(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "maximize_rollover.png"));
 		bmaximize.setToolTipText(getHtmlText("Maximize"));
 		bmaximize.setSize(btnsize);
 		bmaximize.setPreferredSize(btnsize);
@@ -570,8 +565,8 @@ class Titlebar extends JPanel {
 			}
 		});
 
-		bclose = new JButton(new ImageIcon(path_close));
-		bclose.setRolloverIcon(new ImageIcon(path_close_rollover));
+		bclose = new JButton(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "close.png"));
+		bclose.setRolloverIcon(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "close_rollover.png"));
 		bclose.setToolTipText(getHtmlText("Close"));
 		bclose.setSize(btnsize);
 		bclose.setPreferredSize(btnsize);
@@ -618,13 +613,13 @@ class Titlebar extends JPanel {
 	}
 
 	public void setToMaximizeIcon() {
-		bmaximize.setIcon(new ImageIcon(path_max));
-		bmaximize.setRolloverIcon(new ImageIcon(path_max_rollover));
+		bmaximize.setIcon(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "maximize.png"));
+		bmaximize.setRolloverIcon(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "maximize_rollover.png"));
 	}
 
 	public void setToNormalizeIcon() {
-		bmaximize.setIcon(new ImageIcon(path_norm));
-		bmaximize.setRolloverIcon(new ImageIcon(path_norm_rollover));
+		bmaximize.setIcon(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "normalize.png"));
+		bmaximize.setRolloverIcon(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "normalize_rollover.png"));
 	}
 
 	public void setForegroundColor(boolean white) {
@@ -716,12 +711,11 @@ class FrameConfigDialog extends JDialog {
 			public void stateChanged(ChangeEvent e) {
 				float value = slider.getValue();
 				parent.setOpacity(value * 0.01f);
+				//new NoxToolkit().setOpacity(value * 0.01f);
 			}
 		});
-		close = new JButton(new ImageIcon("resrc\\buttons\\close.png"));
-		close
-				.setPressedIcon(new ImageIcon(
-						"resrc\\buttons\\close_rollover.png"));
+		close = new JButton(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "close.png"));
+		close.setPressedIcon(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "close_rollover.png"));
 		close.setOpaque(false);
 		close.setContentAreaFilled(false);
 		Dimension bnsize = new Dimension(20, 20);
@@ -742,12 +736,7 @@ class FrameConfigDialog extends JDialog {
 		root.add(opaque);
 		root.add(close);
 		root.setBackground(parent.getBackgroundColor());
-		// this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		/*
-		 * this.getContentPane().add(transparent);
-		 * this.getContentPane().add(slider); this.getContentPane().add(opaque);
-		 */
-		// this.getContentPane().add(root);
+		
 		this.setContentPane(root);
 		Dimension size = new Dimension(250, 20);
 		this.setSize(size);
