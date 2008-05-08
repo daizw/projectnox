@@ -33,13 +33,13 @@ public class NoX {
 						DBTableName.PEER_SQLTABLE_NAME);
 				stmt.execute("create table " +
 						DBTableName.PEER_SQLTABLE_NAME  +
-						" (ID VARCHAR, Good BOOLEAN, Object OTHER)");
+						" (ID VARCHAR not null, Good BOOLEAN not null, Object OTHER not null)");
 				
 				System.out.println("creating table: " +
 						DBTableName.GROUP_SQLTABLE_NAME);
 				stmt.execute("create table " +
 						DBTableName.GROUP_SQLTABLE_NAME  +
-						" (ID VARCHAR, Good BOOLEAN, Object OTHER)");
+						" (ID VARCHAR not null, Good BOOLEAN, Object OTHER not null)");
 				stmt.close();
 			} catch(SQLException e) {
 				System.out.println("数据库已存在");

@@ -19,8 +19,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Vector;
 
-import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -31,8 +32,6 @@ import javax.swing.ListModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import db.nox.DBTableName;
-
 public class ObjectList extends JList {
 	/**
 	 * 好友列表
@@ -42,6 +41,10 @@ public class ObjectList extends JList {
 	private FilterModel fmod;
 	private FilterField filterField;
 	private int DEFAULT_FIELD_WIDTH = 20;
+	
+	private boolean isGood;
+	private Connection sqlconn;
+	private String tablename;
 
 	/**
 	 * 如果变量为render类内部变量, 则会出现列表元素被添加到同一行, 并且该行重复N次的情况
@@ -56,10 +59,14 @@ public class ObjectList extends JList {
 	 * @param objs
 	 *            列表元素(FriendItem类型)数组
 	 */
-	ObjectList(Connection sqlconn, String tablename, boolean good) {
+	ObjectList(Connection sqlconn, String tablename, boolean isGood) {
 		// super(objs);
 		fmod = new FilterModel();
 		this.setModel(fmod);
+		this.sqlconn = sqlconn;
+		this.tablename = tablename;
+		this.isGood = isGood;
+		
 		portrait = new JLabel();
 		nick = new JLabel();
 		sign = new JLabel();
@@ -73,15 +80,16 @@ public class ObjectList extends JList {
 		try {
 			Statement stmt = sqlconn.createStatement();
 			ResultSet rs = stmt.executeQuery("select * from " +
-					tablename + " where Good = " + good);
+					tablename + " where Good = " + isGood);
 			
 			while(rs.next()){
 				ObjectInputStream objInput = new ObjectInputStream(rs.getBinaryStream("Object"));
 				System.out.println("Found object. Contents: ");
 				
 				NoxJListItem tmpItem = (NoxJListItem)objInput.readObject();
-				addItem(tmpItem, sqlconn, tablename, good);
+				addDBObject2List(tmpItem);
 				
+				System.out.println("isGood:	" + isGood);
 				System.out.println("Nick:	" + tmpItem.getNick());
 				System.out.println("Desc:	" + tmpItem.getSign());
 				System.out.println("ID:	" + tmpItem.getUUID());
@@ -110,7 +118,6 @@ public class ObjectList extends JList {
 					ObjectList.this.setSelectedIndex(index);
 				}
 			}
-
 			@Override
 			public void mouseEntered(MouseEvent menter) {
 				// TODO 自动改变背景色
@@ -118,19 +125,43 @@ public class ObjectList extends JList {
 				// ObjectList.this.locationToIndex(menter.getPoint());
 				// ObjectList.this.set
 			}
-
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 			}
-
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 			}
-
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 			}
 		});
+	}
+	/**
+	 * 从List中删除某项
+	 * @param sqlconn 数据库连接
+	 * @param tablename 表名
+	 * @param isGood 好友/黑名单成员 (这个参数其实不必要, 因为peer要么属于好友列表, 要么属于黑名单)
+	 * @param index (列表索引值)
+	 * @return 被删除的项
+	 */
+	public Object deleteItem(Connection sqlconn, String tablename, boolean isGood, int index){
+		System.out.println("removing the item from this list: " + index + "/" + fmod.getRealSize());
+		System.out.println("Items before removing: " + fmod.getSize());
+		Statement stmt;
+		try {
+			stmt = sqlconn.createStatement();
+			
+			stmt.execute("delete from "
+					+ tablename 
+					+ " where ID = '"
+					+ ((NoxJListItem)fmod.getRealElementAt(index)).getUUID().toString()
+					+ "'");
+					//+ " and Good = " + isGood);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Items left: " + fmod.getRealSize());
+		return fmod.deleteElementAt(index);
 	}
 
 	public void setModel(ListModel m) {
@@ -138,62 +169,96 @@ public class ObjectList extends JList {
 			throw new IllegalArgumentException();
 		super.setModel(m);
 	}
-
-	public Object addItem(Object o, Connection sqlconn, String tablename, boolean good) throws SQLException, IOException {
-		//TODO 加之前应该先判断是否已有!!
-		Statement stmt = sqlconn.createStatement();
-		ResultSet rs = null;
-		
-		int size =  ((FilterModel) (ObjectList.this.getModel())).getSize();
+	/**
+	 * 系统初始化时调用, 用于将数据库中数据添加到列表
+	 * @param o
+	 * @return
+	 */
+	private Object addDBObject2List(Object o){
+		int size =  fmod.getRealSize();
 		for(int index = 0; index <  size; index++){
 			//如果已经有了, 则返回.
 			NoxJListItem newItem = (NoxJListItem)o;
-			NoxJListItem curItem = (NoxJListItem)(((FilterModel) getModel()).getElementAt(index));
+			NoxJListItem curItem = (NoxJListItem)(fmod.getRealElementAt(index));
 			if(newItem.getUUID().equals(curItem.getUUID())){
-				//找到数据库中的相同item
-				rs = stmt.executeQuery("select * from " +
-						tablename + " where ID = " + newItem.getUUID());
 				//如果当前的更新, 则更新
 				if(newItem.getTimeStamp() > curItem.getTimeStamp()){
 					curItem = newItem;
+				}
+				return (Object)curItem;
+			}
+		}
+		fmod.addElement((NoxJListItem) o);		
+		return o;
+	}
+
+	/**
+	 * 用于外部对象调用, 向列表中添加项.
+	 * @param object 要添加的项
+	 * @param sqlconn 数据库连接
+	 * @param tablename 表名
+	 * @param isGood true: 好友; false: 黑名单成员
+	 * @return 已添加的项, 或原来的更新的项
+	 * @throws SQLException
+	 * @throws IOException
+	 */
+	public Object addItem(Object object) throws SQLException, IOException {
+		//TODO 加之前应该先判断是否已有!!
+		Statement stmt = sqlconn.createStatement();
+		
+		System.out.println("Items before adding: " + fmod.getRealSize());
+		
+		int size =  fmod.getRealSize();
+		for(int index = 0; index <  size; index++){
+			//如果已经有了, 则返回.
+			NoxJListItem newItem = (NoxJListItem)object;
+			NoxJListItem curItem = (NoxJListItem)fmod.getRealElementAt(index);
+			if(newItem.getUUID().equals(curItem.getUUID())){
+				//如果当前的更新, 则更新
+				if(newItem.getTimeStamp() > curItem.getTimeStamp()){
+					System.out.println("Got a newer item");
+					curItem = newItem;
 					//删除数据库中该ID
 					stmt.execute("delete from "+
-						tablename + " where ID = " + curItem.getUUID());
+						tablename + " where ID = '" + curItem.getUUID().toString() + "'");
 					//添加到数据库
 					PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
 							tablename + " values (?, ?, ?)");
 					pstmt.setString(1, newItem.getUUID().toString());
-					pstmt.setString(2, good + "");
+					pstmt.setString(2, isGood + "");
 					
 					ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
 					ObjectOutputStream out = new ObjectOutputStream(byteArrayStream);
 					out.writeObject((Object) newItem);
 					ByteArrayInputStream input = new ByteArrayInputStream(byteArrayStream.toByteArray());
 					pstmt.setBinaryStream(3, input, byteArrayStream.size());
-					int recCount = pstmt.executeUpdate();
+					pstmt.executeUpdate();
 					pstmt.close();
 				}
 				stmt.close();
+				System.out.println("Got a item that already exist in the list");
+				System.out.println("Items now: " + fmod.getSize());
 				return (Object)curItem;
 			}
 		}
-		((FilterModel) getModel()).addElement((NoxJListItem) o);
+		fmod.addElement((NoxJListItem) object);
 		//添加到数据库
 		PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
 				tablename + " values (?, ?, ?)");
-		pstmt.setString(1, ((NoxJListItem) o).getUUID().toString());
-		pstmt.setString(2, good + "");
+		pstmt.setString(1, ((NoxJListItem) object).getUUID().toString());
+		pstmt.setString(2, isGood + "");
 		
 		ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
 		ObjectOutputStream out = new ObjectOutputStream(byteArrayStream);
-		out.writeObject((Object) o);
+		out.writeObject((Object) object);
 		ByteArrayInputStream input = new ByteArrayInputStream(byteArrayStream.toByteArray());
 		pstmt.setBinaryStream(3, input, byteArrayStream.size());
-		int recCount = pstmt.executeUpdate();
+		pstmt.executeUpdate();
 		pstmt.close();
 		stmt.close();
-		
-		return o;
+		System.out.println("Add a totally new item to the list");
+		System.out.println("Items now: " + fmod.getSize());
+		return object;
 	}
 
 	public class NoxJListCellRender extends JPanel implements ListCellRenderer {
@@ -209,7 +274,11 @@ public class ObjectList extends JList {
 
 			portrait.setIcon((Icon) item.getPortrait());
 			nick.setText(item.getNick());
-			sign.setText('(' + item.getSign() + ')');
+			sign.setText("<html><Font color=gray>"
+					+ '('
+					+ item.getSign()
+					+ ')'
+					+ "</Font></html>");
 
 			/*
 			 * portrait.setOpaque(false); nick.setOpaque(false);
@@ -311,18 +380,17 @@ public class ObjectList extends JList {
 	}
 
 	// inner class to provide filtered model
-	class FilterModel extends AbstractListModel {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
+	@SuppressWarnings("serial")
+	class FilterModel extends DefaultListModel {
 		ArrayList<NoxJListItem> items;
 		ArrayList<NoxJListItem> filterItems;
+		Vector<Integer> indexes;
 
 		public FilterModel() {
 			super();
 			items = new ArrayList<NoxJListItem>();
 			filterItems = new ArrayList<NoxJListItem>();
+			indexes = new Vector<Integer>();
 		}
 
 		public Object getElementAt(int index) {
@@ -331,9 +399,19 @@ public class ObjectList extends JList {
 			else
 				return null;
 		}
+		public Object getRealElementAt(int index) {
+			if (index < filterItems.size() && indexes.elementAt(index) < items.size())
+				return items.get(indexes.elementAt(index));
+			else
+				return null;
+		}
 
 		public int getSize() {
 			return filterItems.size();
+		}
+		
+		public int getRealSize() {
+			return items.size();
 		}
 
 		public void addElement(Object o) {
@@ -341,17 +419,28 @@ public class ObjectList extends JList {
 			// System.out.println("addElement...");
 			refilter();
 		}
+		
+		public Object deleteElementAt(int index){
+			//真正删除之
+			NoxJListItem ob = items.remove((int)indexes.elementAt(index));
+			refilter();
+			
+			return ob;
+		}
 
 		private void refilter() {
 			// System.out.println("refiltering...");
 			filterItems.clear();
+			indexes.clear();
+			int index = 0;
 			String term = getFilterField().getText();
 			for (int i = 0; i < items.size(); i++)
 				if (items.get(i).getNick().indexOf(term, 0) != -1) {
 					// System.out.println(items.get(i).getNick());
 					filterItems.add(items.get(i));
+					index++;
+					indexes.add(i);
 				}
-
 			fireContentsChanged(this, 0, getSize());
 		}
 	}
