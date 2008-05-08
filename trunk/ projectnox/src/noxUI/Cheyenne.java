@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -44,8 +45,6 @@ import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
 
-import db.nox.DBTableName;
-
 import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroupID;
 import net.jxta.protocol.PeerAdvertisement;
@@ -53,6 +52,7 @@ import net.jxta.protocol.PeerGroupAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
 import net.nox.NoxToolkit;
 import net.nox.NoxToolkit.ChatroomUnit;
+import db.nox.DBTableName;
 /**
  * 
  * @author shinysky
@@ -148,6 +148,9 @@ public class Cheyenne extends NoxFrame {
 		sfrm.setLocation(100, 60);
 		sfrm.setSize(new Dimension(500, 350));
 	}
+	public Connection getSQLConnection(){
+		return sqlconn;
+	}
 	/**
 	 * 将广告所代表的peer添加到好友列表中
 	 * @param adv 要添加的peer的广告 
@@ -162,7 +165,10 @@ public class Cheyenne extends NoxFrame {
 		//这样的赋值目前没有必要,
 		//不过在已经存在好友, 且头像有变化的时候有用;
 		try {
-			newFriend = (PeerItem) friendlist.addItem(newFriend, sqlconn, DBTableName.PEER_SQLTABLE_NAME, good);
+			if(good)
+				newFriend = (PeerItem) friendlist.addItem(newFriend);
+			else
+				newFriend = (PeerItem) blacklist.addItem(newFriend);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -256,6 +262,14 @@ public class Cheyenne extends NoxFrame {
             //mi.setShortcut(new MenuShortcut(KeyEvent.VK_X, true));
             traymenu.add(new MenuItem("Exit")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
+                	try {
+                		Statement stmt = sqlconn.createStatement();
+                		stmt.execute("SHUTDOWN");
+						sqlconn.close();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
                 	new NoxToolkit().getNetwork().StopNetwork();
                     System.exit(0);
                 }
@@ -554,6 +568,7 @@ class ListsPane extends JTabbedPane {
 			}
 		});*/
 		flist.addMouseListener(new MouseListener(){
+			@SuppressWarnings("serial")
 			@Override
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() == 2){
@@ -564,32 +579,23 @@ class ListsPane extends JTabbedPane {
 					listItem = (PeerItem)flist.getSelectedValue();
 					ListsPane.this.showChatRoom(listItem);
 				}else if(me.getButton() == MouseEvent.BUTTON3){
-					final JPopupMenu fiendOprMenu = new JPopupMenu();
+					final JPopupMenu friendOprMenu = new JPopupMenu();
 					listItem = (PeerItem)flist.getSelectedValue();
 					if(listItem == null)
 						return;
 					//System.out.println("You just Right Click the List Item!");
-					fiendOprMenu.add(new AbstractAction("Talk to him/her") {
-						/**
-						 * 
-						 */
-						private static final long serialVersionUID = -729947600305959488L;
-
+					friendOprMenu.add(new AbstractAction("Talk to him/her") {
 						public void actionPerformed(ActionEvent e) {
 							ListsPane.this.showChatRoom(listItem);
 						}
 					});
-					fiendOprMenu.add(new AbstractAction("His/Her information") {
-						/**
-						 * 
-						 */
-						private static final long serialVersionUID = -729947600305959488L;
-
+					friendOprMenu.add(new AbstractAction("His/Her information") {
 						public void actionPerformed(ActionEvent e) {
 							JOptionPane.showMessageDialog((Component) null, 
 									"<html>"//<BODY bgColor=#ffffff>"
 									+ "<img width=64 height=64 src=\"file:/"
 									+ System.getProperty("user.dir")
+									+ System.getProperty("file.separator")
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+ "chat.png\"><br>"
 									+"<Font color=black>昵称:</Font> <Font color=blue>"
@@ -607,13 +613,28 @@ class ListsPane extends JTabbedPane {
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
 						}
 					});
-					MenuElement els[] = fiendOprMenu.getSubElements();
+					friendOprMenu.add(new AbstractAction("Add to the blacklist") {
+						public void actionPerformed(ActionEvent e) {
+							//TODO add to the blacklist
+							int index = flist.getSelectedIndex();
+							PeerItem temppeer = (PeerItem)flist.deleteItem(parent.getSQLConnection(), DBTableName.PEER_SQLTABLE_NAME, true, index);
+							try {
+								blist.addItem(temppeer);
+							} catch (SQLException e1) {
+								e1.printStackTrace();
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+							ListsPane.this.repaint();
+						}
+					});
+					MenuElement els[] = friendOprMenu.getSubElements();
 					for(int i = 0; i < els.length; i++)
 						els[i].getComponent().setBackground(Color.WHITE);
-					fiendOprMenu.setLightWeightPopupEnabled(true);
-					fiendOprMenu.pack();
+					friendOprMenu.setLightWeightPopupEnabled(true);
+					friendOprMenu.pack();
 					// 位置应该是相对于源的位置
-					fiendOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
+					friendOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
 				}
 			}
 			@Override
@@ -629,6 +650,100 @@ class ListsPane extends JTabbedPane {
 			public void mouseReleased(MouseEvent arg0) {
 			}
 		});
+		
+		blist.addMouseListener(new MouseListener(){
+			@SuppressWarnings("serial")
+			@Override
+			public void mouseClicked(MouseEvent me) {
+				if(me.getClickCount() == 2){
+					listItem = (PeerItem)blist.getSelectedValue();
+					JOptionPane.showMessageDialog((Component) null, 
+							"<html>"//<BODY bgColor=#ffffff>"
+							+ "<img width=64 height=64 src=\"file:/"
+							+ System.getProperty("user.dir")
+							+ System.getProperty("file.separator")
+							+ SystemPath.PORTRAIT_RESOURCE_PATH
+							+ "chat.png\"><br>"
+							+"<Font color=black>昵称:</Font> <Font color=blue>"
+							+ listItem.getNick()
+							+"<br></Font>"
+							+"<Font color=black>签名档:</Font> <Font color=blue>"
+							+ listItem.getSign()
+							+"<br></Font>"
+							+"<Font color=black>联系方式:</Font> <Font color=blue>"
+							+ "110, 119, 120, 114, 117"
+							+"<br></Font>"
+							+"<Font color=black>个人说明:</Font> <Font color=blue>"
+							+ listItem.getNick() + " owns me so much MONEY!! "
+							+"<br></Font></BODY></html>",
+							"User Information", JOptionPane.INFORMATION_MESSAGE);
+				}else if(me.getButton() == MouseEvent.BUTTON3){
+					final JPopupMenu blacklistOprMenu = new JPopupMenu();
+					listItem = (PeerItem)blist.getSelectedValue();
+					if(listItem == null)
+						return;
+					blacklistOprMenu.add(new AbstractAction("His/Her information") {
+						public void actionPerformed(ActionEvent e) {
+							JOptionPane.showMessageDialog((Component) null, 
+									"<html>"//<BODY bgColor=#ffffff>"
+									+ "<img width=64 height=64 src=\"file:/"
+									+ System.getProperty("user.dir")
+									+ System.getProperty("file.separator")
+									+ SystemPath.PORTRAIT_RESOURCE_PATH
+									+ "chat.png\"><br>"
+									+"<Font color=black>昵称:</Font> <Font color=blue>"
+									+ listItem.getNick()
+									+"<br></Font>"
+									+"<Font color=black>签名档:</Font> <Font color=blue>"
+									+ listItem.getSign()
+									+"<br></Font>"
+									+"<Font color=black>联系方式:</Font> <Font color=blue>"
+									+ "110, 119, 120, 114, 117"
+									+"<br></Font>"
+									+"<Font color=black>个人说明:</Font> <Font color=blue>"
+									+ listItem.getNick() + " owns me so much MONEY!! "
+									+"<br></Font></BODY></html>",
+									"User Information", JOptionPane.INFORMATION_MESSAGE);
+						}
+					});
+					blacklistOprMenu.add(new AbstractAction("Add to the friendlist") {
+						public void actionPerformed(ActionEvent e) {
+							//TODO add to the blacklist
+							int index = blist.getSelectedIndex();
+							PeerItem temppeer = (PeerItem)blist.deleteItem(parent.getSQLConnection(), DBTableName.PEER_SQLTABLE_NAME, false, index);
+							try {
+								flist.addItem(temppeer);
+							} catch (SQLException e1) {
+								e1.printStackTrace();
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+							ListsPane.this.repaint();
+						}
+					});
+					MenuElement els[] = blacklistOprMenu.getSubElements();
+					for(int i = 0; i < els.length; i++)
+						els[i].getComponent().setBackground(Color.WHITE);
+					blacklistOprMenu.setLightWeightPopupEnabled(true);
+					blacklistOprMenu.pack();
+					// 位置应该是相对于源的位置
+					blacklistOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
+				}
+			}
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+			}
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+			}
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+			}
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+			}
+		});
+		
 		grplistpane.setLayout(new BorderLayout());
 		grplistpane.add(grpListScrPane, BorderLayout.CENTER);
 		grplistpane.add(glist.getFilterField(), BorderLayout.NORTH);

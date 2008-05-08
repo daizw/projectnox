@@ -14,7 +14,7 @@ public class DBWriter {
 	}
 
 	public void doWrite(ObjectList list, String tablename) {
-		int length = list.getModel().getSize();
+		int length = list.getModel().getSize();//getRealSize
 		NoxJListItem item;
 		try {
 			for (int i = 0; i < length; i++) {
