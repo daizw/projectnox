@@ -108,7 +108,7 @@ class MultiChatRoomSidePane extends JSplitPane{
 		groupInfoPane.add(groupInfo);
 		
 		l_groupMembers = new JLabel("Group Members:");
-		groupmemerlist = new ObjectList(members);
+		groupmemerlist = new ObjectList(null, null, true);
 		groupMemverListScrPane = new JScrollPane(groupmemerlist,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

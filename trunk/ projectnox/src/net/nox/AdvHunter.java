@@ -55,16 +55,10 @@
  */
 package net.nox;
 
-import java.util.Date;
-import java.util.Enumeration;
-
-import net.jxta.discovery.DiscoveryEvent;
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
-import net.jxta.document.Advertisement;
 import net.jxta.peergroup.PeerGroup;
 import net.jxta.platform.NetworkManager;
-import net.jxta.protocol.DiscoveryResponseMsg;
 
 /**
  * Illustrates the use of the Discovery Service
@@ -121,41 +115,6 @@ public class AdvHunter {
 					listener);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * This method is called whenever a discovery response is received, which
-	 * are either in response to a query we sent, or a remote publish by another
-	 * node
-	 * 
-	 * @param ev
-	 *            the discovery event
-	 */
-	public void discoveryEvent(DiscoveryEvent ev) {
-
-		DiscoveryResponseMsg res = ev.getResponse();
-
-		// let's get the responding peer's advertisement
-		System.out.println(" [  Got a Discovery Response ["
-				+ res.getResponseCount() + " elements]  from peer : "
-				+ ev.getSource() + "  ]");
-
-		curTime = new Date().getTime();
-		System.out.println(curTime);
-
-		Advertisement adv;
-		Enumeration<Advertisement> en = res.getAdvertisements();
-
-		if (en != null) {
-			while (en.hasMoreElements()) {
-				adv = (Advertisement) en.nextElement();
-				System.out.println(adv);
-				dehandler
-						.eventOccured(adv, ev.getSource(), curTime - startTime);
-				// new NoxToolkit().getHuntingEventHandler().eventOccured(adv,
-				// ev.getSource(), curTime - startTime);
-			}
 		}
 	}
 }

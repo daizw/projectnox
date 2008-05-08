@@ -12,9 +12,9 @@ import net.jxta.id.ID;
 import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
 import net.jxta.util.JxtaBiDiPipe;
+import noxUI.AdvTable;
 import noxUI.Cheyenne;
 import noxUI.NoxJListItem;
-import noxUI.SearchingFrame.AdvTable;
 import noxUI.Chatroom;
 /**
  * NoX 工具包
@@ -22,7 +22,8 @@ import noxUI.Chatroom;
  */
 public class NoxToolkit {
 	/**
-	 * 搜索事件处理器
+	 * 搜索事件处理器,
+	 * 目前无用
 	 * @author shinysky
 	 *
 	 */
@@ -36,7 +37,7 @@ public class NoxToolkit {
 		}
 		public void eventOccured(AdvTable searchResultTable, Advertisement adv, Object src, long delay) {
 			try{
-				table.addRow(adv, src, delay);
+				searchResultTable.addRow(adv, src, delay);
 			}catch(Exception ex){
 				ex.printStackTrace();
 			}

@@ -387,7 +387,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		b_snapshot.setMaximumSize(buttonSize);
 		b_snapshot.setMinimumSize(buttonSize);
 		
-		b_snapconfig = new JButton("v");
+		b_snapconfig = new JButton("¡ý");
 		b_snapconfig.setMargin(new Insets(0,0,0,0));
 		b_snapconfig.setToolTipText(getHtmlText("Snap Config"));
 		b_snapconfig.setActionCommand("SnapshotConfig");

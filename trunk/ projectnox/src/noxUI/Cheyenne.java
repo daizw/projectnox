@@ -20,8 +20,11 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -40,6 +43,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
+
+import db.nox.DBTableName;
 
 import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroupID;
@@ -75,6 +80,7 @@ public class Cheyenne extends NoxFrame {
 	private MiniProfilePane profile;
 	private ListsPane tabs;
 	
+	Connection sqlconn;
 	/**
 	 * 好友列表/组列表/黑名单
 	 */
@@ -95,7 +101,7 @@ public class Cheyenne extends NoxFrame {
 	 * @param glist
 	 * @param blist
 	 */
-	Cheyenne(ObjectList flist, ObjectList glist, ObjectList blist) {
+	Cheyenne(ObjectList flist, ObjectList glist, ObjectList blist, Connection conn) {
 		super("NoX: a IM system", SystemPath.IMAGES_RESOURCE_PATH + "bkgrd.png", 
 				SystemPath.LOGO_RESOURCE_PATH + "NoXlogo_20.png",
 				SystemPath.LOGO_RESOURCE_PATH + "NoXlogo_48.png",
@@ -105,6 +111,7 @@ public class Cheyenne extends NoxFrame {
 		friendlist = flist;
 		grouplist = glist;
 		blacklist = blist;
+		sqlconn = conn;
 		/*try{
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         }catch(Exception exe){
@@ -146,7 +153,7 @@ public class Cheyenne extends NoxFrame {
 	 * @param adv 要添加的peer的广告 
 	 * @return 好友的列表元素
 	 */
-	public PeerItem add2Friendlist(PeerAdvertisement adv){
+	public PeerItem add2PeerList(PeerAdvertisement adv, boolean good){
 		//TODO 将广告所代表的peer添加到好友列表中
 		
 		PeerItem newFriend = new PeerItem(new ImageIcon(
@@ -154,7 +161,15 @@ public class Cheyenne extends NoxFrame {
 		
 		//这样的赋值目前没有必要,
 		//不过在已经存在好友, 且头像有变化的时候有用;
-		newFriend = (PeerItem) friendlist.addItem(newFriend);
+		try {
+			newFriend = (PeerItem) friendlist.addItem(newFriend, sqlconn, DBTableName.PEER_SQLTABLE_NAME, good);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		tabs.repaint();
 		return newFriend;
 	}
@@ -181,7 +196,7 @@ public class Cheyenne extends NoxFrame {
 	public Chatroom setupNewChatroomOver(JxtaBiDiPipe pipe){
 		//添加到好友列表
 		//如果已经添加, 则在做无用功.
-		PeerItem friend = add2Friendlist(pipe.getRemotePeerAdvertisement());
+		PeerItem friend = add2PeerList(pipe.getRemotePeerAdvertisement(), true);
 		//打开聊天室
 		Chatroom chatroom = new Chatroom(friend, pipe);
 		//注册之

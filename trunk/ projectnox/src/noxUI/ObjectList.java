@@ -8,6 +8,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import javax.swing.AbstractListModel;
@@ -21,7 +31,7 @@ import javax.swing.ListModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import net.jxta.id.ID;
+import db.nox.DBTableName;
 
 public class ObjectList extends JList {
 	/**
@@ -46,11 +56,10 @@ public class ObjectList extends JList {
 	 * @param objs
 	 *            列表元素(FriendItem类型)数组
 	 */
-	ObjectList(Object[] objs) {
+	ObjectList(Connection sqlconn, String tablename, boolean good) {
 		// super(objs);
-
-		if (objs == null)
-			return;
+		fmod = new FilterModel();
+		this.setModel(fmod);
 		portrait = new JLabel();
 		nick = new JLabel();
 		sign = new JLabel();
@@ -61,12 +70,34 @@ public class ObjectList extends JList {
 		filterField.setMaximumSize(new Dimension(10000, 20));
 		filterField.setMinimumSize(new Dimension(20, 20));
 
-		fmod = new FilterModel();
-		this.setModel(fmod);
-		for (int i = 0; i < objs.length; i++) {
-			// System.out.println(objs[i].getClass().toString());
-			addItem((NoxJListItem) objs[i]);
+		try {
+			Statement stmt = sqlconn.createStatement();
+			ResultSet rs = stmt.executeQuery("select * from " +
+					tablename + " where Good = " + good);
+			
+			while(rs.next()){
+				ObjectInputStream objInput = new ObjectInputStream(rs.getBinaryStream("Object"));
+				System.out.println("Found object. Contents: ");
+				
+				NoxJListItem tmpItem = (NoxJListItem)objInput.readObject();
+				addItem(tmpItem, sqlconn, tablename, good);
+				
+				System.out.println("Nick:	" + tmpItem.getNick());
+				System.out.println("Desc:	" + tmpItem.getSign());
+				System.out.println("ID:	" + tmpItem.getUUID());
+				System.out.println("Portrait:	" + tmpItem.getPortrait());
+				System.out.println("TimeStamp:	" + tmpItem.getTimeStamp());
+				System.out.println();
+			}
+			stmt.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
+		
 		this.addMouseListener(new MouseListener() {
 
 			@Override
@@ -108,17 +139,60 @@ public class ObjectList extends JList {
 		super.setModel(m);
 	}
 
-	public Object addItem(Object o) {
+	public Object addItem(Object o, Connection sqlconn, String tablename, boolean good) throws SQLException, IOException {
 		//TODO 加之前应该先判断是否已有!!
-		int size =  ((FilterModel) getModel()).getSize();
+		Statement stmt = sqlconn.createStatement();
+		ResultSet rs = null;
+		
+		int size =  ((FilterModel) (ObjectList.this.getModel())).getSize();
 		for(int index = 0; index <  size; index++){
 			//如果已经有了, 则返回.
-			ID newID = ((NoxJListItem)o).getUUID();
-			ID curID = ((NoxJListItem)(((FilterModel) getModel()).getElementAt(index))).getUUID();
-			if(newID.equals(curID))
-					return o;
+			NoxJListItem newItem = (NoxJListItem)o;
+			NoxJListItem curItem = (NoxJListItem)(((FilterModel) getModel()).getElementAt(index));
+			if(newItem.getUUID().equals(curItem.getUUID())){
+				//找到数据库中的相同item
+				rs = stmt.executeQuery("select * from " +
+						tablename + " where ID = " + newItem.getUUID());
+				//如果当前的更新, 则更新
+				if(newItem.getTimeStamp() > curItem.getTimeStamp()){
+					curItem = newItem;
+					//删除数据库中该ID
+					stmt.execute("delete from "+
+						tablename + " where ID = " + curItem.getUUID());
+					//添加到数据库
+					PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
+							tablename + " values (?, ?, ?)");
+					pstmt.setString(1, newItem.getUUID().toString());
+					pstmt.setString(2, good + "");
+					
+					ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
+					ObjectOutputStream out = new ObjectOutputStream(byteArrayStream);
+					out.writeObject((Object) newItem);
+					ByteArrayInputStream input = new ByteArrayInputStream(byteArrayStream.toByteArray());
+					pstmt.setBinaryStream(3, input, byteArrayStream.size());
+					int recCount = pstmt.executeUpdate();
+					pstmt.close();
+				}
+				stmt.close();
+				return (Object)curItem;
+			}
 		}
 		((FilterModel) getModel()).addElement((NoxJListItem) o);
+		//添加到数据库
+		PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
+				tablename + " values (?, ?, ?)");
+		pstmt.setString(1, ((NoxJListItem) o).getUUID().toString());
+		pstmt.setString(2, good + "");
+		
+		ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
+		ObjectOutputStream out = new ObjectOutputStream(byteArrayStream);
+		out.writeObject((Object) o);
+		ByteArrayInputStream input = new ByteArrayInputStream(byteArrayStream.toByteArray());
+		pstmt.setBinaryStream(3, input, byteArrayStream.size());
+		int recCount = pstmt.executeUpdate();
+		pstmt.close();
+		stmt.close();
+		
 		return o;
 	}
 
