@@ -290,11 +290,11 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 							+ roomID);
 			// 如果发现对应的pipe会修改newOutBidipipeAdv
 			group.getDiscoveryService().getRemoteAdvertisements(
-					roomID.toString(), DiscoveryService.ADV, "Name",
-					roomID.toString(), 10, pipeListener);
+					roomID.toString(), DiscoveryService.ADV, PipeAdvertisement.NameTag,
+					roomID.toString(), 65535, pipeListener);
 			long unittime = 500;
 			long timecount = waittime / unittime;
-			//查找管道广告时间, 固定: 2s
+			//查找管道广告时间, 固定: 2s : 应根据网络状况调整
 			//TODO 自己的管道保存在数据库里, 当需要时才重建管道.
 			int fetchRemotePipeAdvTimeCount = 4;
 			// 如果没找到gotPipeAdv或者超时或者在此时间内仍然没有外来连接
@@ -717,14 +717,14 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 				try {
 					if(newOutPipeAdv == null){
 						newOutPipeAdv = pipeAdv;
-						System.out.println("Got the first pipe adv");
+						System.out.println("Got the first pipe adv: " + pipeAdv.getPipeID());
 					}else{
 						if(Long.parseLong(newOutPipeAdv.getDescription()) 
 								< Long.parseLong(pipeAdv.getDescription())){
 							newOutPipeAdv = pipeAdv;
-							System.out.println("Got a newer pipe adv");
+							System.out.println("Got a newer pipe adv: " + pipeAdv.getPipeID());
 						}else{
-							System.out.println("Got a older pipe adv");
+							System.out.println("Got a older pipe adv: " + pipeAdv.getPipeID());
 						}
 					}
 					// do something with pipe advertisement

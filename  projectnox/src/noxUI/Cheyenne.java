@@ -635,6 +635,14 @@ class ListsPane extends JTabbedPane {
 							ListsPane.this.repaint();
 						}
 					});
+					friendOprMenu.add(new AbstractAction("Delete") {
+						public void actionPerformed(ActionEvent e) {
+							//TODO add to the blacklist
+							int index = flist.getSelectedIndex();
+							flist.deleteItem(parent.getSQLConnection(), DBTableName.PEER_SQLTABLE_NAME, true, index);
+							ListsPane.this.repaint();
+						}
+					});
 					MenuElement els[] = friendOprMenu.getSubElements();
 					for(int i = 0; i < els.length; i++)
 						els[i].getComponent().setBackground(Color.WHITE);
@@ -725,6 +733,14 @@ class ListsPane extends JTabbedPane {
 							} catch (IOException e1) {
 								e1.printStackTrace();
 							}
+							ListsPane.this.repaint();
+						}
+					});
+					blacklistOprMenu.add(new AbstractAction("Delete") {
+						public void actionPerformed(ActionEvent e) {
+							//TODO add to the blacklist
+							int index = blist.getSelectedIndex();
+							blist.deleteItem(parent.getSQLConnection(), DBTableName.PEER_SQLTABLE_NAME, false, index);
 							ListsPane.this.repaint();
 						}
 					});

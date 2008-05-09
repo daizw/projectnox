@@ -9,11 +9,8 @@ import javax.security.cert.CertificateException;
 import javax.swing.JOptionPane;
 
 import net.jxta.discovery.DiscoveryListener;
-import net.jxta.document.AdvertisementFactory;
 import net.jxta.exception.PeerGroupException;
-import net.jxta.id.IDFactory;
 import net.jxta.peergroup.PeerGroup;
-import net.jxta.pipe.PipeID;
 import net.jxta.pipe.PipeService;
 import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
@@ -34,8 +31,19 @@ import net.nox.NoxToolkit.HuntingEventHandler;
  * <li>Sends {@code greeting} messages to the connection.</li>
  * <li>Waits responses.</li>
  * </ol>
- * </li>
  * </ol>
+ * 
+ * <li>Peer 广告格式:</li>
+ * <ol>
+ * <li>name: 用户自定义名称;</li>
+ * <li>description: 用户自定义签名( + " - " + 该Peer所使用的PipeID);</li> 
+ * </ol>
+ * <li>管道广告格式:</li>
+ * <ol>
+ * <li>name: 发布者(Peer)的PeerID;</li>
+ * <li>description: 发布时间(Long);</li>
+ * </ol>
+ * 
  * 
  * @author shinysky
  *
@@ -46,9 +54,11 @@ public class JXTANetwork {
 	public static final String Local_Network_Manager_Name = "Local NoX Network Manager";
 
 	String locpeername = "";
+	//TODO 这里设为public static, 则NoxToolkit中某些函数可以简化
 	static NetworkManager TheNetworkManager;
 	static NetworkConfigurator TheConfig;
 	static PeerGroup TheNetPeerGroup;
+	
 	AdvHunter disocveryClient;
 	NoxToolkit toolkit;
 	HuntingEventHandler hehandler;
@@ -112,11 +122,13 @@ public class JXTANetwork {
 		} else {
 			System.out.println("No local configuration found");
 			String principal = GetPrincipal();
+									
 			TheConfig.setPrincipal(principal);
 			TheConfig.setPassword(GetPassword());
 			TheConfig.setName(principal);
 			TheConfig.setDescription("A NoX Peer");
-
+			
+			
 			TheConfig.setTcpStartPort(9701);
 			TheConfig.setTcpEndPort(65530);
 
@@ -243,8 +255,26 @@ public class JXTANetwork {
 	}
 
 	private void addIncomingConnectionListener() {
-		PipeAdvertisement serverPipeAdv = getPipeAdvertisement();
+		//PipeAdvertisement serverPipeAdv = getPipeAdvertisement();
+		PipeAdvertisement serverPipeAdv = PipeUtil.getPipeAdvWithoutRemoteDiscovery(
+				TheNetworkManager.getNetPeerGroup(),
+				TheConfig.getPeerID().toString(),
+				PipeService.UnicastType,
+				//(BIDI_PIPEID == null)?null:BIDI_PIPEID.toString(),
+				true);
+		
+		//如果在上一句中创建了新广告, 则下面属于重新发布...
 		try {
+			//得到自己需要用到的pipeAdv后, 从本地缓存中清除所有DiscoveryService.ADV类型的Adv,
+			//然后再本地发布和远程发布正在使用的pipeAdv.
+			//这样可以清除自己/别人过期(不再使用)的pipeAdv.
+			//但是有可能造成网络整体性能的降低, 因为增加了远程发现的负担.
+			System.out.println("Flushing advs...");
+			/*//似乎第一个参数如果为null, 则没有效果. 怎么flush?
+			//只能手动?
+			TheNetworkManager.getNetPeerGroup().getDiscoveryService()
+				.flushAdvertisements(null, DiscoveryService.ADV);*/
+			PipeUtil.flushOldPipeAdvs(TheNetworkManager.getNetPeerGroup(), TheConfig.getPeerID().toString());
 			System.out.println("Publishing pipe adv...");
 			TheNetworkManager.getNetPeerGroup().getDiscoveryService().publish(serverPipeAdv);
 			TheNetworkManager.getNetPeerGroup().getDiscoveryService().remotePublish(serverPipeAdv);
@@ -281,7 +311,7 @@ public class JXTANetwork {
 	 * 
 	 * @return The pipeAdvertisement
 	 */
-	public static PipeAdvertisement getPipeAdvertisement() {
+	/*public static PipeAdvertisement getPipeAdvertisement() {
 		PipeAdvertisement advertisement = (PipeAdvertisement) AdvertisementFactory
 				.newAdvertisement(PipeAdvertisement.getAdvertisementType());
 
@@ -289,7 +319,7 @@ public class JXTANetwork {
 				NoxToolkit.getNetworkManager().getNetPeerGroup().getPeerGroupID());
 		System.out.println("BIDI_PIPEID built(using it): " + BIDI_PIPEID);
 		
-		/*PipeID BIDI_TUTORIAL_PIPEID = PipeID.create(URI.create("urn:jxta:uuid-59616261646162614E50472050325033251CBAB70EC44D04BB66F83CEB93747F04"));*/
+		PipeID BIDI_TUTORIAL_PIPEID = PipeID.create(URI.create("urn:jxta:uuid-59616261646162614E50472050325033251CBAB70EC44D04BB66F83CEB93747F04"));
 		
 		advertisement.setPipeID(BIDI_PIPEID);
 		advertisement.setType(PipeService.UnicastType);
@@ -299,5 +329,5 @@ public class JXTANetwork {
 		//System.out.println(advertisement);
 		
 		return advertisement;
-	}
+	}*/
 }
