@@ -196,7 +196,7 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 	 *             Thrown for errors sending messages.
 	 */
 	private void sendGreetingMessages(JxtaBiDiPipe bidipipe) throws IOException {
-		System.out.println("Sending greeting message");
+		System.out.println("Sending greeting message...");
 		// create the message
 		Message msg = new Message();
 		Date date = new Date(System.currentTimeMillis());
