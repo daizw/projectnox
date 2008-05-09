@@ -1,11 +1,23 @@
 package noxUI;
 
-import javax.swing.*;
-import javax.swing.border.MatteBorder;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JWindow;
+import javax.swing.Timer;
 
 public class SlideInNotification extends Object {
 

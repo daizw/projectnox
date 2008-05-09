@@ -44,7 +44,7 @@ public abstract class SearchPanel extends JPanel{
 	protected SearchPanel(int type, Cheyenne chy){
 		advType = type;
 		parent =chy;
-		this.MyLogin = new NoxToolkit().getNetwork();
+		this.MyLogin = NoxToolkit.getNetwork();
 
 		String[] columns = { "Name", "Description", "UUID", "Delay/ms", "Adv" };
 		Object[][] data = {};

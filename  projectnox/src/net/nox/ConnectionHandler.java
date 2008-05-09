@@ -10,7 +10,7 @@ import net.jxta.id.ID;
 import net.jxta.pipe.PipeMsgEvent;
 import net.jxta.pipe.PipeMsgListener;
 import net.jxta.util.JxtaBiDiPipe;
-import net.nox.NoxToolkit.ChatroomUnit;
+import net.nox.ChatroomUnit;
 import noxUI.Chatroom;
 import xml.nox.XmlMsgFormat;
 
@@ -75,12 +75,12 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 	 */
 	private void registerPipe(JxtaBiDiPipe pipe) {
 		ID roomID = pipe.getRemotePeerAdvertisement().getPeerID();
-		roomunit = new NoxToolkit().getChatroomUnit(roomID);
+		roomunit = NoxToolkit.getChatroomUnit(roomID);
 		if (roomunit == null)// 该ID对应的ChatroomUnit不存在
 		{
 			//注册该pipe
 			System.out.println("The chatroom doesn't exist yet, I will register the pipe.");
-			roomunit = new NoxToolkit().registerChatroomUnit(roomID, pipe);
+			roomunit = NoxToolkit.registerChatroomUnit(roomID, pipe);
 		}else{
 			//重设pipe
 			roomunit.setOutPipe(pipe);
@@ -178,7 +178,7 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 			//然后注册该chatroom.
 			
 			//建立新聊天室
-			Chatroom room = new NoxToolkit().getCheyenne().setupNewChatroomOver(outbidipipe);
+			Chatroom room = NoxToolkit.getCheyenne().setupNewChatroomOver(outbidipipe);
 			//注册聊天室
 			roomunit.setChatroom(room);
 			//new NoxToolkit().registerChatroom(room.getRoomID(), room);
@@ -202,12 +202,12 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 		Date date = new Date(System.currentTimeMillis());
 		// add a string message element with the current date
 		String hellomsg = "Greetings! [F:100]\nIn ConnectionHandler sendGreetingMessages() from "
-				+ new NoxToolkit().getNetworkConfigurator().getName();
+				+ NoxToolkit.getNetworkConfigurator().getName();
 
 		StringMessageElement senderEle = new StringMessageElement(
-				XmlMsgFormat.SENDER_ELEMENT_NAME, new NoxToolkit().getNetworkConfigurator().getName(), null);
+				XmlMsgFormat.SENDER_ELEMENT_NAME, NoxToolkit.getNetworkConfigurator().getName(), null);
 		StringMessageElement senderIDEle = new StringMessageElement(
-				XmlMsgFormat.SENDERID_ELEMENT_NAME, new NoxToolkit().getNetworkConfigurator().getPeerID().toString(), null);
+				XmlMsgFormat.SENDERID_ELEMENT_NAME, NoxToolkit.getNetworkConfigurator().getPeerID().toString(), null);
 		StringMessageElement receiverEle = new StringMessageElement(
 				XmlMsgFormat.RECEIVER_ELEMENT_NAME, bidipipe.getRemotePeerAdvertisement().getName(), null);
 		StringMessageElement receiverIDEle = new StringMessageElement(

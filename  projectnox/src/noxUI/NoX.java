@@ -22,7 +22,7 @@ public class NoX {
 		MyLogin.Start();
 
 		//Êý¾Ý¿âÃû
-		String username = new NoxToolkit().getNetworkConfigurator().getName();
+		String username = NoxToolkit.getNetworkConfigurator().getName();
 		try {
 			Class.forName("org.hsqldb.jdbcDriver").newInstance();
 			Connection conn = DriverManager.getConnection(

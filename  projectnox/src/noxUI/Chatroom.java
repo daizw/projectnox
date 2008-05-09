@@ -190,7 +190,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 					} else {
 						//注册之, 注意: 应注册ChatroomUnit而不是Chatroom!
 						//因为注册Chatroom只适用于已存在ID-pipe对的情况
-						new NoxToolkit().registerChatroomUnit(roomID, outbidipipe, Chatroom.this);
+						NoxToolkit.registerChatroomUnit(roomID, outbidipipe, Chatroom.this);
 						outbidipipe.setMessageListener(Chatroom.this);
 						rootpane.setVisible(true);
 						glassPane.setVisible(false);
@@ -212,7 +212,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 	}
 	public Chatroom(final GroupItem group, GroupItem[] gmembers) {
 		this(group.getNick());
-		MultiChatRoomSidePane groupmembers = new MultiChatRoomSidePane(
+		GroupChatRoomSidePane groupmembers = new GroupChatRoomSidePane(
 				"Hello, everyone, happy everyday!", gmembers);
 		rootpane.add(groupmembers);
 		rootpane.add(chatroompane);
@@ -275,7 +275,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 		}
 		System.out.println("+++++++++++Begin TryToConnect()+++++++++++");
 		// get the pipe service, and discovery
-		PeerGroup group = new NoxToolkit().getNetworkManager()
+		PeerGroup group = NoxToolkit.getNetworkManager()
 				.getNetPeerGroup();
 
 		try {
@@ -296,7 +296,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 			long timecount = waittime / unittime;
 			//查找管道广告时间, 固定: 2s
 			//TODO 自己的管道保存在数据库里, 当需要时才重建管道.
-			int fetchRemotePipeAdvTimeCount = 2;
+			int fetchRemotePipeAdvTimeCount = 4;
 			// 如果没找到gotPipeAdv或者超时或者在此时间内仍然没有外来连接
 			// (这里有个同步的问题, 在查找过程中, 如果对方主动连接, 而没有修改gotPipeAdv, 则这里会仍然导致超时)
 			while (fetchRemotePipeAdvTimeCount-- > 0 && getOutBidipipe() == null) {
@@ -373,13 +373,13 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 			msg = new Message();
 			Date date = new Date(System.currentTimeMillis());
 			String hellomsg = "Hello [F:100] from "
-					+ new NoxToolkit().getNetworkConfigurator().getName();
+					+ NoxToolkit.getNetworkConfigurator().getName();
 			// add a string message element with the current date
 			StringMessageElement senderEle = new StringMessageElement(
-					XmlMsgFormat.SENDER_ELEMENT_NAME, new NoxToolkit()
+					XmlMsgFormat.SENDER_ELEMENT_NAME, NoxToolkit
 							.getNetworkConfigurator().getName(), null);
 			StringMessageElement senderIDEle = new StringMessageElement(
-					XmlMsgFormat.SENDERID_ELEMENT_NAME, new NoxToolkit()
+					XmlMsgFormat.SENDERID_ELEMENT_NAME, NoxToolkit
 							.getNetworkConfigurator().getPeerID().toString(),
 					null);
 			StringMessageElement receiverEle = new StringMessageElement(
@@ -463,7 +463,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 		 */
 		System.out.println("Put the message to the Chatroom window...");
 		String whoami = "ME";
-		whoami = new NoxToolkit().getNetworkConfigurator().getName();
+		whoami = NoxToolkit.getNetworkConfigurator().getName();
 		String[] strArrayMsg = { "", roomname, whoami, msg.getMessageElement(
 				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
 				XmlMsgFormat.TIME_ELEMENT_NAME).toString(),
@@ -592,10 +592,10 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 			Date date = new Date(System.currentTimeMillis());
 			// add a string message element with the current date
 			StringMessageElement senderEle = new StringMessageElement(
-					XmlMsgFormat.SENDER_ELEMENT_NAME, new NoxToolkit()
+					XmlMsgFormat.SENDER_ELEMENT_NAME, NoxToolkit
 							.getNetworkConfigurator().getName(), null);
 			StringMessageElement senderIDEle = new StringMessageElement(
-					XmlMsgFormat.SENDERID_ELEMENT_NAME, new NoxToolkit()
+					XmlMsgFormat.SENDERID_ELEMENT_NAME, NoxToolkit
 							.getNetworkConfigurator().getPeerID().toString(),
 					null);
 			StringMessageElement receiverEle = new StringMessageElement(
