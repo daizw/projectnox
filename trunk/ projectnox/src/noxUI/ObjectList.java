@@ -242,6 +242,9 @@ public class ObjectList extends JList {
 			}
 		}
 		fmod.addElement((NoxJListItem) object);
+		//删除数据库中该ID
+		stmt.execute("delete from "+
+			tablename + " where ID = '" + ((NoxJListItem) object).getUUID().toString() + "'");
 		//添加到数据库
 		PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
 				tablename + " values (?, ?, ?)");

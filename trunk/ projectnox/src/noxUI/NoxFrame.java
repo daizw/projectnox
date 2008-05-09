@@ -460,7 +460,7 @@ class Titlebar extends JPanel {
 
 					public void actionPerformed(ActionEvent e) {
 						if(IAmBase){
-							new NoxToolkit().getNetwork().StopNetwork();
+							NoxToolkit.getNetwork().StopNetwork();
 							System.exit(0);
 						}
 						else

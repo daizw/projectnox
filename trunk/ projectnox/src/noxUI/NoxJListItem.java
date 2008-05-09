@@ -64,6 +64,7 @@ public abstract class NoxJListItem implements Serializable{
 	}
 }
 
+@SuppressWarnings("serial")
 class PeerItem extends NoxJListItem{
 	PeerItem(ImageIcon portr, PeerAdvertisement adv){
 		super(portr, adv.getName(), adv.getDescription(), adv.getPeerID());
@@ -85,6 +86,7 @@ class PeerItem extends NoxJListItem{
 	}
 }
 
+@SuppressWarnings("serial")
 class GroupItem extends NoxJListItem{
 	private int onlineCount;
 	private int memberCount;

@@ -51,7 +51,7 @@ import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
 import net.nox.NoxToolkit;
-import net.nox.NoxToolkit.ChatroomUnit;
+import net.nox.ChatroomUnit;
 import db.nox.DBTableName;
 /**
  * 
@@ -107,7 +107,7 @@ public class Cheyenne extends NoxFrame {
 				SystemPath.LOGO_RESOURCE_PATH + "NoXlogo_48.png",
 				SystemPath.LOGO_RESOURCE_PATH + "nox.png", true);
 
-		new NoxToolkit().setCheyenne(this);
+		NoxToolkit.setCheyenne(this);
 		friendlist = flist;
 		grouplist = glist;
 		blacklist = blist;
@@ -129,7 +129,7 @@ public class Cheyenne extends NoxFrame {
 		 * mini profile 组件 含: 头像, 昵称, 状态, 签名
 		 */
 		profile = new MiniProfilePane(this, SystemPath.PORTRAIT_RESOURCE_PATH + "portrait.png",
-				new NoxToolkit().getNetworkConfigurator().getName(), new NoxToolkit().getNetworkManager().getNetPeerGroup().getPeerAdvertisement().getDescription());
+				NoxToolkit.getNetworkConfigurator().getName(), NoxToolkit.getNetworkManager().getNetPeerGroup().getPeerAdvertisement().getDescription());
 		// profile.setBackground(new Color(0, 255, 0));
 		profile.setSize(new Dimension(WIDTH_DEFLT, 50));
 		profile.setPreferredSize(new Dimension(WIDTH_PREF, 50));
@@ -206,7 +206,7 @@ public class Cheyenne extends NoxFrame {
 		//打开聊天室
 		Chatroom chatroom = new Chatroom(friend, pipe);
 		//注册之
-		new NoxToolkit().registerChatroom(friend.getUUID(), chatroom);
+		NoxToolkit.registerChatroom(friend.getUUID(), chatroom);
 		//TODO comment this
 		chatroom.setVisible(true);
 		
@@ -270,11 +270,11 @@ public class Cheyenne extends NoxFrame {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-                	new NoxToolkit().getNetwork().StopNetwork();
+					NoxToolkit.getNetwork().StopNetwork();
                     System.exit(0);
                 }
             });
-            TrayIcon trayIcon=new TrayIcon(trayImg,"NoX",traymenu);
+            TrayIcon trayIcon=new TrayIcon(trayImg,NoxToolkit.getNetworkConfigurator().getName() + " - NoX",traymenu);
             tray.add(trayIcon);
             trayIcon.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
@@ -310,6 +310,13 @@ public class Cheyenne extends NoxFrame {
 	 */
 	public void ShowConfigCenter(){
 		ccf.setVisible(true);
+	}
+	/**
+	 * 显示创建组窗口
+	 */
+	public void ShowCreateNewGroupDialog(){
+		CreateNewGroupDialog cngD = new CreateNewGroupDialog(this);
+		cngD.setVisible(true);
 	}
 }
 
@@ -903,6 +910,26 @@ class ListsPane extends JTabbedPane {
 			}
 		});
 		//this.addTab(null, new ImageIcon(path_blist), blklistpane);
+		JPanel creatGroupPane = new JPanel();
+		creatGroupPane.setBackground(Color.WHITE);
+		this.addTab(null, new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "new_group_25.png"), creatGroupPane);
+		this.setToolTipTextAt(4, getHtmlText("Create New Group"));
+		creatGroupPane.addComponentListener(new ComponentListener(){
+			@Override
+			public void componentHidden(ComponentEvent arg0) {
+			}
+			@Override
+			public void componentMoved(ComponentEvent arg0) {
+			}
+			@Override
+			public void componentResized(ComponentEvent arg0) {
+			}
+			@Override
+			public void componentShown(ComponentEvent arg0) {
+				parent.ShowCreateNewGroupDialog();
+			}
+		});
+		
 		this.setOpaque(false);
 	}
 	/**
@@ -919,7 +946,7 @@ class ListsPane extends JTabbedPane {
 	 */
 	private void showChatRoom(NoxJListItem listItem) {
 		ID id = listItem.getUUID();
-		ChatroomUnit roomunit = new NoxToolkit().getChatroomUnit(id);
+		ChatroomUnit roomunit = NoxToolkit.getChatroomUnit(id);
 		Chatroom room;
 		
 		if(roomunit == null){

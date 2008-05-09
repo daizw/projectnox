@@ -386,7 +386,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		b_snapshot.setMaximumSize(buttonSize);
 		b_snapshot.setMinimumSize(buttonSize);
 		
-		b_snapconfig = new JButton("↓");
+		b_snapconfig = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "snapconfig.png"));
 		b_snapconfig.setMargin(new Insets(0,0,0,0));
 		b_snapconfig.setToolTipText(getHtmlText("Snap Config"));
 		b_snapconfig.setActionCommand("SnapshotConfig");
@@ -555,7 +555,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		}
 
 		String whoami = "ME";
-		whoami = new NoxToolkit().getNetworkConfigurator().getName();
+		whoami = NoxToolkit.getNetworkConfigurator().getName();
 
 		if (strs[2].equals(whoami))// 此处要获取当前用户的用户名
 		{

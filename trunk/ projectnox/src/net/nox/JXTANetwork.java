@@ -286,7 +286,7 @@ public class JXTANetwork {
 				.newAdvertisement(PipeAdvertisement.getAdvertisementType());
 
 		PipeID BIDI_PIPEID = (PipeID)IDFactory.newPipeID(
-				new NoxToolkit().getNetworkManager().getNetPeerGroup().getPeerGroupID());
+				NoxToolkit.getNetworkManager().getNetPeerGroup().getPeerGroupID());
 		System.out.println("BIDI_PIPEID built(using it): " + BIDI_PIPEID);
 		
 		/*PipeID BIDI_TUTORIAL_PIPEID = PipeID.create(URI.create("urn:jxta:uuid-59616261646162614E50472050325033251CBAB70EC44D04BB66F83CEB93747F04"));*/

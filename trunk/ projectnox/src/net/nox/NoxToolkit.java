@@ -9,6 +9,7 @@ import java.util.Set;
 
 import net.jxta.document.Advertisement;
 import net.jxta.id.ID;
+import net.jxta.peergroup.PeerGroup;
 import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
 import net.jxta.util.JxtaBiDiPipe;
@@ -76,49 +77,7 @@ public class NoxToolkit {
 			}
 		}
 	}
-	/**
-	 * Chatroom单元结构,
-	 * 用于保存roomID, outpipe, 和chatroom的对应关系.
-	 * 
-	 * @author shinysky
-	 *
-	 */
-	public class ChatroomUnit{
-		private ID roomID = null;
-		private JxtaBiDiPipe outbidipipe = null;
-		private Chatroom room = null;
-		
-		public ChatroomUnit(ID id, JxtaBiDiPipe pipe){
-			this(id, pipe, null);
-		}
-		public ChatroomUnit(ID id, JxtaBiDiPipe pipe, Chatroom rm){
-			roomID = id;
-			outbidipipe = pipe;
-			room = rm;
-		}
-		public ID getRoomID(){
-			return roomID;
-		}
-		public JxtaBiDiPipe getOutPipe(){
-			return outbidipipe;
-		}
-		/**
-		 * 设置ChatroomUnit的outbidipipe, 并同步更新Chatroom(如果存在)的outbidipipe
-		 * @param pipe
-		 */
-		public void setOutPipe(JxtaBiDiPipe pipe){
-			outbidipipe = pipe;
-			//同步room的outpipe
-			if(room != null)
-				room.setOutBidipipe(pipe);
-		}
-		public Chatroom getChatroom(){
-			return room;
-		}
-		public void setChatroom(Chatroom rm){
-			room = rm;
-		}
-	}
+	
 	private static JXTANetwork network;
 	private static NetworkManager manager;
 	private static NetworkConfigurator configer;
@@ -129,8 +88,7 @@ public class NoxToolkit {
 	private static Set<ChatroomUnit> chatrooms;
 	private static float Opacity = 100;
 	
-	public NoxToolkit(){
-	}
+	public NoxToolkit(){ }
 	
 	public NoxToolkit(JXTANetwork nw, NetworkManager mng, NetworkConfigurator conf, /*AdvHunter ah,*/ HuntingEventHandler heh, CheckStatusEventHandler csh){
 		network = nw;
@@ -143,35 +101,35 @@ public class NoxToolkit {
 		chatrooms.clear();
 	}
 	
-	public JXTANetwork getNetwork(){
+	public static JXTANetwork getNetwork(){
 		return network;
 	}
-	public NetworkManager getNetworkManager(){
+	public static NetworkManager getNetworkManager(){
 		return manager;
 	}
-	public NetworkConfigurator getNetworkConfigurator(){
+	public static NetworkConfigurator getNetworkConfigurator(){
 		return configer;
 	}
 	/*public AdvHunter getAdvHunter(){
 		return advhunter;
 	}*/
-	public HuntingEventHandler getHuntingEventHandler(){
+	public static HuntingEventHandler getHuntingEventHandler(){
 		return hehandler;
 	}
-	public CheckStatusEventHandler getCheckStatusEventHandler(){
+	public static CheckStatusEventHandler getCheckStatusEventHandler(){
 		return cshandler;
 	}
 	
-	public void setCheyenne(Cheyenne chy){
+	public static void setCheyenne(Cheyenne chy){
 		cheyenne = chy;
 	}
-	public Cheyenne getCheyenne(){
+	public static Cheyenne getCheyenne(){
 		return cheyenne;
 	}
-	public float getOpacity(){
+	public static float getOpacity(){
 		return Opacity;
 	}
-	public void setOpacity(float opa){
+	public static void setOpacity(float opa){
 		Opacity = opa;
 	}
 	/**
@@ -179,12 +137,12 @@ public class NoxToolkit {
 	 * @param id
 	 * @param pipe
 	 */
-	public ChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe){
+	public static ChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe){
 		ChatroomUnit newRoomUnit = new ChatroomUnit(id, pipe);
 		chatrooms.add(newRoomUnit);
 		return newRoomUnit;
 	}
-	public ChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe, Chatroom room){
+	public static ChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe, Chatroom room){
 		ChatroomUnit newRoomUnit = new ChatroomUnit(id, pipe, room);
 		chatrooms.add(newRoomUnit);
 		return newRoomUnit;
@@ -194,7 +152,7 @@ public class NoxToolkit {
 	 * @param id
 	 * @param room
 	 */
-	public void registerChatroom(ID id, Chatroom room){
+	public static void registerChatroom(ID id, Chatroom room){
 		Iterator<ChatroomUnit> it = chatrooms.iterator();
 		ChatroomUnit roomunit;
 
@@ -208,7 +166,7 @@ public class NoxToolkit {
 				System.exit(-1);
 			}
 			if(roomunit.getChatroom() != null){
-				System.out.println("Error: That's bad, the room already exist! It's unusual!");
+				System.out.println("Error: That's bad, the room already exists! It's unusual!");
 			}
 			if(id.equals(roomunit.getRoomID())){
 				System.out.println("I find the ID, now I will set the chatroom");
@@ -218,7 +176,7 @@ public class NoxToolkit {
 		}
 		System.out.println("If you see this message, it's bad. Please check the NoxToolkit.registerChatroom()");
 	}
-	public ChatroomUnit getChatroomUnit(ID id){
+	public static ChatroomUnit getChatroomUnit(ID id){
 		Iterator<ChatroomUnit> it = chatrooms.iterator();
 		ChatroomUnit roomunit;
 
@@ -238,6 +196,14 @@ public class NoxToolkit {
 				System.out.println("Unfortunately, this room is not what we're look for.");
 		}
 		System.out.println("Unfortunately, the room doesn't exist yet, I find nothing here.");
+		return null;
+	}
+	
+	public static PeerGroup createNewPeerGroup(String name, String desc, String pwd){
+		return null;
+	}
+
+	public static PeerGroup createNewPeerGroup(String name, String desc) {
 		return null;
 	}
 }

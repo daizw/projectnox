@@ -133,6 +133,7 @@ public class TestHSQLDB {
 	}
 }
 
+@SuppressWarnings("serial")
 class TestItem implements Serializable{
 	private ImageIcon portrait;
 	private String nickname;

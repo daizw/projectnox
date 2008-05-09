@@ -121,10 +121,10 @@ class PeerAdvTable extends AdvTable{
 		}
 		
 		if(((PeerAdvertisement) adv).getPeerID()
-				.equals(new NoxToolkit().getNetworkConfigurator().getPeerID()))
+				.equals(NoxToolkit.getNetworkConfigurator().getPeerID()))
 			return;
 		//System.out.println("Got:	" + ((PeerAdvertisement) adv).getPeerID());
-		//System.out.println("Me:	" + new NoxToolkit().getNetworkConfigurator().getPeerID());
+		//System.out.println("Me:	" + NoxToolkit.getNetworkConfigurator().getPeerID());
 		
 		int rows = model.getRowCount();
 		for (int i = 0; i < rows; i++) {
@@ -189,10 +189,10 @@ class GroupAdvTable extends AdvTable{
 		}
 		
 		if(((PeerGroupAdvertisement) adv).getPeerGroupID()
-				.equals(new NoxToolkit().getNetworkConfigurator().getPeerID()))
+				.equals(NoxToolkit.getNetworkConfigurator().getPeerID()))
 			return;
 		//System.out.println("Got:	" + ((PeerAdvertisement) adv).getPeerID());
-		//System.out.println("Me:	" + new NoxToolkit().getNetworkConfigurator().getPeerID());
+		//System.out.println("Me:	" + NoxToolkit.getNetworkConfigurator().getPeerID());
 		
 		int rows = model.getRowCount();
 		for (int i = 0; i < rows; i++) {
