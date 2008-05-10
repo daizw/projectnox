@@ -6,11 +6,29 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
+import net.jxta.exception.PeerGroupException;
+import net.jxta.logging.Logging;
 import net.jxta.peergroup.PeerGroup;
-import net.nox.*;
+import net.jxta.pipe.PipeService;
+import net.jxta.protocol.PeerGroupAdvertisement;
+import net.jxta.protocol.PipeAdvertisement;
+import net.nox.AuthenticationUtil;
+import net.nox.NoxToolkit;
+import net.nox.PeerGroupUtil;
+import net.nox.PipeUtil;
 
 @SuppressWarnings("serial")
 public class CreateNewGroupDialog extends JDialog{
@@ -47,6 +65,8 @@ public class CreateNewGroupDialog extends JDialog{
 
 @SuppressWarnings("serial")
 class CreateNewGroupPane extends JPanel{
+	private static final long MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000;
+	
 	JPanel namePane = new JPanel();
 	JLabel nameLabel = new JLabel("New Group Name: ");
 	JTextField nameTxtFd = new JTextField(20);
@@ -152,7 +172,69 @@ class CreateNewGroupPane extends JPanel{
 		System.out.println("Password:	" + new String(pwdPwdFd.getPassword()));
 		System.out.println("Verify Pwd:	" + new String(verifyPwdPwdFd.getPassword()));
 		
-		PeerGroup newpg = null;
+		String name = (nameTxtFd.getText() + "").trim();
+        int expiration = 3;
+        String description = (descTxtFd.getText() + "").trim();
+        String password = new String(pwdPwdFd.getPassword());
+        
+        password = password != null ? password.trim() : "";
+
+        if (name.length() == 0) {
+            name = null;
+        }
+
+        // only create groups which have a  non-empty name
+        if (name != null) {
+            PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
+            PeerGroupAdvertisement pga = null;
+            
+            // create the PeerGroupAdvertisement for the new group
+            try {
+                pga = PeerGroupUtil.create(ppg, name, description,
+                        password, expiration * MILLISECONDS_IN_A_DAY);
+            } catch (Exception e) {
+            	e.printStackTrace();
+            }
+
+            if (pga != null) {
+                PeerGroup pg = null;
+
+                // Create the group itself
+                try {
+                    pg = ppg.newGroup(pga);
+                } catch (PeerGroupException pge) {
+                	pge.printStackTrace();
+                }
+
+                // if the group was successfully created join it
+                if (pg != null) {
+                    //Group g = new Group(this.view.getControl(), pg, parent);
+
+//                    g.setAutoRendezVousPeriod(Constants.AUTO_RENDEZVOUS_CREATE_PERIOD);
+
+                    joinGroup(pg, true, true);
+                    
+                    System.out.println("成功创建组");
+        			JOptionPane.showMessageDialog((Component) null,
+        					"成功创建组, 您已自动加入该组. 可在组列表中查看.", "Succeed!",
+        					JOptionPane.INFORMATION_MESSAGE);
+        			return true;
+        			
+                } else {
+                    System.out.println("Error: failed to create new group");
+                    System.out.println("创建组失败");
+        			JOptionPane.showMessageDialog((Component) null,
+        					"创建组失败", "Phew~",
+        					JOptionPane.WARNING_MESSAGE);
+        			return false;
+                }
+            } else {
+            	System.out.println("Error: failed to create new group adv");
+            	return false;
+            }
+        }
+        ///////////////////////////////////////////////////////
+		/*PeerGroup newpg = null;
 		if(privateChkBox.isSelected()){
 			newpg = NoxToolkit.createNewPeerGroup(nameTxtFd.getText() + "",
 					descTxtFd.getText() + "",
@@ -160,20 +242,39 @@ class CreateNewGroupPane extends JPanel{
 		} else {
 			newpg = NoxToolkit.createNewPeerGroup(nameTxtFd.getText() + "",
 					descTxtFd.getText() + "");
-		}
-		
-		if(newpg == null){
-			System.out.println("成功创建组");
-			JOptionPane.showMessageDialog((Component) null,
-					"成功创建组, 您已自动加入该组. 可在组列表中查看.", "Succeed!",
-					JOptionPane.INFORMATION_MESSAGE);
-			return true;
-		} else {
-			System.out.println("创建组失败");
-			JOptionPane.showMessageDialog((Component) null,
-					"创建组失败", "Phew~",
-					JOptionPane.WARNING_MESSAGE);
-			return false;
-		}
+		}*/
+        return false;
 	}
+	
+	/**
+     * Part of group Lifecycle. Joins group. Starts group services and
+     * associated resources.
+     */
+    public void joinGroup(final PeerGroup peerGroup, boolean useAutoRdvMode,
+                          boolean discover) {
+
+        PipeAdvertisement pipeAdvertisment = PipeUtil.getPipeAdv(peerGroup,
+        		peerGroup.getPeerGroupID().toString(), PipeService.UnicastType, null, true);
+
+        // now lets add the different dialogs/pipe listeners
+ 
+        // add the one Group Panel to the navigation tree
+
+        PeerGroup cpg = AuthenticationUtil.getTLSPeerGroup(peerGroup);
+
+        if (!AuthenticationUtil.isAuthenticated(cpg)) {
+            System.out.println("authenticating");
+
+            AuthenticationUtil.authenticate(cpg);
+        }
+
+        if (!AuthenticationUtil.isAuthenticated(cpg)) {
+            System.out.println("not authenticated");
+        }
+
+        if (useAutoRdvMode) {
+        	peerGroup.getRendezVousService().setAutoStart(useAutoRdvMode,
+                    3*1000);
+        }
+    }
 }
