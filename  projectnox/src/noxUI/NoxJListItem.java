@@ -9,6 +9,7 @@ import net.jxta.document.Advertisement;
 import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroupID;
 import net.jxta.protocol.PeerAdvertisement;
+import net.jxta.protocol.PeerGroupAdvertisement;
 
 public abstract class NoxJListItem implements Serializable{
 	private ImageIcon portrait;
@@ -91,10 +92,8 @@ class GroupItem extends NoxJListItem{
 	private int onlineCount;
 	private int memberCount;
 	private Object[] members;
-	GroupItem(ImageIcon portr, String name, String signstr, PeerGroupID uuid, int oc, int mc){
-		super(portr, name, signstr, uuid);
-		onlineCount = oc;
-		memberCount = mc;
+	GroupItem(ImageIcon portr, PeerGroupAdvertisement adv){
+		super(portr, adv.getName(), adv.getDescription(), adv.getPeerGroupID());
 		members = null;
 	}
 	public int getOnlineCount(){
