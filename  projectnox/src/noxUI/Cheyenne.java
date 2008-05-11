@@ -274,6 +274,11 @@ public class Cheyenne extends NoxFrame {
                     System.exit(0);
                 }
             });
+            //TODO 整个好看点的菜单?
+            /*MenuElement els[] = traymenu.getSubElements();
+			for(int i = 0; i < els.length; i++)
+				els[i].getComponent().setBackground(Color.WHITE);*/
+			
             TrayIcon trayIcon=new TrayIcon(trayImg,NoxToolkit.getNetworkConfigurator().getName() + " - NoX",traymenu);
             tray.add(trayIcon);
             trayIcon.addActionListener(new ActionListener(){

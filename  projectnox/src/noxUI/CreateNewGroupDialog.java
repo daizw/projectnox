@@ -6,7 +6,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.logging.Level;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -20,15 +19,10 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import net.jxta.exception.PeerGroupException;
-import net.jxta.logging.Logging;
 import net.jxta.peergroup.PeerGroup;
-import net.jxta.pipe.PipeService;
 import net.jxta.protocol.PeerGroupAdvertisement;
-import net.jxta.protocol.PipeAdvertisement;
-import net.nox.AuthenticationUtil;
 import net.nox.NoxToolkit;
 import net.nox.PeerGroupUtil;
-import net.nox.PipeUtil;
 
 @SuppressWarnings("serial")
 public class CreateNewGroupDialog extends JDialog{
@@ -173,7 +167,8 @@ class CreateNewGroupPane extends JPanel{
 		System.out.println("Verify Pwd:	" + new String(verifyPwdPwdFd.getPassword()));
 		
 		String name = (nameTxtFd.getText() + "").trim();
-        int expiration = 3;
+        //expiration days
+		int expiration = 3;
         String description = (descTxtFd.getText() + "").trim();
         String password = new String(pwdPwdFd.getPassword());
         
@@ -190,7 +185,8 @@ class CreateNewGroupPane extends JPanel{
             
             // create the PeerGroupAdvertisement for the new group
             try {
-                pga = PeerGroupUtil.create(ppg, name, description,
+            	System.out.println("Creating PGA with: " + name + ":" + password);
+                pga = PeerGroupUtil.createPGA(ppg, name, description,
                         password, expiration * MILLISECONDS_IN_A_DAY);
             } catch (Exception e) {
             	e.printStackTrace();
@@ -208,18 +204,20 @@ class CreateNewGroupPane extends JPanel{
 
                 // if the group was successfully created join it
                 if (pg != null) {
-                    //Group g = new Group(this.view.getControl(), pg, parent);
-
-//                    g.setAutoRendezVousPeriod(Constants.AUTO_RENDEZVOUS_CREATE_PERIOD);
-
-                    joinGroup(pg, true, true);
-                    
-                    System.out.println("成功创建组");
-        			JOptionPane.showMessageDialog((Component) null,
+                	System.out.println("成功创建组");
+                	
+                	//boolean joined = joinGroup(pg, true, true);
+                	boolean joined = PeerGroupUtil.joinPeerGroup(pg, PeerGroupUtil.MEMBERSHIP_ID, password);
+                	
+                	if(joined)
+                		JOptionPane.showMessageDialog((Component) null,
         					"成功创建组, 您已自动加入该组. 可在组列表中查看.", "Succeed!",
         					JOptionPane.INFORMATION_MESSAGE);
+                	else
+                		JOptionPane.showMessageDialog((Component) null,
+            					"成功创建组, 但是未能成功加入该组, it's weird!", "Information",
+            					JOptionPane.INFORMATION_MESSAGE);
         			return true;
-        			
                 } else {
                     System.out.println("Error: failed to create new group");
                     System.out.println("创建组失败");
@@ -232,6 +230,8 @@ class CreateNewGroupPane extends JPanel{
             	System.out.println("Error: failed to create new group adv");
             	return false;
             }
+        } else {
+        	System.out.println("Error: name == null, it's not suggested, please enter the new group name.");
         }
         ///////////////////////////////////////////////////////
 		/*PeerGroup newpg = null;
@@ -249,13 +249,18 @@ class CreateNewGroupPane extends JPanel{
 	/**
      * Part of group Lifecycle. Joins group. Starts group services and
      * associated resources.
-     */
-    public void joinGroup(final PeerGroup peerGroup, boolean useAutoRdvMode,
+     *//*
+    public boolean joinGroup(final PeerGroup peerGroup, boolean useAutoRdvMode,
                           boolean discover) {
+    	System.out.println("Try to join this group....");
 
         PipeAdvertisement pipeAdvertisment = PipeUtil.getPipeAdv(peerGroup,
         		peerGroup.getPeerGroupID().toString(), PipeService.UnicastType, null, true);
-
+        
+        if (useAutoRdvMode) {
+        	peerGroup.getRendezVousService().setAutoStart(useAutoRdvMode,
+                    3*1000);
+        }
         // now lets add the different dialogs/pipe listeners
  
         // add the one Group Panel to the navigation tree
@@ -270,11 +275,8 @@ class CreateNewGroupPane extends JPanel{
 
         if (!AuthenticationUtil.isAuthenticated(cpg)) {
             System.out.println("not authenticated");
+            return false;
         }
-
-        if (useAutoRdvMode) {
-        	peerGroup.getRendezVousService().setAutoStart(useAutoRdvMode,
-                    3*1000);
-        }
-    }
+        return true;
+    }*/
 }
