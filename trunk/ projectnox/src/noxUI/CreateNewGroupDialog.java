@@ -170,7 +170,10 @@ class CreateNewGroupPane extends JPanel{
         //expiration days
 		int expiration = 3;
         String description = (descTxtFd.getText() + "").trim();
-        String password = new String(pwdPwdFd.getPassword());
+        String password = null;
+        if(privateChkBox.isSelected()){
+        	password = new String(pwdPwdFd.getPassword());
+        }
         
         password = password != null ? password.trim() : "";
 

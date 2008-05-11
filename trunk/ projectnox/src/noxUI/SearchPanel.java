@@ -248,7 +248,7 @@ class GroupSearchPanel extends SearchPanel{
 					searchResultTable.getSelectionModel()
 							.setLeadSelectionIndex(row);
 
-					ResultOprMenu.add(new AbstractAction("Join in this group") {
+					ResultOprMenu.add(new AbstractAction("Join this group") {
 						public void actionPerformed(ActionEvent e) {
 							// TODO 添加到好友列表
 							int[] selected = searchResultTable

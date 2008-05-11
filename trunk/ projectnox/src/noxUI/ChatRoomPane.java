@@ -503,8 +503,8 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		 * msgPane.setOpaque(false);
 		 */
 		// msgPane.setContinuousLayout(true);
-		this.setSize(new Dimension(Chatroom.WIDTH_DEFLT,
-				Chatroom.HEIGHT_DEFLT - 35));
+		this.setSize(new Dimension(SingleChatroom.WIDTH_DEFLT,
+				SingleChatroom.HEIGHT_DEFLT - 35));
 		this.setDividerLocation(0.65);// 必须先指定尺寸才有效
 		this.setResizeWeight(0.62d);
 		this.setDividerSize(3);

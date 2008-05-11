@@ -56,14 +56,29 @@
 
 package net.nox;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import net.jxta.credential.AuthenticationCredential;
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
-import net.jxta.document.*;
+import net.jxta.document.Advertisement;
+import net.jxta.document.AdvertisementFactory;
+import net.jxta.document.Element;
+import net.jxta.document.MimeMediaType;
+import net.jxta.document.StructuredDocument;
+import net.jxta.document.StructuredDocumentFactory;
+import net.jxta.document.StructuredTextDocument;
+import net.jxta.document.TextElement;
 import net.jxta.id.ID;
 import net.jxta.id.IDFactory;
 import net.jxta.impl.membership.passwd.PasswdMembershipService;
-import net.jxta.impl.membership.pse.StringAuthenticator;
 import net.jxta.membership.Authenticator;
 import net.jxta.membership.MembershipService;
 import net.jxta.peergroup.PeerGroup;
@@ -72,13 +87,6 @@ import net.jxta.platform.ModuleClassID;
 import net.jxta.platform.ModuleSpecID;
 import net.jxta.protocol.ModuleImplAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
-
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
 
 /**
  * @author james todd [gonzo at jxta dot org]
@@ -168,6 +176,8 @@ public class PeerGroupUtil {
 					.newStructuredDocument(MimeMediaType.XMLUTF8, "Param");
 			String loginString = MEMBERSHIP_ID + ":"
 					+ PasswdMembershipService.makePsswd(password) + ":";
+			System.out.println("loginString = " + loginString);
+			
 			TextElement loginElement = login
 					.createElement("login", loginString);
 

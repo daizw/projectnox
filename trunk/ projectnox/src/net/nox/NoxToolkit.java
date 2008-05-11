@@ -14,9 +14,10 @@ import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
 import net.jxta.util.JxtaBiDiPipe;
 import noxUI.AdvTable;
+import noxUI.Chatroom;
 import noxUI.Cheyenne;
 import noxUI.NoxJListItem;
-import noxUI.Chatroom;
+import noxUI.SingleChatroom;
 /**
  * NoX ¹¤¾ß°ü
  * @author shinysky
@@ -143,7 +144,7 @@ public class NoxToolkit {
 		return newRoomUnit;
 	}
 	public static ChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe, Chatroom room){
-		ChatroomUnit newRoomUnit = new ChatroomUnit(id, pipe, room);
+		ChatroomUnit newRoomUnit = new ChatroomUnit(id, pipe, (SingleChatroom) room);
 		chatrooms.add(newRoomUnit);
 		return newRoomUnit;
 	}
@@ -170,7 +171,7 @@ public class NoxToolkit {
 			}
 			if(id.equals(roomunit.getRoomID())){
 				System.out.println("I find the ID, now I will set the chatroom");
-				roomunit.setChatroom(room);
+				roomunit.setChatroom((SingleChatroom) room);
 				return;
 			}
 		}

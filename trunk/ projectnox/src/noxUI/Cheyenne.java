@@ -45,13 +45,16 @@ import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
 
+import net.jxta.exception.PeerGroupException;
 import net.jxta.id.ID;
-import net.jxta.peergroup.PeerGroupID;
+import net.jxta.peergroup.PeerGroup;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
-import net.nox.NoxToolkit;
+import net.nox.AuthenticationUtil;
 import net.nox.ChatroomUnit;
+import net.nox.NoxToolkit;
+import net.nox.PeerGroupUtil;
 import db.nox.DBTableName;
 /**
  * 
@@ -170,10 +173,8 @@ public class Cheyenne extends NoxFrame {
 			else
 				newFriend = (PeerItem) blacklist.addItem(newFriend);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		tabs.repaint();
@@ -186,9 +187,77 @@ public class Cheyenne extends NoxFrame {
 	 */
 	public boolean joinThisGroup(PeerGroupAdvertisement adv){
 		//TODO 加入到adv所代表的组中
-		grouplist.toString();
-		tabs.repaint();
-		return false;
+		PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
+		PeerGroup pg = null;
+		
+		//adv.get
+		// Create the group itself
+        try {
+            pg = ppg.newGroup(adv);
+        } catch (PeerGroupException pge) {
+        	pge.printStackTrace();
+        }
+     // if the group was successfully created join it
+        if (pg != null) {
+        	if(AuthenticationUtil.isAuthenticated(pg)){
+    			System.out.println("你已加入该组, 不需要重新加入. If you're surpried, it may because this group need no password.");
+    			JOptionPane.showMessageDialog((Component) null,
+    					"你已加入该组, 不需要重新加入. If you're surpried, it may because this group need no password.",
+    					"Succeed!",
+    					JOptionPane.INFORMATION_MESSAGE);
+    			//将该组加入列表中
+        		GroupItem newGroupItem = new GroupItem(new ImageIcon(
+        				SystemPath.PORTRAIT_RESOURCE_PATH + "group.png"), adv);
+        		try {
+        			newGroupItem = (GroupItem) grouplist.addItem(newGroupItem);
+        		} catch (SQLException e) {
+        			e.printStackTrace();
+        		} catch (IOException e) {
+        			e.printStackTrace();
+        		}
+        		tabs.repaint();
+        		
+        		return true;
+    		}
+        	
+        	System.out.println("尝试加入组");
+        	String password = "password";
+        	//pg.getMembershipService().        	
+        	boolean joined = PeerGroupUtil.joinPeerGroup(pg, PeerGroupUtil.MEMBERSHIP_ID, password);
+        	
+        	if(joined){
+        		JOptionPane.showMessageDialog((Component) null,
+					"您已成功加入该组. 可在组列表中查看.", "Succeed!",
+					JOptionPane.INFORMATION_MESSAGE);
+        		
+        		//将该组加入列表中
+        		GroupItem newGroupItem = new GroupItem(new ImageIcon(
+        				SystemPath.PORTRAIT_RESOURCE_PATH + "group.png"), adv);
+        		try {
+        			newGroupItem = (GroupItem) grouplist.addItem(newGroupItem);
+        		} catch (SQLException e) {
+        			e.printStackTrace();
+        		} catch (IOException e) {
+        			e.printStackTrace();
+        		}
+        		tabs.repaint();
+        		
+        		return true;
+        	}
+        	else{
+        		JOptionPane.showMessageDialog((Component) null,
+    					"未能成功加入该组, 密码错误?", "Failure!",
+    					JOptionPane.ERROR_MESSAGE);
+        		return false;
+        	}
+        } else {
+            System.out.println("Error: failed to create new group");
+            System.out.println("使用组广告创建组失败");
+			JOptionPane.showMessageDialog((Component) null,
+					"使用组广告创建组失败", "Phew~",
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+        }
 	}
 	/**
 	 * 在存在对应ID-Pipe对, 而不存在对应聊天室的情况下:
@@ -199,12 +268,12 @@ public class Cheyenne extends NoxFrame {
 	 * @param connhandler 用于管理连接的ConnectionHandler
 	 * @return 新建立的chatroom, 用于注册到NoxToolkit
 	 */
-	public Chatroom setupNewChatroomOver(JxtaBiDiPipe pipe){
+	public SingleChatroom setupNewChatroomOver(JxtaBiDiPipe pipe){
 		//添加到好友列表
 		//如果已经添加, 则在做无用功.
 		PeerItem friend = add2PeerList(pipe.getRemotePeerAdvertisement(), true);
 		//打开聊天室
-		Chatroom chatroom = new Chatroom(friend, pipe);
+		SingleChatroom chatroom = new SingleChatroom(friend, pipe);
 		//注册之
 		NoxToolkit.registerChatroom(friend.getUUID(), chatroom);
 		//TODO comment this
@@ -782,8 +851,7 @@ class ListsPane extends JTabbedPane {
 		 * 或者 群聊窗口中组成员列表可以由聊天室窗口直接从数据库获取? 无所谓..最好在这里根据GroupID来获取列表然后传值,
 		 * 尽量把数据库操作集中在一个java文件中
 		 */
-		String[] flistItems = { "Chris", "Joshua", "Daniel", "Michael", "Don",
-				"Kimi", "Kelly", "Keagan", "夏", "张三", "张四", "张五", "张三丰" };
+		/*String[] flistItems = {};
 
 		final GroupItem[] gmembers = new GroupItem[flistItems.length];
 		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
@@ -794,10 +862,10 @@ class ListsPane extends JTabbedPane {
 			gmembers[i] = new GroupItem(new ImageIcon(
 					SystemPath.PORTRAIT_RESOURCE_PATH + "user.png"),
 					flistItems[i], "欢迎加入我们: " + flistItems[i], groupID, 0, 0);
-		}
+		}*/
 		
 		glist.addMouseListener(new MouseListener(){
-
+			@SuppressWarnings("serial")
 			@Override
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() == 2){
@@ -816,21 +884,11 @@ class ListsPane extends JTabbedPane {
 						return;
 					//System.out.println("You just Right Click the List Item!");
 					groupOprMenu.add(new AbstractAction("Enter this chatroom") {
-						/**
-						 * 
-						 */
-						private static final long serialVersionUID = -729947600305959488L;
-
 						public void actionPerformed(ActionEvent e) {
 							ListsPane.this.showChatRoom(listItem);
 						}
 					});
 					groupOprMenu.add(new AbstractAction("Group information") {
-						/**
-						 * 
-						 */
-						private static final long serialVersionUID = -729947600305959488L;
-
 						public void actionPerformed(ActionEvent e) {
 							JOptionPane.showMessageDialog((Component) null, 
 									"<html>"//<BODY bgColor=#ffffff>"
@@ -861,20 +919,13 @@ class ListsPane extends JTabbedPane {
 			}
 
 			@Override
-			public void mouseEntered(MouseEvent arg0) {
-			}
-
+			public void mouseEntered(MouseEvent arg0) {}
 			@Override
-			public void mouseExited(MouseEvent arg0) {
-			}
-
+			public void mouseExited(MouseEvent arg0) {}
 			@Override
-			public void mousePressed(MouseEvent arg0) {
-			}
-
+			public void mousePressed(MouseEvent arg0) {}
 			@Override
-			public void mouseReleased(MouseEvent arg0) {
-			}
+			public void mouseReleased(MouseEvent arg0) {}
 		});
 		
 		/*blklistpane.setLayout(new BorderLayout());
@@ -968,14 +1019,14 @@ class ListsPane extends JTabbedPane {
 	private void showChatRoom(NoxJListItem listItem) {
 		ID id = listItem.getUUID();
 		ChatroomUnit roomunit = NoxToolkit.getChatroomUnit(id);
-		Chatroom room;
+		SingleChatroom room;
 		
 		if(roomunit == null){
 			//未注册pipe, 更无chatroom.
 			//新建聊天室, 会试图连接.
 			//如果连接不上....
 			//如果连接成功....
-			room = new Chatroom((PeerItem)listItem, null);
+			room = new SingleChatroom((PeerItem)listItem, null);
 		}else{
 			//已注册pipe
 			room = roomunit.getChatroom();

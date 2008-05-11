@@ -57,32 +57,12 @@ import xml.nox.XmlMsgFormat;
  * @author shinysky
  * 
  */
-public class Chatroom extends NoxFrame implements PipeMsgListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7981736228268584688L;
-	/**
-	 * 默认尺寸常量
-	 */
-	public static final int WIDTH_DEFLT = 700;
-	public static final int WIDTH_PREF = 700;
-	public static final int WIDTH_MAX = 2000;
-	public static final int WIDTH_MIN = 300;
-	public static final int HEIGHT_DEFLT = 500;
-	public static final int HEIGHT_PREF = 500;
-	public static final int HEIGHT_MAX = 2000;
-	public static final int HEIGHT_MIN = 200;
-
-	public static final int PRIVATE_CHATROOM = 0;
-	public static final int GROUP_CHATROOM = 1;
-
+@SuppressWarnings("serial")
+public class SingleChatroom extends Chatroom implements PipeMsgListener {
 	/**
 	 * 连接对方时显示的模糊进度指示器
 	 */
 	protected InfiniteProgressPanel glassPane;
-	protected JSplitPane rootpane;
-	protected ChatRoomPane chatroompane;
 	
 	private Thread connector;
 	/**
@@ -93,13 +73,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 	 * 用于收发消息的bidipipe
 	 */
 	private JxtaBiDiPipe outbidipipe = null;
-
-	/**
-	 * 私聊: 该值为对方ID; 群聊:为组ID
-	 */
-	protected ID roomID;
-	protected String roomname;
-
+	
 	/**
 	 * 最终应该从主窗口继承颜色, 透明度 考虑实现---------主窗口和从属窗口同步调节颜色和透明度
 	 * 在实例化从属窗口的时候将引用保存在一个Vector中, 调节颜色及透明度时对 Vector中实例依次调用调节函数
@@ -110,7 +84,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 	 *            聊天室类型:
 	 *            Chatroom.PRIVATE_CHATROOM(私聊);Chatroom.GROUP_CHATROOM(群聊);
 	 */
-	Chatroom(String title) {
+	SingleChatroom(String title) {
 		super(title + " - NoX Chatroom", SystemPath.IMAGES_RESOURCE_PATH
 				+ "bkgrd.png", SystemPath.ICONS_RESOURCE_PATH
 				+ "chat_green_20.png", SystemPath.ICONS_RESOURCE_PATH
@@ -144,7 +118,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 	 * @param friend 代表好友的PeerItem
 	 * @see PeerItem
 	 */
-	public Chatroom(final PeerItem friend, JxtaBiDiPipe pipe) {
+	public SingleChatroom(final PeerItem friend, JxtaBiDiPipe pipe) {
 		this(friend.getNick());
 		roomID = friend.getUUID();
 
@@ -177,31 +151,31 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 						System.out.println("Failed to connect to the peer.");
 						int choice = JOptionPane
 								.showConfirmDialog(
-										Chatroom.this,
+										SingleChatroom.this,
 										"Sorry, you can get him/her right now. Open the Chatroom anyway?",
 										"Failed to connect",
 										JOptionPane.YES_NO_OPTION);
 						if (choice == JOptionPane.YES_OPTION) {
 							rootpane.setVisible(true);
 							glassPane.setVisible(false);
-							Chatroom.this.setVisible(true);
+							SingleChatroom.this.setVisible(true);
 						} else
-							Chatroom.this.dispose();
+							SingleChatroom.this.dispose();
 					} else {
 						//注册之, 注意: 应注册ChatroomUnit而不是Chatroom!
 						//因为注册Chatroom只适用于已存在ID-pipe对的情况
-						NoxToolkit.registerChatroomUnit(roomID, outbidipipe, Chatroom.this);
-						outbidipipe.setMessageListener(Chatroom.this);
+						NoxToolkit.registerChatroomUnit(roomID, outbidipipe, SingleChatroom.this);
+						outbidipipe.setMessageListener(SingleChatroom.this);
 						rootpane.setVisible(true);
 						glassPane.setVisible(false);
-						Chatroom.this.setVisible(true);
+						SingleChatroom.this.setVisible(true);
 					}
 				}
 			}, "Connector");
 			connector.start();
 		}else{
 			outbidipipe = pipe;
-			outbidipipe.setMessageListener(Chatroom.this);
+			outbidipipe.setMessageListener(SingleChatroom.this);
 		}
 		this.getContainer().setLayout(new BorderLayout());
 		this.getContainer().add(rootpane);
@@ -210,30 +184,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 		 */
 		this.setVisible(true);
 	}
-	public Chatroom(final GroupItem group, GroupItem[] gmembers) {
-		this(group.getNick());
-		GroupChatRoomSidePane groupmembers = new GroupChatRoomSidePane(
-				"Hello, everyone, happy everyday!", gmembers);
-		rootpane.add(groupmembers);
-		rootpane.add(chatroompane);
-		this.getContainer().setLayout(new BorderLayout());
-		this.getContainer().add(rootpane, BorderLayout.CENTER);
-		roomID = group.getUUID();
-		this.setVisible(true);
-	}
-
-	/**
-	 * TODO comment this method
-	 * @return room ID
-	 */
-	public ID getRoomID() {
-		return roomID;
-	}
-
-	public String getRoomName() {
-		return roomname;
-	}
-
+	
 	public JxtaBiDiPipe getOutBidipipe() {
 		/*if (connectionHandler != null)
 			return connectionHandler.getPipe();
@@ -545,7 +496,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 			showMeIt.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent arg0){
-					Chatroom.this.setVisible(true);
+					SingleChatroom.this.setVisible(true);
 					slider.Dispose();
 				}
 			});
@@ -578,6 +529,7 @@ public class Chatroom extends NoxFrame implements PipeMsgListener {
 	 *            string msg
 	 * @return succeed or not
 	 */
+	@Override
 	public boolean SendMsg(String strmsg, BufferedImage bufImg) {
 		if (outbidipipe == null) {
 			System.out
