@@ -10,7 +10,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 
-public class GroupChatRoomSidePane extends JSplitPane{
+public class GroupChatroomSidePane extends JSplitPane{
 	/**
 	 * 
 	 */
@@ -22,7 +22,7 @@ public class GroupChatRoomSidePane extends JSplitPane{
 	JPanel groupMemberListPane;
 	JLabel l_groupMembers;
 	ObjectList groupmemerlist;
-	GroupChatRoomSidePane(String grpInfo, Object[] members){
+	GroupChatroomSidePane(String grpInfo, Object[] members){
 		super(JSplitPane.VERTICAL_SPLIT);
 		
 		l_groupInfo = new JLabel("Group Info:");

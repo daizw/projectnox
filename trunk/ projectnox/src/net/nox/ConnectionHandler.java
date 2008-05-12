@@ -10,8 +10,8 @@ import net.jxta.id.ID;
 import net.jxta.pipe.PipeMsgEvent;
 import net.jxta.pipe.PipeMsgListener;
 import net.jxta.util.JxtaBiDiPipe;
-import net.nox.ChatroomUnit;
-import noxUI.SingleChatroom;
+import net.nox.PeerChatroomUnit;
+import noxUI.PeerChatroom;
 import xml.nox.XmlMsgFormat;
 
 /**
@@ -39,7 +39,7 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 	/**
 	 * 对应的ChatroomUnit
 	 */
-	private ChatroomUnit roomunit;
+	private PeerChatroomUnit roomunit;
 	/**
 	 * <ol>
 	 * <li>Constructor for the ConnectionHandler object.
@@ -71,11 +71,11 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 	 * <li>以上这两种情况都不会试图去实例化Chatroom.</li>
 	 * 
 	 * @param pipe
-	 * @see ChatroomUnit
+	 * @see PeerChatroomUnit
 	 */
 	private void registerPipe(JxtaBiDiPipe pipe) {
 		ID roomID = pipe.getRemotePeerAdvertisement().getPeerID();
-		roomunit = NoxToolkit.getChatroomUnit(roomID);
+		roomunit = (PeerChatroomUnit)NoxToolkit.getChatroomUnit(roomID);
 		if (roomunit == null)// 该ID对应的ChatroomUnit不存在
 		{
 			//注册该pipe
@@ -178,7 +178,7 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 			//然后注册该chatroom.
 			
 			//建立新聊天室
-			SingleChatroom room = NoxToolkit.getCheyenne().setupNewChatroomOver(outbidipipe);
+			PeerChatroom room = NoxToolkit.getCheyenne().setupNewChatroomOver(outbidipipe);
 			//注册聊天室
 			roomunit.setChatroom(room);
 			//new NoxToolkit().registerChatroom(room.getRoomID(), room);

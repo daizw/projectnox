@@ -4,7 +4,6 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,7 +24,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
@@ -41,7 +39,6 @@ import net.jxta.endpoint.StringMessageElement;
 import net.jxta.endpoint.WireFormatMessage;
 import net.jxta.endpoint.WireFormatMessageFactory;
 import net.jxta.endpoint.Message.ElementIterator;
-import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroup;
 import net.jxta.pipe.PipeMsgEvent;
 import net.jxta.pipe.PipeMsgListener;
@@ -58,7 +55,7 @@ import xml.nox.XmlMsgFormat;
  * 
  */
 @SuppressWarnings("serial")
-public class SingleChatroom extends Chatroom implements PipeMsgListener {
+public class PeerChatroom extends Chatroom implements PipeMsgListener {
 	/**
 	 * 连接对方时显示的模糊进度指示器
 	 */
@@ -75,40 +72,10 @@ public class SingleChatroom extends Chatroom implements PipeMsgListener {
 	private JxtaBiDiPipe outbidipipe = null;
 	
 	/**
-	 * 最终应该从主窗口继承颜色, 透明度 考虑实现---------主窗口和从属窗口同步调节颜色和透明度
-	 * 在实例化从属窗口的时候将引用保存在一个Vector中, 调节颜色及透明度时对 Vector中实例依次调用调节函数
+	 * 最终应该从主窗口继承颜色, 透明度 考虑实现:主窗口和从属窗口同步调节颜色和透明度.
+	 * 在实例化从属窗口的时候将引用保存在一个Vector中,
+	 * 调节颜色及透明度时对 Vector中实例依次调用调节函数.
 	 * 
-	 * @param title
-	 *            聊天室标题, 一般是对方的昵称, 或者组名
-	 * @param type
-	 *            聊天室类型:
-	 *            Chatroom.PRIVATE_CHATROOM(私聊);Chatroom.GROUP_CHATROOM(群聊);
-	 */
-	SingleChatroom(String title) {
-		super(title + " - NoX Chatroom", SystemPath.IMAGES_RESOURCE_PATH
-				+ "bkgrd.png", SystemPath.ICONS_RESOURCE_PATH
-				+ "chat_green_20.png", SystemPath.ICONS_RESOURCE_PATH
-				+ "chat_green_48.png", title, false);
-		// 最终此处应为false
-
-		roomname = title;
-		this.setBounds(100, 80, WIDTH_DEFLT, HEIGHT_DEFLT);
-		this.setSize(new Dimension(WIDTH_DEFLT, HEIGHT_DEFLT));
-		this.setPreferredSize(new Dimension(WIDTH_PREF, HEIGHT_PREF));
-		this.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
-		this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
-
-		chatroompane = new ChatRoomPane(this);
-		// crp.setLayout(new FlowLayout());
-		rootpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		rootpane.setOneTouchExpandable(true);
-		// rootpane.setDividerLocation(0.2f);
-		rootpane.setDividerLocation(0f);
-		rootpane.setDividerSize(8);
-		rootpane.setResizeWeight(0.2d);
-	}
-
-	/**
 	 * <li>构造函数.</li>
 	 * <li>用户双击好友图标时, 如果不存在对应的chatroom, 则</li>
 	 * <ol>
@@ -118,11 +85,15 @@ public class SingleChatroom extends Chatroom implements PipeMsgListener {
 	 * @param friend 代表好友的PeerItem
 	 * @see PeerItem
 	 */
-	public SingleChatroom(final PeerItem friend, JxtaBiDiPipe pipe) {
-		this(friend.getNick());
+	public PeerChatroom(final PeerItem friend, JxtaBiDiPipe pipe) {
+		super(friend.getNick(), SystemPath.IMAGES_RESOURCE_PATH
+				+ "bkgrd.png", SystemPath.ICONS_RESOURCE_PATH
+				+ "chat_green_20.png", SystemPath.ICONS_RESOURCE_PATH
+				+ "chat_green_48.png", false);
+		
 		roomID = friend.getUUID();
 
-		SingleChatRoomSidePane portraits = new SingleChatRoomSidePane(friend
+		PeerChatroomSidePane portraits = new PeerChatroomSidePane(friend
 				.getNick(), friend.getPortrait(), new ImageIcon(
 				SystemPath.PORTRAIT_RESOURCE_PATH + "portrait.png"));
 		rootpane.add(portraits);
@@ -151,31 +122,31 @@ public class SingleChatroom extends Chatroom implements PipeMsgListener {
 						System.out.println("Failed to connect to the peer.");
 						int choice = JOptionPane
 								.showConfirmDialog(
-										SingleChatroom.this,
+										PeerChatroom.this,
 										"Sorry, you can get him/her right now. Open the Chatroom anyway?",
 										"Failed to connect",
 										JOptionPane.YES_NO_OPTION);
 						if (choice == JOptionPane.YES_OPTION) {
 							rootpane.setVisible(true);
 							glassPane.setVisible(false);
-							SingleChatroom.this.setVisible(true);
+							PeerChatroom.this.setVisible(true);
 						} else
-							SingleChatroom.this.dispose();
+							PeerChatroom.this.dispose();
 					} else {
 						//注册之, 注意: 应注册ChatroomUnit而不是Chatroom!
 						//因为注册Chatroom只适用于已存在ID-pipe对的情况
-						NoxToolkit.registerChatroomUnit(roomID, outbidipipe, SingleChatroom.this);
-						outbidipipe.setMessageListener(SingleChatroom.this);
+						NoxToolkit.registerChatroomUnit(roomID, outbidipipe, PeerChatroom.this);
+						outbidipipe.setMessageListener(PeerChatroom.this);
 						rootpane.setVisible(true);
 						glassPane.setVisible(false);
-						SingleChatroom.this.setVisible(true);
+						PeerChatroom.this.setVisible(true);
 					}
 				}
 			}, "Connector");
 			connector.start();
 		}else{
 			outbidipipe = pipe;
-			outbidipipe.setMessageListener(SingleChatroom.this);
+			outbidipipe.setMessageListener(PeerChatroom.this);
 		}
 		this.getContainer().setLayout(new BorderLayout());
 		this.getContainer().add(rootpane);
@@ -186,10 +157,6 @@ public class SingleChatroom extends Chatroom implements PipeMsgListener {
 	}
 	
 	public JxtaBiDiPipe getOutBidipipe() {
-		/*if (connectionHandler != null)
-			return connectionHandler.getPipe();
-		else
-			return null;*/
 		return outbidipipe;
 	}
 
@@ -496,7 +463,7 @@ public class SingleChatroom extends Chatroom implements PipeMsgListener {
 			showMeIt.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent arg0){
-					SingleChatroom.this.setVisible(true);
+					PeerChatroom.this.setVisible(true);
 					slider.Dispose();
 				}
 			});

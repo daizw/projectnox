@@ -17,7 +17,7 @@ import noxUI.AdvTable;
 import noxUI.Chatroom;
 import noxUI.Cheyenne;
 import noxUI.NoxJListItem;
-import noxUI.SingleChatroom;
+import noxUI.PeerChatroom;
 /**
  * NoX 工具包
  * @author shinysky
@@ -86,6 +86,7 @@ public class NoxToolkit {
 	private static HuntingEventHandler hehandler;
 	private static CheckStatusEventHandler cshandler;
 	private static Cheyenne cheyenne;
+	//TODO 考虑使用Map, 使用方法可参考tutorial中的PropagatedPipServer类
 	private static Set<ChatroomUnit> chatrooms;
 	private static float Opacity = 100;
 	
@@ -138,13 +139,13 @@ public class NoxToolkit {
 	 * @param id
 	 * @param pipe
 	 */
-	public static ChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe){
-		ChatroomUnit newRoomUnit = new ChatroomUnit(id, pipe);
+	public static PeerChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe){
+		PeerChatroomUnit newRoomUnit = new PeerChatroomUnit(id, pipe);
 		chatrooms.add(newRoomUnit);
 		return newRoomUnit;
 	}
-	public static ChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe, Chatroom room){
-		ChatroomUnit newRoomUnit = new ChatroomUnit(id, pipe, (SingleChatroom) room);
+	public static PeerChatroomUnit registerChatroomUnit(ID id, JxtaBiDiPipe pipe, Chatroom room){
+		PeerChatroomUnit newRoomUnit = new PeerChatroomUnit(id, pipe, (PeerChatroom) room);
 		chatrooms.add(newRoomUnit);
 		return newRoomUnit;
 	}
@@ -159,7 +160,7 @@ public class NoxToolkit {
 
 		while (it.hasNext())
 		{// 遍历集合
-			roomunit = (ChatroomUnit)(it.next());
+			roomunit = (PeerChatroomUnit)(it.next());
 			System.out.println("Chatroom Iterator here : " + roomunit.getRoomID());
 			if(roomunit.getRoomID() == null || id == null){
 				System.out.println("Error	: This room has no ID or you want to get a Chatroom without any id, it's very strange!!");
@@ -171,7 +172,7 @@ public class NoxToolkit {
 			}
 			if(id.equals(roomunit.getRoomID())){
 				System.out.println("I find the ID, now I will set the chatroom");
-				roomunit.setChatroom((SingleChatroom) room);
+				roomunit.setChatroom((PeerChatroom) room);
 				return;
 			}
 		}

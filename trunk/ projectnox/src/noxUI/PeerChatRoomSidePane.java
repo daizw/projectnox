@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-public class SingleChatRoomSidePane extends JSplitPane{
+public class PeerChatroomSidePane extends JSplitPane{
 	/**
 	 * 
 	 */
@@ -24,7 +24,7 @@ public class SingleChatRoomSidePane extends JSplitPane{
 	JPanel myPane;
 	JLabel l_me;
 	JLabel me;
-	SingleChatRoomSidePane(String friendname, ImageIcon friendPortr, ImageIcon myPortr){
+	PeerChatroomSidePane(String friendname, ImageIcon friendPortr, ImageIcon myPortr){
 		super(JSplitPane.VERTICAL_SPLIT);
 		
 		l_friend = new JLabel("<html><Font color=red><h3>" 

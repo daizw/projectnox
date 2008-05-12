@@ -64,7 +64,7 @@ import net.nox.NoxToolkit;
  * (要时刻准备着从服务器接收信息) 信息格式: 第一部分:who sayTo who at time 第二部分:the message
  * 将消息添加到消息记录, 然后通过检查发信人和noDisturb变量来决定是否添加该信息到历史消息窗口
  */
-public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseListener
+public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseListener
 {
 	/**
 	 * we don't know more about it
@@ -234,7 +234,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * @param par
 	 *            父组件, 用于使窗口par振动
 	 */
-	public ChatRoomPane(Chatroom par) {
+	public ChatroomPane(Chatroom par) {
 		super(JSplitPane.VERTICAL_SPLIT);
 		parent = par;
 
@@ -451,7 +451,7 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 					parent.setState(JFrame.NORMAL);
 					buffImg = temp.getWhatWeGot();
 					if (buffImg != null) {
-						ChatRoomPane.this.sendAPicture(buffImg);
+						ChatroomPane.this.sendAPicture(buffImg);
 					} else {
 						System.out.println("phew~we got nothing.");
 					}
@@ -503,8 +503,8 @@ public class ChatRoomPane extends JSplitPane implements ActionListener// ,MouseL
 		 * msgPane.setOpaque(false);
 		 */
 		// msgPane.setContinuousLayout(true);
-		this.setSize(new Dimension(SingleChatroom.WIDTH_DEFLT,
-				SingleChatroom.HEIGHT_DEFLT - 35));
+		this.setSize(new Dimension(PeerChatroom.WIDTH_DEFLT,
+				PeerChatroom.HEIGHT_DEFLT - 35));
 		this.setDividerLocation(0.65);// 必须先指定尺寸才有效
 		this.setResizeWeight(0.62d);
 		this.setDividerSize(3);

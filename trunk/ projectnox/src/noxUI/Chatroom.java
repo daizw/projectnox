@@ -1,5 +1,6 @@
 package noxUI;
 
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JSplitPane;
@@ -24,7 +25,7 @@ public abstract class Chatroom extends NoxFrame{
 	public static final int GROUP_CHATROOM = 1;
 	
 	protected JSplitPane rootpane;
-	protected ChatRoomPane chatroompane;
+	protected ChatroomPane chatroompane;
 	
 	/**
 	 * 私聊: 该值为对方ID;
@@ -34,9 +35,24 @@ public abstract class Chatroom extends NoxFrame{
 	protected String roomname;
 	
 	Chatroom(String title, String path_background, String path_logo,
-			String path_logo_big, String path_title, boolean IAmBase) {
-		super(title, path_background, path_logo, path_logo_big, path_title, IAmBase);
-		// TODO Auto-generated constructor stub
+			String path_logo_big, boolean IAmBase) {
+		super(title + " - NoX Chatroom", path_background, path_logo, path_logo_big, title, IAmBase);
+
+		roomname = title;
+		this.setBounds(100, 80, WIDTH_DEFLT, HEIGHT_DEFLT);
+		this.setSize(new Dimension(WIDTH_DEFLT, HEIGHT_DEFLT));
+		this.setPreferredSize(new Dimension(WIDTH_PREF, HEIGHT_PREF));
+		this.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
+		this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
+
+		chatroompane = new ChatroomPane(this);
+		// crp.setLayout(new FlowLayout());
+		rootpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		rootpane.setOneTouchExpandable(true);
+		// rootpane.setDividerLocation(0.2f);
+		rootpane.setDividerLocation(0f);
+		rootpane.setDividerSize(8);
+		rootpane.setResizeWeight(0.2d);
 	}
 	/**
 	 * TODO comment this method

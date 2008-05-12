@@ -48,11 +48,13 @@ import javax.swing.ScrollPaneConstants;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroup;
+import net.jxta.pipe.OutputPipe;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
 import net.nox.AuthenticationUtil;
-import net.nox.ChatroomUnit;
+import net.nox.GroupChatroomUnit;
+import net.nox.PeerChatroomUnit;
 import net.nox.NoxToolkit;
 import net.nox.PeerGroupUtil;
 import db.nox.DBTableName;
@@ -182,6 +184,8 @@ public class Cheyenne extends NoxFrame {
 	}
 	/**
 	 * 将广告所代表的peer添加到好友列表中
+	 * TODO 这部分可以参考JXTA Prog Guide2.5的Membership Service 一章中对InteractiveAuthenticator的介绍.
+	 * 
 	 * @param adv 要添加的peer的广告 
 	 * @return 成功:返回false; 如果已经处于该组中: 返回true.
 	 */
@@ -221,8 +225,16 @@ public class Cheyenne extends NoxFrame {
     		}
         	
         	System.out.println("尝试加入组");
-        	String password = "password";
-        	//pg.getMembershipService().        	
+        	String password = GetPassword();
+        	if(password == null || password.trim().equals("")){
+        		//TODO 可以获取更多信息的密码输入窗口:
+        		//1. 用户点击了OK;--密码错误
+        		//2. 用户点击Cancel;--忽略
+        		//3. 用户直接关闭窗口.--忽略
+        		System.out.println("The user just canceled the joining process?");
+        		return false;
+        	}
+        	//pg.getMembershipService().
         	boolean joined = PeerGroupUtil.joinPeerGroup(pg, PeerGroupUtil.MEMBERSHIP_ID, password);
         	
         	if(joined){
@@ -259,6 +271,10 @@ public class Cheyenne extends NoxFrame {
 			return false;
         }
 	}
+	private String GetPassword() {
+		return (String) JOptionPane.showInputDialog(this, "Please enter the password:",
+				"Password Needed", JOptionPane.QUESTION_MESSAGE, null, null, "");
+	}
 	/**
 	 * 在存在对应ID-Pipe对, 而不存在对应聊天室的情况下:
 	 * <li>如果是好友的消息, 则(暂时)建立聊天室显示之.
@@ -268,14 +284,33 @@ public class Cheyenne extends NoxFrame {
 	 * @param connhandler 用于管理连接的ConnectionHandler
 	 * @return 新建立的chatroom, 用于注册到NoxToolkit
 	 */
-	public SingleChatroom setupNewChatroomOver(JxtaBiDiPipe pipe){
+	public PeerChatroom setupNewChatroomOver(JxtaBiDiPipe pipe){
 		//添加到好友列表
 		//如果已经添加, 则在做无用功.
 		PeerItem friend = add2PeerList(pipe.getRemotePeerAdvertisement(), true);
 		//打开聊天室
-		SingleChatroom chatroom = new SingleChatroom(friend, pipe);
+		PeerChatroom chatroom = new PeerChatroom(friend, pipe);
 		//注册之
 		NoxToolkit.registerChatroom(friend.getUUID(), chatroom);
+		//TODO comment this
+		chatroom.setVisible(true);
+		
+		return chatroom;
+	}
+	/**
+	 * 在存在对应ID-Pipe对, 而不存在对应聊天室的情况下:
+	 * <li>如果是好友的消息, 则(暂时)建立聊天室显示之.
+	 * (应当)提示有新消息</li>
+	 * <li>如果不是好友的消息, 则(暂时)将之添加为好友建立聊天室并显示之.
+	 * (应当)提示有来自陌生人的新消息</li>
+	 * @param connhandler 用于管理连接的ConnectionHandler
+	 * @return 新建立的chatroom, 用于注册到NoxToolkit
+	 */
+	public GroupChatroom setupNewChatroomOver(GroupItem group, OutputPipe pipe){
+		//打开聊天室
+		GroupChatroom chatroom = new GroupChatroom(group, null, pipe);
+		//注册之
+		NoxToolkit.registerChatroom(group.getUUID(), chatroom);
 		//TODO comment this
 		chatroom.setVisible(true);
 		
@@ -544,12 +579,8 @@ class MiniProfilePane extends JPanel {
 	}
 }
 
+@SuppressWarnings("serial")
 class ListsPane extends JTabbedPane {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7834874261118553395L;
-
 	private JPanel frdlistpane;
 	private JPanel grplistpane;
 	private JScrollPane frdListScrPane;
@@ -658,7 +689,7 @@ class ListsPane extends JTabbedPane {
 					 * TODO 应该对每一个对象只开一个窗口, 可以设定标记, 如果已经打开了一个则显示之, 否则开新窗口
 					 */
 					listItem = (PeerItem)flist.getSelectedValue();
-					ListsPane.this.showChatRoom(listItem);
+					ListsPane.this.showPeerChatroom((PeerItem)listItem);
 				}else if(me.getButton() == MouseEvent.BUTTON3){
 					final JPopupMenu friendOprMenu = new JPopupMenu();
 					listItem = (PeerItem)flist.getSelectedValue();
@@ -667,7 +698,7 @@ class ListsPane extends JTabbedPane {
 					//System.out.println("You just Right Click the List Item!");
 					friendOprMenu.add(new AbstractAction("Talk to him/her") {
 						public void actionPerformed(ActionEvent e) {
-							ListsPane.this.showChatRoom(listItem);
+							ListsPane.this.showPeerChatroom((PeerItem)listItem);
 						}
 					});
 					friendOprMenu.add(new AbstractAction("His/Her information") {
@@ -871,7 +902,7 @@ class ListsPane extends JTabbedPane {
 				if(me.getClickCount() == 2){
 					//TODO 判断所点击的cell的在线状态进行对应处理, 暂时直接弹出弹出聊天窗口.
 					listItem = (GroupItem)(glist.getSelectedValue());
-					ListsPane.this.showChatRoom(listItem);
+					ListsPane.this.showGroupChatroom((GroupItem)listItem);
 				}else if(me.getButton() == MouseEvent.BUTTON3){
 					final JPopupMenu groupOprMenu = new JPopupMenu();
 					/*
@@ -885,7 +916,7 @@ class ListsPane extends JTabbedPane {
 					//System.out.println("You just Right Click the List Item!");
 					groupOprMenu.add(new AbstractAction("Enter this chatroom") {
 						public void actionPerformed(ActionEvent e) {
-							ListsPane.this.showChatRoom(listItem);
+							ListsPane.this.showGroupChatroom((GroupItem)listItem);
 						}
 					});
 					groupOprMenu.add(new AbstractAction("Group information") {
@@ -894,6 +925,7 @@ class ListsPane extends JTabbedPane {
 									"<html>"//<BODY bgColor=#ffffff>"
 									+ "<img width=64 height=64 src=\"file:/"
 									+ System.getProperty("user.dir")
+									+ System.getProperty("file.separator")
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+"chat.png\"><br>"
 									+"<Font color=black>组名:</Font> <Font color=blue>"
@@ -1016,23 +1048,47 @@ class ListsPane extends JTabbedPane {
 	 * (在主界面双击好友或者组时被调用)弹出聊天窗口.
 	 * @param listItem
 	 */
-	private void showChatRoom(NoxJListItem listItem) {
+	private void showPeerChatroom(PeerItem listItem) {
 		ID id = listItem.getUUID();
-		ChatroomUnit roomunit = NoxToolkit.getChatroomUnit(id);
-		SingleChatroom room;
+		PeerChatroomUnit roomunit = (PeerChatroomUnit) NoxToolkit.getChatroomUnit(id);
+		PeerChatroom room;
 		
 		if(roomunit == null){
 			//未注册pipe, 更无chatroom.
 			//新建聊天室, 会试图连接.
 			//如果连接不上....
 			//如果连接成功....
-			room = new SingleChatroom((PeerItem)listItem, null);
+			room = new PeerChatroom(listItem, null);
 		}else{
 			//已注册pipe
 			room = roomunit.getChatroom();
 			if(room == null)
 			{//不存在, 开新窗口
 				room = parent.setupNewChatroomOver(roomunit.getOutPipe());
+				//new NoxToolkit().registerChatroom(id, room);
+			}else{
+				room.pack();
+				room.setVisible(true);
+			}
+		}
+	}
+	private void showGroupChatroom(GroupItem listItem) {
+		ID id = listItem.getUUID();
+		GroupChatroomUnit roomunit = (GroupChatroomUnit)NoxToolkit.getChatroomUnit(id);
+		GroupChatroom room;
+		
+		if(roomunit == null){
+			//未注册pipe, 更无chatroom.
+			//新建聊天室, 会试图连接.
+			//如果连接不上....
+			//如果连接成功....
+			room = new GroupChatroom(listItem, null, null);
+		}else{
+			//已注册pipe
+			room = roomunit.getChatroom();
+			if(room == null)
+			{//不存在, 开新窗口
+				room = parent.setupNewChatroomOver(listItem, roomunit.getOutPipe());
 				//new NoxToolkit().registerChatroom(id, room);
 			}else{
 				room.pack();
