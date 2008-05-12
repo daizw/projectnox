@@ -2,7 +2,8 @@ package net.nox;
 
 import net.jxta.id.ID;
 import net.jxta.util.JxtaBiDiPipe;
-import noxUI.SingleChatroom;
+import noxUI.Chatroom;
+import noxUI.PeerChatroom;
 
 /**
  * Chatroom单元结构,
@@ -11,15 +12,15 @@ import noxUI.SingleChatroom;
  * @author shinysky
  *
  */
-public class ChatroomUnit{
+public class PeerChatroomUnit implements ChatroomUnit{
 	private ID roomID = null;
 	private JxtaBiDiPipe outbidipipe = null;
-	private SingleChatroom room = null;
+	private PeerChatroom room = null;
 	
-	public ChatroomUnit(ID id, JxtaBiDiPipe pipe){
+	public PeerChatroomUnit(ID id, JxtaBiDiPipe pipe){
 		this(id, pipe, null);
 	}
-	public ChatroomUnit(ID id, JxtaBiDiPipe pipe, SingleChatroom rm){
+	public PeerChatroomUnit(ID id, JxtaBiDiPipe pipe, PeerChatroom rm){
 		roomID = id;
 		outbidipipe = pipe;
 		room = rm;
@@ -40,10 +41,12 @@ public class ChatroomUnit{
 		if(room != null)
 			room.setOutBidipipe(pipe);
 	}
-	public SingleChatroom getChatroom(){
+	@Override
+	public PeerChatroom getChatroom(){
 		return room;
 	}
-	public void setChatroom(SingleChatroom rm){
-		room = rm;
+	@Override
+	public void setChatroom(Chatroom rm){
+		room = (PeerChatroom) rm;
 	}
 }
