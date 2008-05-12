@@ -41,15 +41,16 @@ public class GroupChatroomSidePane extends JSplitPane{
 		groupInfoPane.add(groupInfo);
 		
 		l_groupMembers = new JLabel("Group Members:");
-		groupmemerlist = new ObjectList(null, null, true);
+		//groupmemerlist = new ObjectList(null, null, true);
+		/*groupmemerlist = null;
 		groupMemverListScrPane = new JScrollPane(groupmemerlist,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);*/
 		groupMemberListPane = new JPanel();
 		groupMemberListPane.setLayout(new BoxLayout(groupMemberListPane, BoxLayout.Y_AXIS));
 		groupMemberListPane.add(l_groupMembers);
-		groupMemberListPane.add(groupmemerlist.getFilterField());
-		groupMemberListPane.add(groupMemverListScrPane);
+		//groupMemberListPane.add(groupmemerlist.getFilterField());
+		//groupMemberListPane.add(groupMemverListScrPane);
 		
 		
 		this.add(groupInfoPane);

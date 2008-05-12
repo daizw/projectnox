@@ -48,14 +48,13 @@ import javax.swing.ScrollPaneConstants;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroup;
-import net.jxta.pipe.OutputPipe;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
 import net.nox.AuthenticationUtil;
 import net.nox.GroupChatroomUnit;
-import net.nox.PeerChatroomUnit;
 import net.nox.NoxToolkit;
+import net.nox.PeerChatroomUnit;
 import net.nox.PeerGroupUtil;
 import db.nox.DBTableName;
 /**
@@ -306,9 +305,9 @@ public class Cheyenne extends NoxFrame {
 	 * @param connhandler 用于管理连接的ConnectionHandler
 	 * @return 新建立的chatroom, 用于注册到NoxToolkit
 	 */
-	public GroupChatroom setupNewChatroomOver(GroupItem group, OutputPipe pipe){
+	public GroupChatroom setupNewChatroomOver(GroupItem group){
 		//打开聊天室
-		GroupChatroom chatroom = new GroupChatroom(group, null, pipe);
+		GroupChatroom chatroom = new GroupChatroom(group);
 		//注册之
 		NoxToolkit.registerChatroom(group.getUUID(), chatroom);
 		//TODO comment this
@@ -1082,13 +1081,13 @@ class ListsPane extends JTabbedPane {
 			//新建聊天室, 会试图连接.
 			//如果连接不上....
 			//如果连接成功....
-			room = new GroupChatroom(listItem, null, null);
+			room = new GroupChatroom(listItem);
 		}else{
 			//已注册pipe
 			room = roomunit.getChatroom();
 			if(room == null)
 			{//不存在, 开新窗口
-				room = parent.setupNewChatroomOver(listItem, roomunit.getOutPipe());
+				room = parent.setupNewChatroomOver(listItem);
 				//new NoxToolkit().registerChatroom(id, room);
 			}else{
 				room.pack();

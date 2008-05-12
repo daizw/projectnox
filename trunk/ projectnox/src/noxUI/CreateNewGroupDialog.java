@@ -5,6 +5,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -20,9 +21,12 @@ import javax.swing.JTextField;
 
 import net.jxta.exception.PeerGroupException;
 import net.jxta.peergroup.PeerGroup;
+import net.jxta.pipe.PipeService;
 import net.jxta.protocol.PeerGroupAdvertisement;
+import net.jxta.protocol.PipeAdvertisement;
 import net.nox.NoxToolkit;
 import net.nox.PeerGroupUtil;
+import net.nox.PipeUtil;
 
 @SuppressWarnings("serial")
 public class CreateNewGroupDialog extends JDialog{
@@ -207,8 +211,15 @@ class CreateNewGroupPane extends JPanel{
 
                 // if the group was successfully created join it
                 if (pg != null) {
-                	System.out.println("成功创建组");
-                	
+                	System.out.println("成功创建组, 正在创建该组所用管道广告...");
+                	//创建对应的管道广告, 并发布之
+                	PipeAdvertisement pia = PipeUtil.createAdv(pg, pg.getPeerGroupID().toString(), PipeService.PropagateType, null);
+                	try {
+						pg.getDiscoveryService().publish(pia);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+                	pg.getDiscoveryService().remotePublish(pia);
                 	//boolean joined = joinGroup(pg, true, true);
                 	boolean joined = PeerGroupUtil.joinPeerGroup(pg, PeerGroupUtil.MEMBERSHIP_ID, password);
                 	
