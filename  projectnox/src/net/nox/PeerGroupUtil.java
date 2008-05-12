@@ -358,6 +358,44 @@ public class PeerGroupUtil {
 
 		return p;
 	}
+	
+	/**
+	 * 获取本地广告
+	 * 
+	 * @param pg
+	 *            (Parent?) PeerGroup
+	 * @param name
+	 *            广告的名字
+	 * @return 发现的所有符合查询条件的广告的List
+	 */
+	public static PeerGroupAdvertisement getLocalAdvByID(PeerGroup pg,
+			String id) {
+		PeerGroupAdvertisement pga = null;
+
+		try {
+			for (Enumeration<Advertisement> gas = pg.getDiscoveryService()
+					.getLocalAdvertisements(DiscoveryService.GROUP,
+							id != null ? "GID" : null, id); gas.hasMoreElements();) {
+				Advertisement adv = gas.nextElement();
+				System.out.println("getLocalAdvByID(): got a pga");
+				if (adv instanceof PeerGroupAdvertisement) {
+					pga = (PeerGroupAdvertisement) adv;
+					/*if(pga == null){
+						pga = (PeerGroupAdvertisement) adv;
+					}else{
+						if(Long.parseLong(pga.getDescription())
+								<Long.parseLong(((PeerGroupAdvertisement)adv).getDescription())){
+							//如果当前正处理的广告比当前广告更新, 则更新
+							pga = (PeerGroupAdvertisement) adv;
+						}
+					}*/
+				}
+			}
+		} catch (IOException ioe) {
+		}
+
+		return pga;
+	}
 
 	/**
 	 * 发现远程广告

@@ -559,7 +559,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 
 		if (strs[2].equals(whoami))// 此处要获取当前用户的用户名
 		{
-			String label = strs[1] + " say to me at " + strs[3];
+			String label = "[" + strs[1] + "@" + strs[3] + "]";
 			Thread playThd = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -571,10 +571,10 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 			}, "Beeper");
 			playThd.start();
 			appendToHMsg(label, strbuf_msg.toString(), incomingPic, true, false);
-		} else if (strs[0].equals("fromAll"))// 群聊消息
+		} else if (strs[0].equals(GroupChatroom.FROMALLSTR))// 群聊消息
 		{
 			System.out.println("noDisturb " + noDisturb);
-			String label = strs[1] + " say to ALL at " + strs[2] + ":";
+			String label = "[" + strs[1] + "@" + strs[3] + "]";
 			// appendToHMsg(label, strbuf_msg.toString(), !noDisturb);
 			if (noDisturb)// 且 防打扰打开
 			{
