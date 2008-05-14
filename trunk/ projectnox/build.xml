@@ -164,7 +164,7 @@
 	<!-- Creates the jar package(s)                                          -->
 	<!-- =================================================================== -->
 	<target name="jar" depends="build" description="Creates the jar package(s)">
-		<jar jarfile="${release.dir}/${application.name}.jar" basedir="${classes.dir}" includes="**" />
+		<jar jarfile="${release.dir}/${application.name}.jar" basedir="${classes.dir}" manifest="./MANIFEST.MF" includes="**" />
 	</target>
 
 	<!-- =================================================================== -->
@@ -205,6 +205,7 @@
 			<fileset dir="${classes.dir}" />
 			<fileset dir="${release.dir}" />
 		</delete>
+		<mkdir dir="${release.dir}" />
 	</target>
 
 	<!-- =================================================================== -->
@@ -224,6 +225,7 @@
 			<fileset dir="${javadocs.dir}" />
 			<fileset dir="${release.dir}" />
 		</delete>
+		<mkdir dir="${release.dir}" />
 	</target>
 
 	<target name="clean" depends="clean-all" description="Clean classes, jars, and javadocs" />
