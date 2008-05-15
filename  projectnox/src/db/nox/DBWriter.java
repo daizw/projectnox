@@ -21,7 +21,7 @@ public class DBWriter {
 				item = (NoxJListItem) (list.getModel().getElementAt(i));
 				// if(item instanceof )
 				statement.execute("INSERT INTO " + tablename + " VALUES "
-						+ "('" + item.getNick() + "', '" + item.getSign()
+						+ "('" + item.getName() + "', '" + item.getDesc()
 						+ "', '" + item.getUUID().toString() + "')");
 			}
 			statement.close();

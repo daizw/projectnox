@@ -26,6 +26,9 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -48,6 +51,7 @@ import javax.swing.ScrollPaneConstants;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroup;
+import net.jxta.peergroup.PeerGroupID;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
@@ -151,6 +155,62 @@ public class Cheyenne extends NoxFrame {
 		
 		sfrm.setLocation(100, 60);
 		sfrm.setSize(new Dimension(500, 350));
+		
+		Thread addGroupListenerThread = new Thread(new Runnable() {
+			public void run() {
+				initGroupListener();
+			}
+		}, "Connector");
+		addGroupListenerThread.start();
+	}
+	/**
+	 * 重新加入各组, 然后为组添加管道监听器
+	 */
+	private void initGroupListener(){
+		Map<ID, String> idpwds = grouplist.getGroupIDPwds();
+		if(idpwds == null)
+			return;
+		
+		Iterator<Entry<ID, String>> it=idpwds.entrySet().iterator();
+		   //使用entrySet方法将hashMap转化为Set视图,返回的Set中的每个元素都是一个Map.Entry
+		   while(it.hasNext()){
+		    Map.Entry<ID, String> entry=(Map.Entry<ID, String>)it.next();
+			PeerGroupID curID = (PeerGroupID)entry.getKey();
+			PeerGroupAdvertisement pga = PeerGroupUtil.getLocalAdvByID(NoxToolkit.getNetworkManager().getNetPeerGroup(), curID.toString());
+			authenticateThisGroup(pga, (String)entry.getValue());
+			//TODO 为每个组建立inputPipe并添加监听器
+		}
+	}
+	private boolean authenticateThisGroup(PeerGroupAdvertisement adv, String password) {
+		PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
+		PeerGroup pg = null;
+
+        try {
+            pg = ppg.newGroup(adv);
+        } catch (PeerGroupException pge) {
+        	pge.printStackTrace();
+        	return false;
+        }
+        // if the group was successfully created join it
+        if (pg != null) {
+        	if(AuthenticationUtil.isAuthenticated(pg))
+        		return true;
+        	else{
+        		boolean joined = PeerGroupUtil.joinPeerGroup(pg, PeerGroupUtil.MEMBERSHIP_ID, password);
+        		
+        		if(joined){
+            		System.out.println("您已成功加入该组. 可在组列表中查看.");
+            		return true;
+            	}
+            	else{
+            		System.out.println("未能成功加入该组, 密码错误?");
+            		return false;
+            	}
+        	}
+        } else {
+            System.out.println("使用组广告创建组失败");
+			return false;
+        }
 	}
 	public Connection getSQLConnection(){
 		return sqlconn;
@@ -189,6 +249,8 @@ public class Cheyenne extends NoxFrame {
 	 * @return 成功:返回false; 如果已经处于该组中: 返回true.
 	 */
 	public boolean joinThisGroup(PeerGroupAdvertisement adv){
+		System.out.println("In joinThisGroup(): \n" + adv);
+		
 		//TODO 加入到adv所代表的组中
 		PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
 		PeerGroup pg = null;
@@ -203,23 +265,31 @@ public class Cheyenne extends NoxFrame {
      // if the group was successfully created join it
         if (pg != null) {
         	if(AuthenticationUtil.isAuthenticated(pg)){
-    			System.out.println("你已加入该组, 不需要重新加入. If you're surpried, it may because this group need no password.");
-    			JOptionPane.showMessageDialog((Component) null,
-    					"你已加入该组, 不需要重新加入. If you're surpried, it may because this group need no password.",
-    					"Succeed!",
-    					JOptionPane.INFORMATION_MESSAGE);
-    			//将该组加入列表中
-        		GroupItem newGroupItem = new GroupItem(new ImageIcon(
-        				SystemPath.PORTRAIT_RESOURCE_PATH + "group.png"), adv);
-        		try {
-        			newGroupItem = (GroupItem) grouplist.addItem(newGroupItem);
-        		} catch (SQLException e) {
-        			e.printStackTrace();
-        		} catch (IOException e) {
-        			e.printStackTrace();
+        		if(grouplist.isExist(pg.getPeerGroupID())){
+        			//如果列表里已经有该组则:"你已加入该组, 不需要重新加入"
+        			System.out.println("你已加入该组, 不需要重新加入. If you're surpried, it may because this group need no password.");
+        			JOptionPane.showMessageDialog((Component) null,
+        					"你已加入该组, 不需要重新加入. If you're surpried, it may because this group need no password.",
+        					"Succeed!",
+        					JOptionPane.INFORMATION_MESSAGE);
+        		}else{
+        			//如果列表中没有, 说明该组不需要密码, 正常提示加入成功.
+        			//将该组加入列表中
+	        		GroupItem newGroupItem = new GroupItem(new ImageIcon(
+	        				SystemPath.PORTRAIT_RESOURCE_PATH + "group.png"), adv);
+	        		try {
+	        			newGroupItem = (GroupItem) grouplist.addItem(newGroupItem);
+	        		} catch (SQLException e) {
+	        			e.printStackTrace();
+	        		} catch (IOException e) {
+	        			e.printStackTrace();
+	        		}
+	        		tabs.repaint();
+	        		System.out.println("您已成功加入该组. 可在组列表中查看.");
+	        		JOptionPane.showMessageDialog((Component) null,
+	    					"您已成功加入该组. 可在组列表中查看.", "Succeed!",
+	    					JOptionPane.INFORMATION_MESSAGE);
         		}
-        		tabs.repaint();
-        		
         		return true;
     		}
         	
@@ -237,22 +307,10 @@ public class Cheyenne extends NoxFrame {
         	boolean joined = PeerGroupUtil.joinPeerGroup(pg, PeerGroupUtil.MEMBERSHIP_ID, password);
         	
         	if(joined){
+        		add2GroupList(adv, password);
         		JOptionPane.showMessageDialog((Component) null,
-					"您已成功加入该组. 可在组列表中查看.", "Succeed!",
-					JOptionPane.INFORMATION_MESSAGE);
-        		
-        		//将该组加入列表中
-        		GroupItem newGroupItem = new GroupItem(new ImageIcon(
-        				SystemPath.PORTRAIT_RESOURCE_PATH + "group.png"), adv);
-        		try {
-        			newGroupItem = (GroupItem) grouplist.addItem(newGroupItem);
-        		} catch (SQLException e) {
-        			e.printStackTrace();
-        		} catch (IOException e) {
-        			e.printStackTrace();
-        		}
-        		tabs.repaint();
-        		
+    					"您已成功加入该组. 可在组列表中查看.", "Succeed!",
+    					JOptionPane.INFORMATION_MESSAGE);        		
         		return true;
         	}
         	else{
@@ -269,6 +327,22 @@ public class Cheyenne extends NoxFrame {
 					JOptionPane.ERROR_MESSAGE);
 			return false;
         }
+	}
+	public GroupItem add2GroupList(PeerGroupAdvertisement adv, String password){
+		//将该组加入列表中
+		GroupItem newGroupItem = new GroupItem(new ImageIcon(
+				SystemPath.PORTRAIT_RESOURCE_PATH + "group.png"), adv, password);
+		try {
+			newGroupItem = (GroupItem) grouplist.addItem(newGroupItem);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		tabs.repaint();
+		return newGroupItem;
 	}
 	private String GetPassword() {
 		return (String) JOptionPane.showInputDialog(this, "Please enter the password:",
@@ -369,6 +443,19 @@ public class Cheyenne extends NoxFrame {
                 		Statement stmt = sqlconn.createStatement();
                 		stmt.execute("SHUTDOWN");
 						sqlconn.close();
+						//FIXME 关闭其它, 如管道, 组, JXTA网络, 等等等等清理工作.
+						/*
+						 * pipe.close();
+						 * 
+						 * group.stopApp();
+						 * group.unref();
+
+				        // Un-reference the parent peer group.
+				        parentgroup.unref();
+				        
+				        *jxtanetwork.stop();
+				        *
+				        */
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -710,16 +797,16 @@ class ListsPane extends JTabbedPane {
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+ "chat.png\"><br>"
 									+"<Font color=black>昵称:</Font> <Font color=blue>"
-									+ listItem.getNick()
+									+ listItem.getName()
 									+"<br></Font>"
 									+"<Font color=black>签名档:</Font> <Font color=blue>"
-									+ listItem.getSign()
+									+ listItem.getDesc()
 									+"<br></Font>"
 									+"<Font color=black>联系方式:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font>"
 									+"<Font color=black>个人说明:</Font> <Font color=blue>"
-									+ listItem.getNick() + " owns me so much MONEY!! "
+									+ listItem.getName() + " owns me so much MONEY!! "
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
 						}
@@ -741,7 +828,6 @@ class ListsPane extends JTabbedPane {
 					});
 					friendOprMenu.add(new AbstractAction("Delete") {
 						public void actionPerformed(ActionEvent e) {
-							//TODO add to the blacklist
 							int index = flist.getSelectedIndex();
 							flist.deleteItem(parent.getSQLConnection(), DBTableName.PEER_SQLTABLE_NAME, true, index);
 							ListsPane.this.repaint();
@@ -784,16 +870,16 @@ class ListsPane extends JTabbedPane {
 							+ SystemPath.PORTRAIT_RESOURCE_PATH
 							+ "chat.png\"><br>"
 							+"<Font color=black>昵称:</Font> <Font color=blue>"
-							+ listItem.getNick()
+							+ listItem.getName()
 							+"<br></Font>"
 							+"<Font color=black>签名档:</Font> <Font color=blue>"
-							+ listItem.getSign()
+							+ listItem.getDesc()
 							+"<br></Font>"
 							+"<Font color=black>联系方式:</Font> <Font color=blue>"
 							+ "110, 119, 120, 114, 117"
 							+"<br></Font>"
 							+"<Font color=black>个人说明:</Font> <Font color=blue>"
-							+ listItem.getNick() + " owns me so much MONEY!! "
+							+ listItem.getName() + " owns me so much MONEY!! "
 							+"<br></Font></BODY></html>",
 							"User Information", JOptionPane.INFORMATION_MESSAGE);
 				}else if(me.getButton() == MouseEvent.BUTTON3){
@@ -811,16 +897,16 @@ class ListsPane extends JTabbedPane {
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+ "chat.png\"><br>"
 									+"<Font color=black>昵称:</Font> <Font color=blue>"
-									+ listItem.getNick()
+									+ listItem.getName()
 									+"<br></Font>"
 									+"<Font color=black>签名档:</Font> <Font color=blue>"
-									+ listItem.getSign()
+									+ listItem.getDesc()
 									+"<br></Font>"
 									+"<Font color=black>联系方式:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font>"
 									+"<Font color=black>个人说明:</Font> <Font color=blue>"
-									+ listItem.getNick() + " owns me so much MONEY!! "
+									+ listItem.getName() + " owns me so much MONEY!! "
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
 						}
@@ -928,15 +1014,23 @@ class ListsPane extends JTabbedPane {
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+"chat.png\"><br>"
 									+"<Font color=black>组名:</Font> <Font color=blue>"
-									+ listItem.getNick()
+									+ listItem.getName()
 									+"<br></Font>"
 									+"<Font color=black>公告:</Font> <Font color=blue>"
-									+ listItem.getSign()
+									+ listItem.getDesc()
 									+"<br></Font>"
 									+"<Font color=black>成员数量:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
+						}
+					});
+					groupOprMenu.add(new AbstractAction("Resign") {
+						public void actionPerformed(ActionEvent e) {
+							int index = glist.getSelectedIndex();
+							GroupItem group = (GroupItem)glist.deleteItem(index);
+							ListsPane.this.repaint();
+							//TODO 删除认证书, 删除ChatroomUnit, 删除管道监听器.
 						}
 					});
 					MenuElement els[] = groupOprMenu.getSubElements();

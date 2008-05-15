@@ -91,21 +91,28 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 	 * @see PeerItem
 	 */
 	public GroupChatroom(final GroupItem group) {
-		super(group.getNick(), SystemPath.IMAGES_RESOURCE_PATH
+		super(group.getName(), SystemPath.IMAGES_RESOURCE_PATH
 				+ "bkgrd.png", SystemPath.ICONS_RESOURCE_PATH
 				+ "groupChat_20.png", SystemPath.ICONS_RESOURCE_PATH
 				+ "groupChat_48.png", false);
 		roomID = group.getUUID();
 
 		GroupChatroomSidePane gcsp = new GroupChatroomSidePane(group
-				.getNick(), null);
+				.getName(), null);
 		rootpane.add(gcsp);
 		rootpane.add(chatroompane);
 		this.getContainer().setLayout(new BorderLayout());
 		this.getContainer().add(rootpane, BorderLayout.CENTER);
 		this.setVisible(true);
-		
-		TryToConnect(5 * 1000);
+		connector = new Thread(new Runnable() {
+			public void run() {
+				/**
+				 * 与该peer建立连接
+				 */
+				TryToConnect(5 * 1000);
+			}
+		}, "Connector");
+		connector.start();
 	}
 	/*public GroupChatroom(final GroupItem group, GroupItem[] gmembers) {
 		super(group.getNick(), SystemPath.IMAGES_RESOURCE_PATH
@@ -147,7 +154,7 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 	}
 
 	/**
-	 * TODO 与该peer建立连接:
+	 * 与该peer建立连接:
 	 */
 	private void TryToConnect(long waittime) {
 		// 如果已经有了outbidipipe, 则不需要重新连接

@@ -86,7 +86,7 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 	 * @see PeerItem
 	 */
 	public PeerChatroom(final PeerItem friend, JxtaBiDiPipe pipe) {
-		super(friend.getNick(), SystemPath.IMAGES_RESOURCE_PATH
+		super(friend.getName(), SystemPath.IMAGES_RESOURCE_PATH
 				+ "bkgrd.png", SystemPath.ICONS_RESOURCE_PATH
 				+ "chat_green_20.png", SystemPath.ICONS_RESOURCE_PATH
 				+ "chat_green_48.png", false);
@@ -94,7 +94,7 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 		roomID = friend.getUUID();
 
 		PeerChatroomSidePane portraits = new PeerChatroomSidePane(friend
-				.getNick(), friend.getPortrait(), new ImageIcon(
+				.getName(), friend.getPortrait(), new ImageIcon(
 				SystemPath.PORTRAIT_RESOURCE_PATH + "portrait.png"));
 		rootpane.add(portraits);
 		rootpane.add(chatroompane);
@@ -180,7 +180,7 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 	}
 
 	/**
-	 * TODO 与该peer建立连接:
+	 * 与该peer建立连接:
 	 */
 	private void TryToConnect(long waittime) {
 		// 如果已经有了outbidipipe, 则不需要重新连接
