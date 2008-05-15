@@ -250,7 +250,7 @@ class GroupSearchPanel extends SearchPanel{
 
 					ResultOprMenu.add(new AbstractAction("Join this group") {
 						public void actionPerformed(ActionEvent e) {
-							// TODO 添加到好友列表
+							// TODO 添加到组列表
 							int[] selected = searchResultTable
 									.getSelectedRows();
 							for (int i = 0; i < selected.length; i++) {

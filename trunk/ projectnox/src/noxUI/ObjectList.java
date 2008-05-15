@@ -13,12 +13,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.DefaultListModel;
@@ -31,6 +33,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import net.jxta.id.ID;
 
 public class ObjectList extends JList {
 	/**
@@ -90,8 +94,8 @@ public class ObjectList extends JList {
 				addDBObject2List(tmpItem);
 				
 				System.out.println("isGood:	" + isGood);
-				System.out.println("Nick:	" + tmpItem.getNick());
-				System.out.println("Desc:	" + tmpItem.getSign());
+				System.out.println("Nick:	" + tmpItem.getName());
+				System.out.println("Desc:	" + tmpItem.getDesc());
 				System.out.println("ID:	" + tmpItem.getUUID());
 				System.out.println("Portrait:	" + tmpItem.getPortrait());
 				System.out.println("TimeStamp:	" + tmpItem.getTimeStamp());
@@ -137,6 +141,45 @@ public class ObjectList extends JList {
 		});
 	}
 	/**
+	 * 判断是否列表中已存在ID为id的表项
+	 * @param id 要查找的ID
+	 * @return 是否存在
+	 */
+	public boolean isExist(ID id){
+		int size =  fmod.getRealSize();
+		for(int index = 0; index <  size; index++){
+			if(((NoxJListItem)fmod.getRealElementAt(index)).getUUID().equals(id))
+				return true;
+		}
+		return false;
+	}
+	/**
+	 * 返回列表项中所有ID-password对.
+	 * 只能当表项是GroupItem对象时才能调用.
+	 * @return 所有广告
+	 */
+	public Map<ID, String> getGroupIDPwds(){
+		Map<ID, String> idpwds = null;
+		//items.clear();
+		try{
+			int size =  fmod.getRealSize();
+			GroupItem tempItem = null;
+			System.out.println("List size: " + size);
+			for(int index = 0; index <  size; index++){
+				tempItem = (GroupItem)fmod.getRealElementAt(index);
+				idpwds.put(tempItem.getUUID(), tempItem.getPassword());
+			}
+		}catch(Exception e){
+			return null;
+		}
+		
+		return idpwds;
+	}
+	
+	public Object deleteItem(int index){
+		return deleteItem(sqlconn, tablename, isGood, index);
+	}
+	/**
 	 * 从List中删除某项
 	 * @param sqlconn 数据库连接
 	 * @param tablename 表名
@@ -176,9 +219,9 @@ public class ObjectList extends JList {
 	 */
 	private Object addDBObject2List(Object o){
 		int size =  fmod.getRealSize();
+		NoxJListItem newItem = (NoxJListItem)o;
 		for(int index = 0; index <  size; index++){
 			//如果已经有了, 则返回.
-			NoxJListItem newItem = (NoxJListItem)o;
 			NoxJListItem curItem = (NoxJListItem)(fmod.getRealElementAt(index));
 			if(newItem.getUUID().equals(curItem.getUUID())){
 				//如果当前的更新, 则更新
@@ -229,7 +272,7 @@ public class ObjectList extends JList {
 					
 					ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
 					ObjectOutputStream out = new ObjectOutputStream(byteArrayStream);
-					out.writeObject((Object) newItem);
+					out.writeObject((Serializable)newItem);
 					ByteArrayInputStream input = new ByteArrayInputStream(byteArrayStream.toByteArray());
 					pstmt.setBinaryStream(3, input, byteArrayStream.size());
 					pstmt.executeUpdate();
@@ -243,6 +286,8 @@ public class ObjectList extends JList {
 		}
 		fmod.addElement((NoxJListItem) object);
 		//删除数据库中该ID
+		System.out.println("stmt.execute:delete from "+
+			tablename + " where ID = '" + ((NoxJListItem) object).getUUID().toString() + "'");
 		stmt.execute("delete from "+
 			tablename + " where ID = '" + ((NoxJListItem) object).getUUID().toString() + "'");
 		//添加到数据库
@@ -253,7 +298,7 @@ public class ObjectList extends JList {
 		
 		ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
 		ObjectOutputStream out = new ObjectOutputStream(byteArrayStream);
-		out.writeObject((Object) object);
+		out.writeObject((NoxJListItem)object);
 		ByteArrayInputStream input = new ByteArrayInputStream(byteArrayStream.toByteArray());
 		pstmt.setBinaryStream(3, input, byteArrayStream.size());
 		pstmt.executeUpdate();
@@ -276,10 +321,10 @@ public class ObjectList extends JList {
 			NoxJListItem item = (NoxJListItem) value;
 
 			portrait.setIcon((Icon) item.getPortrait());
-			nick.setText(item.getNick());
+			nick.setText(item.getName());
 			sign.setText("<html><Font color=gray>"
 					+ '('
-					+ item.getSign()
+					+ item.getDesc()
 					+ ')'
 					+ "</Font></html>");
 
@@ -325,16 +370,16 @@ public class ObjectList extends JList {
 								+ SystemPath.PORTRAIT_RESOURCE_PATH
 								+"chat.png\"><br>"
 								+ "<Font color=black>昵称:</Font> <Font color=blue>"
-								+ item.getNick()
+								+ item.getName()
 								+ "<br></Font>"
 								+ "<Font color=black>签名档:</Font> <Font color=blue>"
-								+ item.getSign()
+								+ item.getDesc()
 								+ "<br></Font>"
 								+ "<Font color=black>联系方式:</Font> <Font color=blue>"
 								+ "110, 119, 120, 114, 117"
 								+ "<br></Font>"
 								+ "<Font color=black>个人说明:</Font> <Font color=blue>"
-								+ item.getNick()
+								+ item.getName()
 								+ " owns me so much MONEY!! "
 								+ "<br></Font>"
 								+ "<Font color=black>UUID:</Font> <Font color=blue>"
@@ -348,10 +393,10 @@ public class ObjectList extends JList {
 								+ SystemPath.PORTRAIT_RESOURCE_PATH
 								+ "chat.png\"><br>"
 								+ "<Font color=black>组名:</Font> <Font color=blue>"
-								+ item.getNick()
+								+ item.getName()
 								+ "<br></Font>"
 								+ "<Font color=black>公告:</Font> <Font color=blue>"
-								+ item.getSign()
+								+ item.getDesc()
 								+ "<br></Font>"
 								+ "<Font color=black>成员数量:</Font> <Font color=blue>"
 								+ "110, 119, 120, 114, 117"
@@ -438,7 +483,7 @@ public class ObjectList extends JList {
 			int index = 0;
 			String term = getFilterField().getText();
 			for (int i = 0; i < items.size(); i++)
-				if (items.get(i).getNick().indexOf(term, 0) != -1) {
+				if (items.get(i).getName().indexOf(term, 0) != -1) {
 					// System.out.println(items.get(i).getNick());
 					filterItems.add(items.get(i));
 					index++;

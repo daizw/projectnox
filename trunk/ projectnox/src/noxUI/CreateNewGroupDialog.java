@@ -34,10 +34,10 @@ public class CreateNewGroupDialog extends JDialog{
 	private Toolkit tk;
 	private Image img_logo;
 	private Image img_logo_big;
-	
+	private JFrame parent;
 	CreateNewGroupDialog(JFrame parent){
 		super(parent, "Create New Group", true);
-		
+		this.parent = parent;
 		//如果extends JDialog, 则设置大图标没有意义.
 		//extends JFrame时才可以显示大图标.
 		tk = Toolkit.getDefaultToolkit();
@@ -53,6 +53,9 @@ public class CreateNewGroupDialog extends JDialog{
 		
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		this.setResizable(false);
+	}
+	public boolean add2GrouList(PeerGroupAdvertisement adv){
+		return ((Cheyenne)parent).joinThisGroup(adv);
 	}
 	
 	public static void main(String[] args){
@@ -87,7 +90,11 @@ class CreateNewGroupPane extends JPanel{
 	JButton doCreateBtn = new JButton("OK");
 	JButton cancelBtn = new JButton("Cancel");
 
+	CreateNewGroupDialog parent;
+	
 	CreateNewGroupPane(final CreateNewGroupDialog parent){
+		this.parent = parent;
+		
 		namePane.add(nameLabel);
 		namePane.add(nameTxtFd);
 		
@@ -223,10 +230,14 @@ class CreateNewGroupPane extends JPanel{
                 	//boolean joined = joinGroup(pg, true, true);
                 	boolean joined = PeerGroupUtil.joinPeerGroup(pg, PeerGroupUtil.MEMBERSHIP_ID, password);
                 	
-                	if(joined)
+                	if(joined){
                 		JOptionPane.showMessageDialog((Component) null,
         					"成功创建组, 您已自动加入该组. 可在组列表中查看.", "Succeed!",
         					JOptionPane.INFORMATION_MESSAGE);
+                		if(parent.add2GrouList(pga)){
+                			System.out.println("加入成功, 但是没有成功添加到组列表, it's weird!");
+                		}
+                	}
                 	else
                 		JOptionPane.showMessageDialog((Component) null,
             					"成功创建组, 但是未能成功加入该组, it's weird!", "Information",
