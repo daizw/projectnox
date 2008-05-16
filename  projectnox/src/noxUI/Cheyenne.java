@@ -220,6 +220,7 @@ public class Cheyenne extends NoxFrame {
 	 * @param password
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private boolean authenticateThisGroup(PeerGroupAdvertisement adv, String password) {
 		PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
 		PeerGroup pg = null;
@@ -424,11 +425,7 @@ public class Cheyenne extends NoxFrame {
 		return chatroom;
 	}
 	/**
-	 * 在存在对应ID-Pipe对, 而不存在对应聊天室的情况下:
-	 * <li>如果是好友的消息, 则(暂时)建立聊天室显示之.
-	 * (应当)提示有新消息</li>
-	 * <li>如果不是好友的消息, 则(暂时)将之添加为好友建立聊天室并显示之.
-	 * (应当)提示有来自陌生人的新消息</li>
+	 * 在不存在对应ID-Pipe对, 更不存在对应聊天室的情况下调用
 	 * @param connhandler 用于管理连接的ConnectionHandler
 	 * @return 新建立的chatroom, 用于注册到NoxToolkit
 	 */
@@ -443,6 +440,7 @@ public class Cheyenne extends NoxFrame {
 		return chatroom;
 	}
 	/**
+	 * 大多数情况下(系统初始化时成功建立管道并监听之), 调用此函数建立组聊天室.</p>
 	 * 在存在对应ID-Pipe对, 而不存在对应聊天室的情况下:
 	 * <li>如果是好友的消息, 则(暂时)建立聊天室显示之.
 	 * (应当)提示有新消息</li>
@@ -451,16 +449,17 @@ public class Cheyenne extends NoxFrame {
 	 * @param connhandler 用于管理连接的ConnectionHandler
 	 * @return 新建立的chatroom, 用于注册到NoxToolkit
 	 */
-	public GroupChatroom setupNewChatroomOver(PeerGroup pg, InputPipe ipipe, OutputPipe opipe){
+	public GroupChatroom setupNewChatroomOver(PeerGroupAdvertisement pga, InputPipe ipipe, OutputPipe opipe){
 		//打开聊天室
-		GroupChatroom chatroom = new GroupChatroom(pg, ipipe, opipe);
+		GroupChatroom chatroom = new GroupChatroom(pga, ipipe, opipe);
 		//注册之
-		NoxToolkit.registerChatroom(pg.getPeerGroupID(), chatroom);
+		NoxToolkit.registerChatroom(pga.getPeerGroupID(), chatroom);
 		//TODO comment this
 		chatroom.setVisible(true);
 		
 		return chatroom;
 	}
+	
 	/*public boolean setupGroupChatroom(PeerGroupAdvertisement adv){
 		//打开群聊窗口
 		//do something
@@ -1237,6 +1236,11 @@ class ListsPane extends JTabbedPane {
 			}
 		}
 	}
+	/**
+	 * 因为组聊天室的管道实际上都是注册过的, 所以处理方法应该跟私聊有所不同!
+	 * 
+	 * @param listItem
+	 */
 	private void showGroupChatroom(GroupItem listItem) {
 		ID id = listItem.getUUID();
 		GroupChatroomUnit roomunit = (GroupChatroomUnit)NoxToolkit.getChatroomUnit(id);
@@ -1247,14 +1251,26 @@ class ListsPane extends JTabbedPane {
 			//新建聊天室, 会试图连接.
 			//如果连接不上....
 			//如果连接成功....
+			System.out.println("该ID未注册, 建立并注册之. 如果你看到这条消息, 说明系统初始化时没有成功建立该聊天室对应的pipe.");
 			room = new GroupChatroom(listItem);
+			
+			//注册之, 注意: 应注册ChatroomUnit而不是Chatroom!
+			//因为注册Chatroom只适用于已存在ID-pipe对的情况
+			NoxToolkit.registerChatroomUnit(id, null, null, room);
 		}else{
 			//已注册pipe
 			room = roomunit.getChatroom();
 			if(room == null)
 			{//不存在, 开新窗口
-				room = parent.setupNewChatroomOver(listItem);
-				//new NoxToolkit().registerChatroom(id, room);
+				PeerGroupAdvertisement pga
+					= PeerGroupUtil.getLocalAdvByID(NoxToolkit.getNetworkManager().getNetPeerGroup(), id.toString());
+				if(pga == null){
+					System.out.println("in showGroupChatroom(): 找不到该组的广告");
+					return;
+				}
+
+				room = parent.setupNewChatroomOver(pga, roomunit.getInPipe(), roomunit.getOutPipe());
+				NoxToolkit.registerChatroom(id, room);
 			}else{
 				room.pack();
 				room.setVisible(true);

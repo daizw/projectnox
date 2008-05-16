@@ -498,11 +498,19 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 	 */
 	@Override
 	public boolean SendMsg(String strmsg, BufferedImage bufImg) {
-		if (outbidipipe == null) {
+		int retrial = 0;
+		while (outbidipipe == null && retrial < Chatroom.MAXRETRIES) {
 			System.out
-					.println("outBiDiPipe is null now, canceling sending msg.");
+					.println("outBiDiPipe is null now, trying to connect...");
+			TryToConnect(Chatroom.UnitWaitTime);
+			retrial ++;
+		}
+		if(outbidipipe == null){
+			System.out
+			.println("outBiDiPipe is still null even after trying so many times, canceling sending msg...");
 			return false;
 		}
+
 		Message msg;
 		try {
 			System.out.println("Sending message:\n" + strmsg);

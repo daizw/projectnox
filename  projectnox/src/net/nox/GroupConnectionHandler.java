@@ -139,7 +139,7 @@ public class GroupConnectionHandler implements Runnable, PipeMsgListener{
 			//然后注册该chatroom.
 			
 			//建立新聊天室
-			GroupChatroom room = NoxToolkit.getCheyenne().setupNewChatroomOver(peergroup, inpipe, outpipe);
+			GroupChatroom room = NoxToolkit.getCheyenne().setupNewChatroomOver(peergroup.getPeerGroupAdvertisement(), inpipe, outpipe);
 			//注册聊天室
 			roomunit.setChatroom(room);
 			//new NoxToolkit().registerChatroom(room.getRoomID(), room);

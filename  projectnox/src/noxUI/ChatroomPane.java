@@ -531,6 +531,14 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 				"Message form the Server", JOptionPane.INFORMATION_MESSAGE);
 	}
 
+	public void showFailedSendingMsg(String msg){		
+		tp_historymsg.setEditable(true);
+		tp_historymsg.setCaretPosition(styledDoc.getLength());// !!!
+		styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(), italic);
+		tp_historymsg
+				.replaceSelection("Sorry, failed to send out the msg:\n" + msg + '\n');
+		tp_historymsg.setEditable(false);
+	}
 	/**
 	 * 用于外部程序调用,以显示消息
 	 * 
@@ -855,7 +863,11 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		}
 		System.out.println("strbuf_msg :" + strbuf_msg);
 
-		parent.SendMsg(new String(strbuf_msg), null);
+		boolean succeed = parent.SendMsg(new String(strbuf_msg), null);
+		if(!succeed){
+			//TODO tell user what happend.
+			showFailedSendingMsg(new String(strbuf_msg));
+		}
 
 		tp_input.setText("");// 输入框清空
 	}
@@ -873,7 +885,11 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		/**
 		 * 向对方发送消息 999:表示表情索引
 		 */
-		parent.SendMsg(shakeMsg, null);
+		boolean succeed = parent.SendMsg(shakeMsg, null);
+		if(!succeed){
+			//TODO tell user what happend.
+			showFailedSendingMsg("(It's a shake emotion actually.)");
+		}
 	}
 
 	/**
@@ -946,7 +962,11 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		tp_historymsg.setCaretPosition(styledDoc.getLength());
 		tp_historymsg.replaceSelection("\n");
 		tp_historymsg.setEditable(false);// 重新设为不可编辑
-		parent.SendMsg("", bufImg);
+		boolean succeed = parent.SendMsg("", bufImg);
+		if(!succeed){
+			//TODO tell user what happend.
+			showFailedSendingMsg("(It's a picture actually.)");
+		}
 	}
 
 	/**

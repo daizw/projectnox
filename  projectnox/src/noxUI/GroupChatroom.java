@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
-import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -26,9 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
-import net.jxta.discovery.DiscoveryEvent;
-import net.jxta.discovery.DiscoveryListener;
-import net.jxta.document.Advertisement;
 import net.jxta.document.MimeMediaType;
 import net.jxta.endpoint.ByteArrayMessageElement;
 import net.jxta.endpoint.Message;
@@ -114,17 +110,21 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 		}, "Connector");
 		connector.start();
 	}
-	public GroupChatroom(PeerGroup pg, InputPipe ipipe, OutputPipe opipe) {
-		super(pg.getPeerGroupName(), SystemPath.IMAGES_RESOURCE_PATH
+	public GroupChatroom(PeerGroupAdvertisement pga, InputPipe ipipe, OutputPipe opipe) {
+		super(pga.getName(), SystemPath.IMAGES_RESOURCE_PATH
 				+ "bkgrd.png", SystemPath.ICONS_RESOURCE_PATH
 				+ "groupChat_20.png", SystemPath.ICONS_RESOURCE_PATH
 				+ "groupChat_48.png", false);
 		this.inpipe = ipipe;
 		this.outpipe = opipe;
 		
-		roomID = pg.getPeerGroupID();
+		/**
+		 * TODO 移除原来的管道监听器
+		 */
+
+		roomID = pga.getPeerGroupID();
 		GroupChatroomSidePane gcsp 
-			= new GroupChatroomSidePane(pg.getPeerGroupAdvertisement().getDescription(), null);
+			= new GroupChatroomSidePane(pga.getDescription(), null);
 		rootpane.add(gcsp);
 		rootpane.add(chatroompane);
 		this.getContainer().setLayout(new BorderLayout());
@@ -175,11 +175,11 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 	 */
 	private void TryToConnect(long waittime) {
 		// 如果已经有了outbidipipe, 则不需要重新连接
-		if (outpipe != null) {
+		if (outpipe != null && inpipe != null) {
 			System.out
 					.println("["
 							+ Thread.currentThread().getName()
-							+ "] We have gotten a outbidipipe, cancelling TryToConnect().");
+							+ "] We have gotten a I/O pipe, cancelling TryToConnect().");
 			return;
 		}
 		System.out.println("+++++++++++Begin TryToConnect()+++++++++++");
@@ -206,8 +206,10 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 				}
 				System.out.println("Creating Propagated InputPipe for pipe: " + pia.getPipeID());
 		        try {
-		            inpipe = pg.getPipeService().createInputPipe(pia, this);
-		            outpipe = pg.getPipeService().createOutputPipe(pia, waittime);
+		        	if(inpipe == null)
+		        		inpipe = pg.getPipeService().createInputPipe(pia, this);
+		            if(outpipe == null)
+		            	outpipe = pg.getPipeService().createOutputPipe(pia, waittime);
 		        } catch (IOException e) {
 		        	System.out.println("Failed to create Propagated InputPipe for pipe: " + pia.getPipeID());
 		            e.printStackTrace();
@@ -436,11 +438,19 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 	 * @return succeed or not
 	 */
 	public boolean SendMsg(String strmsg, BufferedImage bufImg) {
-		if (outpipe == null) {
+		int retrial = 0;
+		while (outpipe == null && retrial < Chatroom.MAXRETRIES) {
 			System.out
-					.println("outPipe is null now, canceling sending msg.");
+					.println("outPipe is null now, trying to connect...");
+			TryToConnect(Chatroom.UnitWaitTime);
+			retrial ++;
+		}
+		if(outpipe == null){
+			System.out
+			.println("outPipe is still null even after trying so many times, canceling sending msg...");
 			return false;
 		}
+		
 		Message msg;
 		try {
 			System.out.println("Sending message:\n" + strmsg);
@@ -561,38 +571,5 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 		}
 		this.processIncomingMsg(msg, false);
 		System.out.println("+++End Chatroom pipeMsgEvent()...+++");
-	}
-
-	class localDiscoveryListener implements DiscoveryListener {
-		public void discoveryEvent(DiscoveryEvent e) {
-			PipeAdvertisement pipeAdv = null;
-			Enumeration<Advertisement> responses = e.getSearchResults();
-			/**
-			 * TODO 事实上这里似乎不需要while循环; 但是有可能存在广告过期的问题
-			 */
-			while (responses.hasMoreElements()) {
-				pipeAdv = (PipeAdvertisement) responses.nextElement();
-				if(pipeAdv.getDescription() == null){
-					continue;
-				}
-				try {
-					if(newOutPipeAdv == null){
-						newOutPipeAdv = pipeAdv;
-						System.out.println("Got the first pipe adv: " + pipeAdv.getPipeID());
-					}else{
-						if(Long.parseLong(newOutPipeAdv.getDescription()) 
-								< Long.parseLong(pipeAdv.getDescription())){
-							newOutPipeAdv = pipeAdv;
-							System.out.println("Got a newer pipe adv: " + pipeAdv.getPipeID());
-						}else{
-							System.out.println("Got a older pipe adv: " + pipeAdv.getPipeID());
-						}
-					}
-					// do something with pipe advertisement
-				} catch (Exception ee) {
-					// not a pipe advertisement
-				}
-			}
-		}
 	}
 }

@@ -27,6 +27,9 @@ public abstract class Chatroom extends NoxFrame{
 	protected JSplitPane rootpane;
 	protected ChatroomPane chatroompane;
 	
+	public static final int UnitWaitTime = 500;		// 远程发现的等待时间，需根据网络情况调整
+	public static final int MAXRETRIES = 5;		// 远程发现时的重试次数，需根据网络情况调整
+	
 	/**
 	 * 私聊: 该值为对方ID;
 	 * 群聊:为组ID

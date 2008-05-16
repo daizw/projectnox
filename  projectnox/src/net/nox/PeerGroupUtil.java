@@ -149,10 +149,21 @@ public class PeerGroupUtil {
 		boolean passProt = (password != null && !password.trim().equals(""));
 
 		System.out.println("in createPGA(): Creating PGA with: " + name + ":" + password);
+		if(password.equals(""))
+			System.out.println("password == \"\"");
+		else if(password == null)
+			System.out.println("password == null");
+		else
+			System.out.println("password == >" + password + "<");
+		
+		System.out.println("parentGroup:");
+		System.out.println(parentGroup.getPeerGroupName());
+		System.out.println(parentGroup.getPeerGroupID());
 		
 		// create the ModuleImplAdvertisement
 		mia = parentGroup.getAllPurposePeerGroupImplAdvertisement();
 
+		System.out.println("mia:\n" + mia.toString());
 		// 如果有密码, 则在mia中添加密码认证moduleImpl
 		if (passProt) {
 			System.out.println("pasProt == true : Begin createPasswordModuleImpl()");
@@ -195,6 +206,8 @@ public class PeerGroupUtil {
 		ds.remotePublish(pga, expiration != 0 ? expiration
 				: 2 * MILLISECONDS_IN_A_WEEK);
 
+		System.out.println("mia final edition:\n" + mia.toString());
+		
 		return pga;
 	}
 	
