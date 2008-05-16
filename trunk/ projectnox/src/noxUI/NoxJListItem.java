@@ -126,11 +126,11 @@ class GroupItem extends NoxJListItem {
 	private String password = null;
 	private int onlineCount;
 	private int memberCount;
-	private Object[] members;
+	//private Object[] members;
 
 	GroupItem(ImageIcon portr, PeerGroupAdvertisement adv, String password) {
 		super(portr, adv.getName(), adv.getDescription(), adv.getPeerGroupID());
-		this.members = null;
+		//this.members = new PeerItem[0];
 		this.password = password;
 	}
 
@@ -141,6 +141,10 @@ class GroupItem extends NoxJListItem {
 	public String getPassword() {
 		return password;
 	}
+	
+	/*public Object[] getMembers(){
+		return members;
+	}*/
 
 	public int getOnlineCount() {
 		return onlineCount;

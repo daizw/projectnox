@@ -25,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.MimeMediaType;
 import net.jxta.endpoint.ByteArrayMessageElement;
 import net.jxta.endpoint.Message;
@@ -61,17 +62,15 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 	protected InfiniteProgressPanel glassPane;
 	
 	private Thread connector;
-	/**
-	 * 用于保存找到的管道广告
-	 */
-	protected PipeAdvertisement newOutPipeAdv = null;
+	
+	private PeerGroup peergroup = null;
 	/**
 	 * 用于收发消息的pipe
 	 */
 	private InputPipe inpipe = null;
 	private OutputPipe outpipe = null;
 
-	 public static String FROMALLSTR = "fromAll";
+	public static String FROMALLSTR = "fromAll";
 	
 	/**
 	 * 最终应该从主窗口继承颜色, 透明度 考虑实现:主窗口和从属窗口同步调节颜色和透明度.
@@ -93,8 +92,8 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 				+ "groupChat_48.png", false);
 		roomID = group.getUUID();
 
-		GroupChatroomSidePane gcsp = new GroupChatroomSidePane(group
-				.getName(), null);
+		GroupChatroomSidePane gcsp = new GroupChatroomSidePane(this, group
+				.getName(), new PeerItem[0]);
 		rootpane.add(gcsp);
 		rootpane.add(chatroompane);
 		this.getContainer().setLayout(new BorderLayout());
@@ -119,12 +118,25 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 		this.outpipe = opipe;
 		
 		/**
+		 * 初始化peergroup, 供搜索组员使用
+		 */
+		PeerGroup parentgroup = NoxToolkit.getNetworkManager().getNetPeerGroup();
+
+		if(pga != null){
+			try {
+				peergroup = parentgroup.newGroup(pga);
+			} catch (PeerGroupException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		/**
 		 * TODO 移除原来的管道监听器
 		 */
-
 		roomID = pga.getPeerGroupID();
+		
 		GroupChatroomSidePane gcsp 
-			= new GroupChatroomSidePane(pga.getDescription(), null);
+			= new GroupChatroomSidePane(this, pga.getDescription(), new PeerItem[0]);
 		rootpane.add(gcsp);
 		rootpane.add(chatroompane);
 		this.getContainer().setLayout(new BorderLayout());
@@ -146,6 +158,12 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 		roomID = group.getUUID();
 		this.setVisible(true);
 	}*/
+	public DiscoveryService getDiscoveryService(){
+		if(peergroup != null)
+			return peergroup.getDiscoveryService();
+		else
+			return null;
+	}
 	public OutputPipe getOutBidipipe() {
 		/*if (connectionHandler != null)
 			return connectionHandler.getPipe();
@@ -163,6 +181,9 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 			System.out.println("Unbelievable! the parameter 'pipe' is null!!");
 	}
 
+	public void discoverMembers(){
+		;
+	}
 	public void TryToConnectAgain(long waittime) {
 		connector.start();
 		rootpane.setVisible(false);
@@ -189,17 +210,17 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 
 		PeerGroupAdvertisement pga = PeerGroupUtil.getLocalAdvByID(parentgroup, roomID.toString());
 		if(pga != null){
-			PeerGroup pg = null;
+			peergroup = null;
 			try {
-				pg = parentgroup.newGroup(pga);
+				peergroup = parentgroup.newGroup(pga);
 			} catch (PeerGroupException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if(pg != null){
+			if(peergroup != null){
 				System.out.println("成功创建组, 正在查找该组所用管道广告...");
 				PipeAdvertisement pia = null;
-				pia = PipeUtil.findPipeAdv(pg, pg.getPeerGroupID().toString());
+				pia = PipeUtil.findPipeAdv(peergroup, peergroup.getPeerGroupID().toString());
 				if(pia == null){
 					System.out.println("Failed to find or create a pipe adv, it's a fatal error");
 					return;
@@ -207,9 +228,9 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 				System.out.println("Creating Propagated InputPipe for pipe: " + pia.getPipeID());
 		        try {
 		        	if(inpipe == null)
-		        		inpipe = pg.getPipeService().createInputPipe(pia, this);
+		        		inpipe = peergroup.getPipeService().createInputPipe(pia, this);
 		            if(outpipe == null)
-		            	outpipe = pg.getPipeService().createOutputPipe(pia, waittime);
+		            	outpipe = peergroup.getPipeService().createOutputPipe(pia, waittime);
 		        } catch (IOException e) {
 		        	System.out.println("Failed to create Propagated InputPipe for pipe: " + pia.getPipeID());
 		            e.printStackTrace();
