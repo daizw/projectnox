@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
@@ -159,17 +160,18 @@ public class ObjectList extends JList {
 	 * @return 所有广告
 	 */
 	public Map<ID, String> getGroupIDPwds(){
-		Map<ID, String> idpwds = null;
-		//items.clear();
+		Map<ID, String> idpwds = new HashMap<ID, String>();
+		idpwds.clear();
 		try{
 			int size =  fmod.getRealSize();
+			System.out.println("ObjectList size here: " + size);
 			GroupItem tempItem = null;
-			System.out.println("List size: " + size);
 			for(int index = 0; index <  size; index++){
 				tempItem = (GroupItem)fmod.getRealElementAt(index);
 				idpwds.put(tempItem.getUUID(), tempItem.getPassword());
 			}
 		}catch(Exception e){
+			e.printStackTrace();
 			return null;
 		}
 		

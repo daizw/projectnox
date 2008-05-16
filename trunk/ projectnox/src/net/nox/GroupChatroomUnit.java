@@ -49,6 +49,15 @@ public class GroupChatroomUnit implements ChatroomUnit{
 		/*if(room != null)
 			room.setOutPipe(pipe);*/
 	}
+	/**
+	 * …Ë÷√I/O pipe
+	 * @param ipipe inputpipe
+	 * @param opipe outputpipe
+	 */
+	public void setIOPipe(InputPipe ipipe, OutputPipe opipe) {
+		setInPipe(ipipe);
+		setOutPipe(opipe);
+	}
 	@Override
 	public GroupChatroom getChatroom(){
 		return room;

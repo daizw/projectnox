@@ -114,6 +114,23 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 		}, "Connector");
 		connector.start();
 	}
+	public GroupChatroom(PeerGroup pg, InputPipe ipipe, OutputPipe opipe) {
+		super(pg.getPeerGroupName(), SystemPath.IMAGES_RESOURCE_PATH
+				+ "bkgrd.png", SystemPath.ICONS_RESOURCE_PATH
+				+ "groupChat_20.png", SystemPath.ICONS_RESOURCE_PATH
+				+ "groupChat_48.png", false);
+		this.inpipe = ipipe;
+		this.outpipe = opipe;
+		
+		roomID = pg.getPeerGroupID();
+		GroupChatroomSidePane gcsp 
+			= new GroupChatroomSidePane(pg.getPeerGroupAdvertisement().getDescription(), null);
+		rootpane.add(gcsp);
+		rootpane.add(chatroompane);
+		this.getContainer().setLayout(new BorderLayout());
+		this.getContainer().add(rootpane, BorderLayout.CENTER);
+		this.setVisible(true);
+	}
 	/*public GroupChatroom(final GroupItem group, GroupItem[] gmembers) {
 		super(group.getNick(), SystemPath.IMAGES_RESOURCE_PATH
 				+ "bkgrd.png", SystemPath.ICONS_RESOURCE_PATH
