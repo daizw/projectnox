@@ -208,7 +208,7 @@ class CreateNewGroupPane extends JPanel{
 
             if (pga != null) {
                 PeerGroup pg = null;
-
+                System.out.println("新组所用的广告: \n" + pga);
                 // Create the group itself
                 try {
                     pg = ppg.newGroup(pga);
