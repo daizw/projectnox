@@ -10,12 +10,15 @@ import java.util.Set;
 import net.jxta.document.Advertisement;
 import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroup;
+import net.jxta.pipe.InputPipe;
+import net.jxta.pipe.OutputPipe;
 import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
 import net.jxta.util.JxtaBiDiPipe;
 import noxUI.AdvTable;
 import noxUI.Chatroom;
 import noxUI.Cheyenne;
+import noxUI.GroupChatroom;
 import noxUI.NoxJListItem;
 import noxUI.PeerChatroom;
 /**
@@ -150,6 +153,22 @@ public class NoxToolkit {
 		return newRoomUnit;
 	}
 	/**
+	 * 注册ID和IOPipe的对应关系
+	 * @param id chatroom 的ID(组ID)
+	 * @param ipipe inputpipe
+	 * @param opipe outputpipe
+	 */
+	public static GroupChatroomUnit registerChatroomUnit(ID id, InputPipe ipipe, OutputPipe opipe){
+		GroupChatroomUnit newRoomUnit = new GroupChatroomUnit(id, ipipe, opipe);
+		chatrooms.add(newRoomUnit);
+		return newRoomUnit;
+	}
+	public static GroupChatroomUnit registerChatroomUnit(ID id, InputPipe ipipe, OutputPipe opipe, Chatroom room){
+		GroupChatroomUnit newRoomUnit = new GroupChatroomUnit(id, ipipe, opipe, (GroupChatroom) room);
+		chatrooms.add(newRoomUnit);
+		return newRoomUnit;
+	}
+	/**
 	 * 为ID添加对应的room
 	 * @param id
 	 * @param room
@@ -160,7 +179,7 @@ public class NoxToolkit {
 
 		while (it.hasNext())
 		{// 遍历集合
-			roomunit = (PeerChatroomUnit)(it.next());
+			roomunit = it.next();
 			System.out.println("Chatroom Iterator here : " + roomunit.getRoomID());
 			if(roomunit.getRoomID() == null || id == null){
 				System.out.println("Error	: This room has no ID or you want to get a Chatroom without any id, it's very strange!!");
@@ -172,7 +191,7 @@ public class NoxToolkit {
 			}
 			if(id.equals(roomunit.getRoomID())){
 				System.out.println("I find the ID, now I will set the chatroom");
-				roomunit.setChatroom((PeerChatroom) room);
+				roomunit.setChatroom(room);
 				return;
 			}
 		}

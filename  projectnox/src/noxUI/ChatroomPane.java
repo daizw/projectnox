@@ -773,6 +773,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 			// *****************************************************
 			tp_historymsg.setEditable(false);// 重新设为不可编辑
 		}
+		this.repaint();
 	}
 
 	/**

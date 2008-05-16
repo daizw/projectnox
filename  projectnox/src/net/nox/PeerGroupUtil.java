@@ -155,6 +155,7 @@ public class PeerGroupUtil {
 
 		// 如果有密码, 则在mia中添加密码认证moduleImpl
 		if (passProt) {
+			System.out.println("pasProt == true : Begin createPasswordModuleImpl()");
 			createPasswordModuleImpl(mia);
 		}
 
