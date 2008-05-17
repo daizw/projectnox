@@ -87,7 +87,7 @@ public class Cheyenne extends NoxFrame {
 	 * @param glist
 	 * @param blist
 	 */
-	Cheyenne(ObjectList flist, ObjectList glist, ObjectList blist, Connection conn) {
+	public Cheyenne(ObjectList flist, ObjectList glist, ObjectList blist, Connection conn) {
 		super("NoX: a IM system", SystemPath.IMAGES_RESOURCE_PATH + "bkgrd.png", 
 				SystemPath.LOGO_RESOURCE_PATH + "NoXlogo_20.png",
 				SystemPath.LOGO_RESOURCE_PATH + "NoXlogo_48.png",
