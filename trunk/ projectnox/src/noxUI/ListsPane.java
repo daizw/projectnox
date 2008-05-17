@@ -403,6 +403,8 @@ public class ListsPane extends JTabbedPane {
 							GroupItem group = (GroupItem)glist.deleteItem(index);
 							ListsPane.this.repaint();
 							//TODO 删除认证书, 删除ChatroomUnit, 删除管道监听器.
+							//from: myJXTA:
+							//peerGroup.getMembershipService().resign();
 						}
 					});
 					MenuElement els[] = groupOprMenu.getSubElements();

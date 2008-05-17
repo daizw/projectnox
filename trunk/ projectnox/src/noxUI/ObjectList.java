@@ -64,7 +64,7 @@ public class ObjectList extends JList {
 	 * @param objs
 	 *            列表元素(FriendItem类型)数组
 	 */
-	ObjectList(Connection sqlconn, String tablename, boolean isGood) {
+	public ObjectList(Connection sqlconn, String tablename, boolean isGood) {
 		// super(objs);
 		fmod = new FilterModel();
 		this.setModel(fmod);
