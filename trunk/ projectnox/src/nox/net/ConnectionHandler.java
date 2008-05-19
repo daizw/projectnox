@@ -1,17 +1,15 @@
 package nox.net;
 
 import java.io.IOException;
-import java.util.Date;
 
 import net.jxta.endpoint.Message;
-import net.jxta.endpoint.MessageElement;
-import net.jxta.endpoint.StringMessageElement;
 import net.jxta.id.ID;
 import net.jxta.pipe.PipeMsgEvent;
 import net.jxta.pipe.PipeMsgListener;
+import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
-import nox.net.PeerChatroomUnit;
 import nox.ui.PeerChatroom;
+import nox.xml.NoxMsgUtil;
 import nox.xml.XmlMsgFormat;
 
 /**
@@ -56,11 +54,11 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 	 */
 	public ConnectionHandler(JxtaBiDiPipe pipe) {
 		this.outbidipipe = pipe;
-		outbidipipe.setMessageListener(this);
 		//TODO register the chatroom.
 		//if it has exist, then refresh the outpipe(?).
 		//if not, handle the connection considering the condition.
 		registerPipe(outbidipipe);
+		outbidipipe.setMessageListener(this);
 	}
 	/**
 	 * 负责建立和维护ID-Pipe对, 同时更新此处成员变量room.
@@ -97,52 +95,6 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 		Message msg = event.getMessage();
 
 		System.out.println("Incoming call: " + msg.toString());
-
-		// get the message element named SenderMessage
-		MessageElement senderEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.SENDER_ELEMENT_NAME);
-		MessageElement senderIDEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.SENDERID_ELEMENT_NAME);
-		MessageElement receiverEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.RECEIVER_ELEMENT_NAME);
-		MessageElement receiverIDEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.RECEIVERID_ELEMENT_NAME);
-		MessageElement timeEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.TIME_ELEMENT_NAME);
-		MessageElement msgEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.MESSAGE_ELEMENT_NAME);
-
-		System.out.println("Detecting if the msg elements is null");
-
-		if (null == senderEle || receiverEle == null || timeEle == null
-				|| msgEle == null) {
-			System.out.println("Msg is empty, it's weird.");
-			return;
-		}
-		System.out.println("Incoming call: From: " + senderEle.toString());
-		System.out.println("Incoming call: FromID: " + senderIDEle.toString());
-		System.out.println("Incoming call: To: " + receiverEle.toString());
-		System.out.println("Incoming call: ToID: " + receiverIDEle.toString());
-		System.out.println("Incoming call: At: " + timeEle.toString());
-		System.out.println("Incoming call: Msg: " + msgEle.toString());
-
-		// Get message
-		// TODO 这是在干嘛?
-		if (null == senderEle.toString() || receiverEle.toString() == null
-				|| timeEle.toString() == null || msgEle.toString() == null) {
-			System.out
-					.println("Msg.toString() is empty, it's weird even more.");
-			return;
-		}
-
-		System.out.println("Connection-Handler got Message :"
-				+ msgEle.toString());
 		
 		// TODO 将经过处理的消息传给对应的Chatroom.
 		System.out.println("Trying to setup a chatroom...");
@@ -198,31 +150,17 @@ public class ConnectionHandler implements Runnable, PipeMsgListener {
 	private void sendGreetingMessages(JxtaBiDiPipe bidipipe) throws IOException {
 		System.out.println("Sending greeting message...");
 		// create the message
-		Message msg = new Message();
-		Date date = new Date(System.currentTimeMillis());
 		// add a string message element with the current date
 		String hellomsg = "Greetings! What's up? [F:100]\nIn ConnectionHandler sendGreetingMessages() from "
 				+ NoxToolkit.getNetworkConfigurator().getName();
 
-		StringMessageElement senderEle = new StringMessageElement(
-				XmlMsgFormat.SENDER_ELEMENT_NAME, NoxToolkit.getNetworkConfigurator().getName(), null);
-		StringMessageElement senderIDEle = new StringMessageElement(
-				XmlMsgFormat.SENDERID_ELEMENT_NAME, NoxToolkit.getNetworkConfigurator().getPeerID().toString(), null);
-		StringMessageElement receiverEle = new StringMessageElement(
-				XmlMsgFormat.RECEIVER_ELEMENT_NAME, bidipipe.getRemotePeerAdvertisement().getName(), null);
-		StringMessageElement receiverIDEle = new StringMessageElement(
-				XmlMsgFormat.RECEIVERID_ELEMENT_NAME, bidipipe.getRemotePeerAdvertisement().getPeerID().toString(), null);
-		StringMessageElement timeEle = new StringMessageElement(
-				XmlMsgFormat.TIME_ELEMENT_NAME, date.toString(), null);
-		StringMessageElement msgEle = new StringMessageElement(
-				XmlMsgFormat.MESSAGE_ELEMENT_NAME, hellomsg, null);
-
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderEle);
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderIDEle);
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverEle);
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverIDEle);
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, timeEle);
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, msgEle);
+		PeerAdvertisement adv = bidipipe.getRemotePeerAdvertisement();
+		
+		Message msg = NoxMsgUtil.generateMsg(XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
+				NoxToolkit.getNetworkConfigurator().getName(),
+				NoxToolkit.getNetworkConfigurator().getPeerID().toString(),
+				adv.getName(), adv.getPeerID().toString(),
+				hellomsg.getBytes());
 
 		bidipipe.sendMessage(msg);
 	}
