@@ -39,12 +39,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-
-import nox.net.NoxToolkit;
 
 /*
  * Created on 2006-9-9
@@ -113,6 +112,10 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 	 */
 	private JButton b_sendPic;
 	/**
+	 * 发送文件按钮
+	 */
+	private JButton b_sendFile;
+	/**
 	 * 截屏按钮
 	 */
 	private JButton b_snapshot;
@@ -124,6 +127,11 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 图片索引格式化处理
 	 */
 	public static final DecimalFormat fmNum = new DecimalFormat("000");
+	/**
+	 * 消息加密JToggleButton
+	 */
+	private JToggleButton tb_encrypt;
+	
 	/**
 	 * 消息发送JButton
 	 */
@@ -194,10 +202,6 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * 欢迎消息
 	 */
 	private String sayHello;
-	/**
-	 * 防打扰
-	 */
-	private boolean noDisturb = false;
 
 	/***************************************************************************
 	 * //
@@ -376,6 +380,15 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		b_sendPic.setPreferredSize(buttonSize);
 		b_sendPic.setMaximumSize(buttonSize);
 		b_sendPic.setMinimumSize(buttonSize);
+		
+		b_sendFile = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "sendfile.png"));
+		b_sendFile.setToolTipText(getHtmlText("Send a file"));
+		b_sendFile.setActionCommand("SendFile");
+		b_sendFile.addActionListener(this);
+		b_sendFile.setSize(buttonSize);
+		b_sendFile.setPreferredSize(buttonSize);
+		b_sendFile.setMaximumSize(buttonSize);
+		b_sendFile.setMinimumSize(buttonSize);
 
 		b_snapshot = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "snapshot.png"));
 		b_snapshot.setToolTipText(getHtmlText("Snap it !"));
@@ -466,6 +479,15 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		menuSnap.add(hideFrame);
 		menuSnap.pack();
 
+		tb_encrypt= new JToggleButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "unlock.png"));
+		tb_encrypt.setToolTipText(getHtmlText("Encrypt or not"));
+		tb_encrypt.setSelectedIcon(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "lock.png"));
+		tb_encrypt.setSelected(true);
+		tb_encrypt.setSize(buttonSize);
+		tb_encrypt.setPreferredSize(buttonSize);
+		tb_encrypt.setMaximumSize(buttonSize);
+		tb_encrypt.setMinimumSize(buttonSize);
+		
 		// b_send = new JButton("Send");
 		b_send = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "send.png"));
 		b_send.setMnemonic('S');
@@ -484,9 +506,11 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		p_buttons.add(b_emotion);
 		p_buttons.add(b_shake);
 		p_buttons.add(b_sendPic);
+		p_buttons.add(b_sendFile);
 		p_buttons.add(b_snapshot);
 		p_buttons.add(b_snapconfig);
 		p_buttons.add(Box.createHorizontalGlue());
+		p_buttons.add(tb_encrypt);
 		p_buttons.add(b_send);
 		// p_buttons.add(p_side, BorderLayout.CENTER);
 		// p_buttons.add(b_send, BorderLayout.WEST);
@@ -546,14 +570,14 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 	 *            1:sender;2:receiver;3:time;4:msg
 	 * @param incomingPic 外来图片
 	 */
-	public void incomingMsgProcessor(final String[] strs, ImageIcon incomingPic) {// 1:sender;2:receiver;3:time;4:msg
+	/*public void incomingMsgProcessor(final String[] strs, ImageIcon incomingPic) {// 1:sender;2:receiver;3:time;4:msg
 		System.out.println("playAudio()...");
 		// System.out.println("public void receiveMsgAndAccess(String[] strs)");
 		// System.out.println("currentUsername :" + currentUsername);
 
-		/**
+		*//**
 		 * 处理外部传来的消息字符串
-		 */
+		 *//*
 		StringBuffer strbuf_msg = new StringBuffer(strs[4]);
 		int caretPos = -1;
 
@@ -563,7 +587,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		}
 
 		String whoami = "ME";
-		whoami = NoxToolkit.getNetworkConfigurator().getName();
+		whoami = NoxToolkit.getNetworkConfigurator().getPeerID().toString();
 
 		if (strs[2].equals(whoami))// 此处要获取当前用户的用户名
 		{
@@ -603,6 +627,77 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 				playThd.start();
 			}
 		}
+	}*/
+	
+	public void incomingMsgProcessor(String sender, String time,
+			String strmsg){
+		incomingMsgProcessor(sender, time, strmsg, null);
+	}
+	
+	public void incomingMsgProcessor(String sender, String time,
+			ImageIcon incomingPic){
+		incomingMsgProcessor(sender, time, null, incomingPic);
+	}
+	
+	public void incomingMsgProcessor(String sender, String time,
+			final String strmsg, ImageIcon incomingPic) {
+		System.out.println("playAudio()...");
+		Thread playThd = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				if (strmsg != null && strmsg.equals(shakeMsg))
+					playShakeAudio();
+				else
+					playAudio();
+			}
+		}, "Beeper");
+		playThd.start();
+		
+		/**
+		 * 处理外部传来的消息字符串
+		 */
+		String label = "[" + sender + "@" + time + "]";
+		
+		StringBuffer strbuf_msg = null;
+		if(strmsg != null){
+			strbuf_msg = new StringBuffer(strmsg);
+			int caretPos = -1;
+
+			for (; (caretPos = strbuf_msg.indexOf("^n", caretPos + 1)) >= 0;) {
+				// 把"^n"替换为"\n"
+				strbuf_msg.replace(caretPos, caretPos + 2, "\n");
+			}
+		}
+		
+		appendToHMsg(label, (strbuf_msg != null)?strbuf_msg.toString():null, incomingPic, true, false);
+		
+		/*if (strs[2].equals(whoami))// 此处要获取当前用户的用户名
+		{
+			
+		} else if (strs[0].equals(GroupChatroom.FROMALLSTR))// 群聊消息
+		{
+			System.out.println("noDisturb " + noDisturb);
+			String label = "[" + strs[1] + "@" + strs[3] + "]";
+			// appendToHMsg(label, strbuf_msg.toString(), !noDisturb);
+			if (noDisturb)// 且 防打扰打开
+			{
+				appendToHMsg(label, strbuf_msg.toString(), incomingPic, false, false);
+				return;
+			} else// 防打扰未打开
+			{
+				appendToHMsg(label, strbuf_msg.toString(), incomingPic, true, false);
+				Thread playThd = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						if (strs[4].equals(shakeMsg))
+							playShakeAudio();
+						else
+							playAudio();
+					}
+				}, "Beeper");
+				playThd.start();
+			}
+		}*/
 	}
 
 	/**
@@ -671,8 +766,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 	public void appendToHMsg(String label, String msg, ImageIcon incomingPic, boolean visible,
 			boolean isFromMe) {
 		StringBuffer label_buf = new StringBuffer(label);
-		StringBuffer msg_buf = new StringBuffer(msg);
-
+		
 		// System.out.println("label_buf :" + label_buf);
 		// System.out.println("msg_buf :" + msg_buf);
 
@@ -684,11 +778,11 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		 * 将消息添加到消息记录
 		 */
 		historymsg_save += (label_buf + "\n");
-		historymsg_save += (msg_buf + "\n");
+		
 		/**
 		 * 是否是闪屏振动消息
 		 */
-		if (msg.equals(shakeMsg)) {
+		if (msg != null && msg.equals(shakeMsg)) {
 			// 使用灰色标签
 			labelStyle = gray;
 
@@ -722,7 +816,9 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 			tp_historymsg.replaceSelection(label + '\n');
 			System.out.println("label :" + label);
 			
-			if(!msg.equals("")){
+			if(msg != null && !msg.equals("")){
+				StringBuffer msg_buf = new StringBuffer(msg);
+				historymsg_save += (msg_buf + "\n");
 				//用户发送空消息已被禁止, 所以如果发过来的是空消息,
 				//则说明发送过来的是图片.
 				//所以当msg不为空的时候需要显示消息
@@ -846,8 +942,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		 */
 		Date date = new Date();
 		// fmDate = new SimpleDateFormat("yyyy/MM/dd E HH:mm:ss");
-		String label = "I say to " + parent.getRoomName() + ", at "
-				+ fmDate.format(date) + " :";
+		String label = "I say@" + fmDate.format(date) + ":";
 
 		appendToHMsg(label, tp_input.getText(), null, true, true);
 		/**
@@ -863,7 +958,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		}
 		System.out.println("strbuf_msg :" + strbuf_msg);
 
-		boolean succeed = parent.SendMsg(new String(strbuf_msg), null);
+		boolean succeed = parent.SendMsg(new String(strbuf_msg), tb_encrypt.isSelected());
 		if(!succeed){
 			//TODO tell user what happend.
 			showFailedSendingMsg(new String(strbuf_msg));
@@ -879,13 +974,14 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		Date date = new Date();
 		// fmDate = new SimpleDateFormat("yyyy/MM/dd E HH:mm:ss");
 		String label = "Sending a Shake Emotion to " + parent.getRoomName()
-				+ ", at " + fmDate.format(date) + " :";
+				+ "@" + fmDate.format(date) + ":";
 
-		appendToHMsg(label, tp_input.getText(), null, true, true);
+		//appendToHMsg(label, tp_input.getText(), null, true, true);
+		appendToHMsg(label, null, null, true, true);
 		/**
 		 * 向对方发送消息 999:表示表情索引
 		 */
-		boolean succeed = parent.SendMsg(shakeMsg, null);
+		boolean succeed = parent.SendMsg(shakeMsg, tb_encrypt.isSelected());
 		if(!succeed){
 			//TODO tell user what happend.
 			showFailedSendingMsg("(It's a shake emotion actually.)");
@@ -962,10 +1058,25 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		tp_historymsg.setCaretPosition(styledDoc.getLength());
 		tp_historymsg.replaceSelection("\n");
 		tp_historymsg.setEditable(false);// 重新设为不可编辑
-		boolean succeed = parent.SendMsg("", bufImg);
+		boolean succeed = parent.SendMsg(bufImg, tb_encrypt.isSelected());
 		if(!succeed){
 			//TODO tell user what happend.
 			showFailedSendingMsg("(It's a picture actually.)");
+		}
+	}
+	
+	/**
+	 * 用于发送选择的文件
+	 * @param filePath 文件路径
+	 */
+	private void sendAFile(String filePath) {
+		File theFile = new File(filePath);
+		if(theFile.exists()){
+			boolean succeed = parent.SendMsg(theFile, tb_encrypt.isSelected());
+			if(!succeed){
+				//TODO tell user what happend.
+				showFailedSendingMsg("(It's a file actually.)");
+			}
 		}
 	}
 
@@ -1032,6 +1143,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 				}
 			};
 			chooser.setFileFilter(filter);
+			chooser.setDialogTitle("请选择所要发送的图片");
 			int returnVal = chooser.showOpenDialog(this);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				// getJtf_pic().setText(chooser.getSelectedFile().getPath());
@@ -1039,11 +1151,31 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 						+ chooser.getSelectedFile().getPath());
 				sendAPicture(chooser.getSelectedFile().getPath());
 			}
+		}  else if (srcButton.getActionCommand().equals("SendFile")) {
+			JFileChooser chooser = new JFileChooser();
+			FileFilter filter = new FileFilter() {
+				public boolean accept(File f) {
+					return f.isDirectory() || f.isFile();
+				}
+				@Override
+				public String getDescription() {
+					return "*.*";
+				}
+			};
+			chooser.setFileFilter(filter);
+			chooser.setDialogTitle("请选择所要发送的文件");
+			int returnVal = chooser.showOpenDialog(this);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				// getJtf_pic().setText(chooser.getSelectedFile().getPath());
+				System.out.println("You chose a pic: "
+						+ chooser.getSelectedFile().getPath());
+				sendAFile(chooser.getSelectedFile().getPath());
+			}
 		} else if (srcButton.getActionCommand().equals("Snapshot")) {
 			// 位置应该是相对于JButton的位置
 			//menuSnap.show((Component) e.getSource(), 0, 26);
 			doSnap.doClick();
-		}else if (srcButton.getActionCommand().equals("SnapshotConfig")) {
+		} else if (srcButton.getActionCommand().equals("SnapshotConfig")) {
 			// 位置应该是相对于JButton的位置
 			menuSnap.show((Component) e.getSource(), 0, 26);
 		}

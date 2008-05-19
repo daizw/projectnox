@@ -259,7 +259,7 @@ public class JXTANetwork {
 		PipeAdvertisement serverPipeAdv = PipeUtil.getPipeAdvWithoutRemoteDiscovery(
 				TheNetworkManager.getNetPeerGroup(),
 				TheConfig.getPeerID().toString(),
-				PipeService.UnicastSecureType,
+				PipeService.UnicastType,
 				//(BIDI_PIPEID == null)?null:BIDI_PIPEID.toString(),
 				true);
 		

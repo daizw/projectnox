@@ -102,7 +102,7 @@ public class GroupChatroomSidePane extends JSplitPane{
 		
 		memberLabelPane = new JPanel();
 		l_groupMembers = new JLabel("Group Members:");
-		refresh = new JButton(new ImageIcon(SystemPath.BUTTONS_RESOURCE_PATH + "refresh.png"));
+		refresh = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "refresh.png"));
 		refresh.setToolTipText(ListsPane.getHtmlText("Refresh this list"));
 		Dimension btnsize = new Dimension(20, 20);
 		refresh.setSize(btnsize);

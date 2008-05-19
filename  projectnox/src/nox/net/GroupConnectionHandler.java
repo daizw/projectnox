@@ -15,6 +15,7 @@ import net.jxta.pipe.PipeMsgEvent;
 import net.jxta.pipe.PipeMsgListener;
 import net.jxta.protocol.PipeAdvertisement;
 import nox.ui.GroupChatroom;
+import nox.xml.NoxMsgUtil;
 import nox.xml.XmlMsgFormat;
 
 public class GroupConnectionHandler implements Runnable, PipeMsgListener{
@@ -85,32 +86,15 @@ public class GroupConnectionHandler implements Runnable, PipeMsgListener{
 	private void sendGreetingMessages(OutputPipe outpipe) throws IOException {
 		System.out.println("Sending greeting message...");
 		// create the message
-		Message msg = new Message();
-		Date date = new Date(System.currentTimeMillis());
-		// add a string message element with the current date
 		String hellomsg = "Greetings! What's up? [F:100]\nIn ConnectionHandler sendGreetingMessages() from "
 				+ NoxToolkit.getNetworkConfigurator().getName();
 
-		StringMessageElement senderEle = new StringMessageElement(
-				XmlMsgFormat.SENDER_ELEMENT_NAME, NoxToolkit.getNetworkConfigurator().getName(), null);
-		StringMessageElement senderIDEle = new StringMessageElement(
-				XmlMsgFormat.SENDERID_ELEMENT_NAME, NoxToolkit.getNetworkConfigurator().getPeerID().toString(), null);
-		StringMessageElement receiverEle = new StringMessageElement(
-				XmlMsgFormat.RECEIVER_ELEMENT_NAME, peergroup.getPeerGroupName(), null);
-		StringMessageElement receiverIDEle = new StringMessageElement(
-				XmlMsgFormat.RECEIVERID_ELEMENT_NAME, peergroup.getPeerGroupID().toString(), null);
-		StringMessageElement timeEle = new StringMessageElement(
-				XmlMsgFormat.TIME_ELEMENT_NAME, date.toString(), null);
-		StringMessageElement msgEle = new StringMessageElement(
-				XmlMsgFormat.MESSAGE_ELEMENT_NAME, hellomsg, null);
-
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderEle);
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, senderIDEle);
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverEle);
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, receiverIDEle);
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, timeEle);
-		msg.addMessageElement(XmlMsgFormat.MESSAGE_NAMESPACE_NAME, msgEle);
-
+		Message msg = NoxMsgUtil.generateMsg(XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
+				NoxToolkit.getNetworkConfigurator().getName(),
+				NoxToolkit.getNetworkConfigurator().getPeerID().toString(),
+				peergroup.getPeerGroupName(), peergroup.getPeerGroupID().toString(),
+				hellomsg.getBytes());
+		
 		outpipe.send(msg);
 	}
 	
@@ -163,7 +147,7 @@ public class GroupConnectionHandler implements Runnable, PipeMsgListener{
 	 */
 	@Override
 	public void pipeMsgEvent(PipeMsgEvent event) {
-		System.out.println("===Begin ConnectionHandler PipeMsgEvent()===");
+		System.out.println("===Begin GroupConnectionHandler PipeMsgEvent()===");
 		// TODO 处理消息
 		// 做得细致的话, 应该消息分多种, 对不同消息调用不同处理函数.
 		// grab the message from the event
@@ -171,63 +155,12 @@ public class GroupConnectionHandler implements Runnable, PipeMsgListener{
 
 		System.out.println("Incoming call: " + msg.toString());
 
-		// get the message element named SenderMessage
-		MessageElement senderEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.SENDER_ELEMENT_NAME);
-		MessageElement senderIDEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.SENDERID_ELEMENT_NAME);
-		MessageElement receiverEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.RECEIVER_ELEMENT_NAME);
-		MessageElement receiverIDEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.RECEIVERID_ELEMENT_NAME);
-		MessageElement timeEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.TIME_ELEMENT_NAME);
-		MessageElement msgEle = msg.getMessageElement(
-				XmlMsgFormat.MESSAGE_NAMESPACE_NAME,
-				XmlMsgFormat.MESSAGE_ELEMENT_NAME);
-
-		System.out.println("Detecting if the msg elements is null");
-
-		if (null == senderEle || receiverEle == null || timeEle == null
-				|| msgEle == null) {
-			System.out.println("Msg is empty, it's weird.");
-			return;
-		}
-		System.out.println("Incoming call: From: " + senderEle.toString());
-		System.out.println("Incoming call: FromID: " + senderIDEle.toString());
-		System.out.println("Incoming call: To: " + receiverEle.toString());
-		System.out.println("Incoming call: ToID: " + receiverIDEle.toString());
-		System.out.println("Incoming call: At: " + timeEle.toString());
-		System.out.println("Incoming call: Msg: " + msgEle.toString());
-
-		// Get message
-		// TODO 这是在干嘛?
-		if (null == senderEle.toString() || receiverEle.toString() == null
-				|| timeEle.toString() == null || msgEle.toString() == null) {
-			System.out
-					.println("Msg.toString() is empty, it's weird even more.");
-			return;
-		}
-
-		System.out.println("Connection-Handler got Message :"
-				+ msgEle.toString());
-		
 		// TODO 将经过处理的消息传给对应的Chatroom.
-		System.out.println("Trying to setup a chatroom...");
-		//registerChatroom(senderIDEle, msg, true);
-		if(senderIDEle.toString().equals(NoxToolkit.getNetworkConfigurator().getPeerID().toString())){
-			//自己发的消息, 忽略之
-			return;
-		}
+		System.out.println("Trying to pass the msg to the chatroom...");
 		//提示收到的消息
 		promptIncomingMsg(msg);
 		
-		System.out.println("===End ConnectionHandler PipeMsgEvent()===");
+		System.out.println("===End GroupConnectionHandler PipeMsgEvent()===");
 	}
 
 }
