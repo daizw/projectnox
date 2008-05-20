@@ -44,14 +44,24 @@ public class NoX {
 						+ DBTableName.ME_SQLTABLE_NAME);
 				stmt.execute("create table " + DBTableName.ME_SQLTABLE_NAME
 						+ " (Tag VARCHAR not null, Object OTHER not null)");
+			} catch (SQLException e) {
+				System.out.println("数据库表ME已存在");
+				e.printStackTrace();
+			}
 
+			try {
 				System.out.println("creating table: "
 						+ DBTableName.PEER_SQLTABLE_NAME);
 				stmt
 						.execute("create table "
 								+ DBTableName.PEER_SQLTABLE_NAME
 								+ " (ID VARCHAR not null, Good BOOLEAN not null, Object OTHER not null)");
-
+			} catch (SQLException e) {
+				System.out.println("数据库表PEER已存在");
+				e.printStackTrace();
+			}
+		
+			try {
 				System.out.println("creating table: "
 						+ DBTableName.GROUP_SQLTABLE_NAME);
 				stmt
@@ -60,13 +70,15 @@ public class NoX {
 								+ " (ID VARCHAR not null, Good BOOLEAN, Object OTHER not null)");
 				stmt.close();
 			} catch (SQLException e) {
-				System.out.println("数据库已存在");
+				System.out.println("数据库表GROUP已存在");
 				e.printStackTrace();
 			}
 			// TODO 初始化(系统/个人)设置
 			// 读取公私钥
 			//initMyKeyPair(conn, DBTableName.ME_SQLTABLE_NAME);
 			initEcryption(conn, DBTableName.ME_SQLTABLE_NAME);
+			//或者由Cheyenne初始化
+			initMyStatus(conn, DBTableName.ME_SQLTABLE_NAME);
 
 			// 初始化列表
 			/**
@@ -98,6 +110,16 @@ public class NoX {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * 初始化个人设置
+	 * @param conn
+	 * @param meSqltableName
+	 */
+	private static void initMyStatus(Connection conn, String meSqltableName) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**

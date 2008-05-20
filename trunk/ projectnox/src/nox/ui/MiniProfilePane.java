@@ -9,6 +9,7 @@ import java.awt.event.FocusListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -32,6 +33,7 @@ public class MiniProfilePane extends JPanel {
 	JComboBox myStatus;
 	JTextField mySign;
 	
+	public static Dimension portriatSize = new Dimension(50, 50);
 	ImageIcon lastPortrait = null;
 
 	/**
@@ -44,14 +46,14 @@ public class MiniProfilePane extends JPanel {
 	 * @param sign
 	 *            签名档
 	 */
-	MiniProfilePane(final Cheyenne parent, String path_portrait, String nickname, String sign) {
-		lastPortrait = new ImageIcon(path_portrait);
+	MiniProfilePane(final Cheyenne parent, ImageIcon portrait, String nickname, String sign) {
+		lastPortrait = portrait;
 		myPortrait = new JButton(lastPortrait);
 		myPortrait.setToolTipText(getHtmlText("This is Me"));
-		myPortrait.setSize(new Dimension(50, 50));
-		myPortrait.setPreferredSize(new Dimension(50, 50));
-		myPortrait.setMaximumSize(new Dimension(50, 50));
-		myPortrait.setMinimumSize(new Dimension(50, 50));
+		myPortrait.setSize(portriatSize);
+		myPortrait.setPreferredSize(portriatSize);
+		myPortrait.setMaximumSize(portriatSize);
+		myPortrait.setMinimumSize(portriatSize);
 		// myPortrait.setBorderPainted(true);
 
 		/*
@@ -103,10 +105,10 @@ public class MiniProfilePane extends JPanel {
 		myStatus.addItem(ItemStatus.UnavailableStr);
 		//myStatus.addItem(Offline);
 		myStatus.setToolTipText(getHtmlText("My Status"));
-		myStatus.setSize(new Dimension(75, 20));
-		myStatus.setPreferredSize(new Dimension(75, 20));
-		myStatus.setMaximumSize(new Dimension(75, 20));
-		myStatus.setMinimumSize(new Dimension(75, 20));
+		myStatus.setSize(new Dimension(100, 20));
+		myStatus.setPreferredSize(new Dimension(100, 20));
+		myStatus.setMaximumSize(new Dimension(100, 20));
+		myStatus.setMinimumSize(new Dimension(100, 20));
 		// myStatus.setOpaque(false);
 
 		nickAndStat.setOpaque(false);
@@ -183,17 +185,44 @@ public class MiniProfilePane extends JPanel {
 				stat,
 				curPortrait); 
 	}
-	public void setPortrait(ImageIcon portrait){
-		myPortrait.setIcon(portrait);
+	/**
+	 * 功能与getStatusUnit类似, 唯一不同在于无论有没有修改头像, 都会返回头像.
+	 * @return
+	 */
+	public NoxPeerStatusUnit getFullStatusUnit(){
+		ItemStatus stat = null;
+		String statStr = (String) myStatus.getSelectedItem();
+		if(statStr.equals(ItemStatus.OnlineStr))
+			stat = ItemStatus.ONLINE;
+		else if(statStr.equals(ItemStatus.UnavailableStr))
+			stat = ItemStatus.UNAVAILABLE;
+		else if(statStr.equals(ItemStatus.BusyStr))
+			stat = ItemStatus.BUSY;
+		else
+			stat = ItemStatus.UNKNOWN;
+		
+		ImageIcon curPortrait = (ImageIcon) myPortrait.getIcon();
+		
+		return new NoxPeerStatusUnit(myNick.getText(),
+				mySign.getText(),
+				stat,
+				curPortrait); 
+	}
+	public void setPortrait(Icon icon){
+		myPortrait.setIcon(icon);
 	}
 	/**
 	 * 设置昵称
 	 * @param name
-	 * @deprecated 还是直接在主界面设置吧!
 	 */
 	public void setNickName(String name){
 		myNick.setText(name);
 	}
+	/**
+	 * 设置签名档
+	 * @param sign
+	 * @deprecated 还是直接在主界面设置吧!
+	 */
 	public void setSign(String sign){
 		mySign.setText(sign);
 	}
@@ -206,7 +235,7 @@ public class MiniProfilePane extends JPanel {
 	 * @param text
 	 * @return
 	 */
-	private String getHtmlText(String text) {
+	public static String getHtmlText(String text) {
 		return ("<html><BODY bgColor=#ffffff><Font color=black>" + text + "</Font></BODY></html>");
 	}
 }
