@@ -26,6 +26,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.jxta.endpoint.Message;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.id.ID;
 import net.jxta.peergroup.PeerGroup;
@@ -34,11 +35,19 @@ import net.jxta.pipe.InputPipe;
 import net.jxta.pipe.OutputPipe;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
+import net.jxta.protocol.PipeAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
 import nox.net.AuthenticationUtil;
+import nox.net.ConnectionHandler;
 import nox.net.GroupConnectionHandler;
 import nox.net.NoxToolkit;
+import nox.net.PeerChatroomUnit;
 import nox.net.PeerGroupUtil;
+import nox.net.PipeUtil;
+import nox.ui.ObjectList.FilterModel;
+import nox.xml.NoxMsgUtil;
+import nox.xml.NoxPeerStatusUnit;
+import nox.xml.XmlMsgFormat;
 /**
  * 
  * @author shinysky
@@ -60,6 +69,8 @@ public class Cheyenne extends NoxFrame {
 	public static final int HEIGHT_PREF = 600;
 	public static final int HEIGHT_MAX = 2000;
 	public static final int HEIGHT_MIN = 300;
+	
+	public static final int InterStatusCheckingsSleepTime = 10 * 1000;
 	/**
 	 * 各JPanel
 	 */
@@ -134,6 +145,9 @@ public class Cheyenne extends NoxFrame {
 		sfrm.setLocation(100, 60);
 		sfrm.setSize(new Dimension(500, 350));
 		
+		Thread peersStatusChecker = new Thread(new NoOneLivesForeverExceptMe(), "PeersStatusChecker");
+		peersStatusChecker.start();
+		
 		Thread addGroupListenerThread = new Thread(new Runnable() {
 			public void run() {
 				System.out.println("Begining initGroupListener()");
@@ -141,6 +155,137 @@ public class Cheyenne extends NoxFrame {
 			}
 		}, "Connector");
 		addGroupListenerThread.start();
+	}
+	public NoxPeerStatusUnit getStatusUnit(){
+		return profile.getStatusUnit();
+	}
+	public void setStatus(ID id, NoxPeerStatusUnit stat){
+		try {
+			friendlist.setStatus(id, stat);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private class NoOneLivesForeverExceptMe implements Runnable{
+		FilterModel fmod;
+		int size;
+		NoOneLivesForeverExceptMe(){
+			fmod = (FilterModel) friendlist.getModel();
+			size = fmod.getRealSize();
+		}
+		@Override
+		public void run() {
+			while(true){
+				PeerItem peer;
+				PeerChatroomUnit roomUnit;
+				Message msg = null;
+				for(int index = 0; index < size; index++){
+					JxtaBiDiPipe bidipipe = null;
+					NoxPeerStatusUnit status = profile.getStatusUnit();
+					byte[] statBytes = null;
+					try {
+						statBytes = NoxMsgUtil.getBytesFromObject(status);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					peer = (PeerItem) fmod.getRealElementAt(index);
+					
+					msg = NoxMsgUtil.generateMsg(
+							XmlMsgFormat.PINGMSG_NAMESPACE_NAME,
+							NoxToolkit.getNetworkConfigurator().getName(),
+							NoxToolkit.getNetworkConfigurator().getPeerID().toString(),
+							peer.getName(),
+							peer.getUUID().toString(),
+							statBytes);
+					
+					roomUnit = (PeerChatroomUnit) NoxToolkit.getChatroomUnit(peer.getUUID());
+					if(roomUnit != null){
+						if(roomUnit.getChatroom() != null){
+							//已经存在chatroom, 则取chatroom中的bidipipe使用之
+							bidipipe = roomUnit.getChatroom().getOutBidipipe();
+							if(bidipipe == null){
+								roomUnit.getChatroom().TryToConnectAgain(5 * 1000);
+							}
+							if(bidipipe == null)
+								continue;
+						}else{
+							//没有chatroom, 取Unit中bidipipe使用之
+							bidipipe = roomUnit.getOutPipe();
+							if(bidipipe == null)
+								continue;
+						}
+						try {
+							bidipipe.sendMessage(msg);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}else{
+						//不存在对应的ChatroomUnit, 需要连接然后注册bidipipe
+						PeerGroup group = NoxToolkit.getNetworkManager()
+								.getNetPeerGroup();
+						PipeAdvertisement pia = PipeUtil.findNewestPipeAdv(group,
+								peer.getUUID().toString(), 3 * 1000);
+						int timecount = 4;
+						while (bidipipe == null && timecount > 0) {
+							// Try again and again
+							try {
+								timecount --;
+								bidipipe = new JxtaBiDiPipe(group, pia,
+										(int) Chatroom.UnitWaitTime * 4, null, true);
+							} catch (IOException exc) {
+								exc.printStackTrace();
+							}
+						}
+						if(bidipipe == null){
+							//说明连接超时, 应该设之为离线状态(第二个参数为null)
+							try {
+								friendlist.setStatus(peer.getUUID(), null);
+							} catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							continue;
+						}
+						roomUnit = (PeerChatroomUnit) NoxToolkit.getChatroomUnit(peer.getUUID());
+						//防止对方连过来活在主动连过去建了聊天室?
+						if(roomUnit != null && roomUnit.getChatroom() == null){
+							Thread thread = new Thread(	new ConnectionHandler(	bidipipe),
+									"Incoming Connection Handler");
+							thread.start();
+						}
+
+						/**
+						 * @Fixme comment this
+						 */
+						//注册pipe, 实际上ConnectionHandler初始化时就注册过了...
+						NoxToolkit.registerChatroomUnit(peer.getUUID(), bidipipe);
+						
+						try {
+							bidipipe.sendMessage(msg);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				//一轮轮询之后休息一段时间(InterStatusCheckingsSleepTime)
+				try {
+					Thread.sleep(Cheyenne.InterStatusCheckingsSleepTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					continue;
+				}
+			}
+		}
 	}
 	/**
 	 * 重新加入各组, 然后为组添加管道监听器

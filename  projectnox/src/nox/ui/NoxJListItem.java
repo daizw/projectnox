@@ -43,7 +43,7 @@ public abstract class NoxJListItem implements Serializable{
 	 * 
 	 * @return 当前(在线)状态
 	 */
-	public abstract ItemStatus getStatus();
+	public abstract ItemStatus getOnlineStatus();
 
 	/**
 	 * 获取头像
@@ -94,6 +94,26 @@ public abstract class NoxJListItem implements Serializable{
 	public void updateTimeStamp() {
 		this.timeStamp = new Date().getTime();
 	}
+	
+	/**
+	 * 设置头像
+	 */
+	public void setPortrait(ImageIcon portr) {
+		portrait = portr;
+	}
+
+	/**
+	 * 设置名字(昵称)
+	 */
+	public void setName(String n){
+		name = n;
+	}
+	/**
+	 * 设置签名档(描述)
+	 */
+	public void setDesc(String desc){
+		discription = desc;
+	}
 }
 
 @SuppressWarnings("serial")
@@ -116,7 +136,7 @@ class PeerItem extends NoxJListItem {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ItemStatus getStatus() {
+	public ItemStatus getOnlineStatus() {
 		return stat;
 	}
 }
@@ -168,7 +188,7 @@ class GroupItem extends NoxJListItem {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ItemStatus getStatus() {
+	public ItemStatus getOnlineStatus() {
 		return stat;
 	}
 }

@@ -17,6 +17,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -24,6 +25,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * 设置中心窗口. 在这里可以设置个人及系统的各项参数: 例如: 个人设置: 昵称; 签名档; 个人资料; 头像; 身份验证; 其它. 系统设置:
@@ -101,6 +104,17 @@ public class ConfigCenterFrame extends NoxFrame {
 				ListSelectionModel.SINGLE_SELECTION);
 		sclist.getSelectionModel().setSelectionMode(
 				ListSelectionModel.SINGLE_SELECTION);
+		
+		pclist.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent lse) {
+				int index = lse.getFirstIndex();
+				switch(index){
+				case 0: break;
+				default: break;
+				}
+			}
+		});
 
 		perConfigPane.setLayout(new BorderLayout());
 		perConfigPane.add(pclist, BorderLayout.CENTER);
@@ -197,6 +211,35 @@ public class ConfigCenterFrame extends NoxFrame {
 		//System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
 		ConfigCenterFrame ccf = new ConfigCenterFrame(null);
 		ccf.setVisible(true);
+	}
+}
+
+/**
+ * 个人基本设置JPanel
+ * @author shinysky
+ * @Fixme
+ */
+class PersonalBasicConfigPane extends JPanel implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	Cheyenne parent;
+	JPanel portraitPane = new JPanel();
+	JLabel portraitLab = new JLabel("Portrait:");
+	JLabel portrait = new JLabel("Portrait here");
+	
+	JPanel nicknamePane = new JPanel();
+	JLabel nicknameLab = new JLabel("Nickname:");
+	
+	PersonalBasicConfigPane(Cheyenne prt) {
+		parent = prt;
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent ae) {
 	}
 }
 

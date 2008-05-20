@@ -115,7 +115,56 @@ public class PipeUtil {
 	}
 	
 	/**
-	 * 同步方式发现管道广告
+	 * 同步方式发现一定时间内得到的最新管道广告
+	 * @param pg	节点组，在该节点组内发现管道广告
+	 * @param name	管道广告名称，可使用通配符
+	 * @param time 时间上限
+	 * @return		最新的管道广告对象，如果没有找到或发现过程发生异常，那么返回null
+	 */
+	public static PipeAdvertisement findNewestPipeAdv(PeerGroup pg, String name, long time) {
+		DiscoveryService discovery = pg.getDiscoveryService();
+		
+		int count = (int) (time/WaitTime); // Discovery retry count
+		
+		PipeAdvertisement myAdv = null;
+		
+		try {
+			LOG.info("Attempting to Discover the pipe advertisement");
+			
+			// Check if we have already published ourselves
+			while(count-- > 0) {
+				// We did not find the advertisement locally;
+				// send a remote request
+				// remote advs will be stored in local cache
+				discovery.getRemoteAdvertisements(null, DiscoveryService.ADV, PipeAdvertisement.NameTag, name, Integer.MAX_VALUE, null);
+				
+				// Sleep to allow time for peers to respond to the discovery request
+				try {
+					Thread.sleep(WaitTime);
+				} catch(InterruptedException e) {
+					// ignored
+				}
+			}
+			
+			//发送了N个远程搜索请求后, 检查本地最新的管道广告.
+			myAdv = searchLocal(pg, name);
+			
+		} catch(Exception e) {
+			LOG.severe("Could not get pipe Advertisement");
+			return null;
+		}
+		
+		if(myAdv != null) {
+			LOG.info(myAdv.toString());
+		} else {
+			LOG.info("myAdv is null.");
+		}
+		
+		return myAdv;
+	}
+	
+	/**
+	 * 同步方式发现一定时间内最先得到的管道广告
 	 * @param pg	节点组，在该节点组内发现管道广告
 	 * @param name	管道广告名称，可使用通配符
 	 * @return		管道广告对象，如果没有找到或发现过程发生异常，那么返回null
@@ -142,7 +191,7 @@ public class PipeUtil {
 				// We did not find the advertisement locally;
 				// send a remote request
 				// remote advs will be stored in local cache
-				discovery.getRemoteAdvertisements(null, DiscoveryService.ADV, PipeAdvertisement.NameTag, name, 1, null);
+				discovery.getRemoteAdvertisements(null, DiscoveryService.ADV, PipeAdvertisement.NameTag, name, Integer.MAX_VALUE, null);
 				
 				// Sleep to allow time for peers to respond to the discovery request
 				try {
@@ -246,7 +295,7 @@ public class PipeUtil {
     }
 	
     /**
-     * 本地搜索广告对象
+     * 本地搜索广告对象, 返回得到的最新的广告
      * @param pg		用于搜索管道广告的节点组
      * @param name		用于搜索管道广告的名称，可使用通配符
      * @return			在节点组内创建的广告对象（返回发现的最新的管道广告）

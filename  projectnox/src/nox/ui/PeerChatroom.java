@@ -27,7 +27,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Security;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Enumeration;
 import java.util.Iterator;
 
 import javax.crypto.BadPaddingException;
@@ -51,10 +50,6 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
-import net.jxta.discovery.DiscoveryEvent;
-import net.jxta.discovery.DiscoveryListener;
-import net.jxta.discovery.DiscoveryService;
-import net.jxta.document.Advertisement;
 import net.jxta.document.MimeMediaType;
 import net.jxta.endpoint.ByteArrayMessageElement;
 import net.jxta.endpoint.Message;
@@ -70,8 +65,10 @@ import net.jxta.util.CountingOutputStream;
 import net.jxta.util.DevNullOutputStream;
 import net.jxta.util.JxtaBiDiPipe;
 import nox.net.NoxToolkit;
+import nox.net.PipeUtil;
 import nox.xml.NoxFileUnit;
 import nox.xml.NoxMsgUtil;
+import nox.xml.NoxPeerStatusUnit;
 import nox.xml.XmlMsgFormat;
 
 /**
@@ -211,6 +208,7 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 
 	/**
 	 * 与该peer建立连接:
+	 * @Fixme 获取广告方式, 最好改为在一定时间段内获取本地和远程的广告, 然后取出最新的.
 	 */
 	private void TryToConnect(long waittime) {
 		// 如果已经有了outbidipipe, 则不需要重新连接
@@ -226,31 +224,21 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 		PeerGroup group = NoxToolkit.getNetworkManager()
 				.getNetPeerGroup();
 
-		localDiscoveryListener pipeListener = new localDiscoveryListener();
-		newOutPipeAdv = null;
+		//localDiscoveryListener pipeListener = new localDiscoveryListener();
 		System.out
 				.println("[" + Thread.currentThread().getName()
 						+ "] Fetching remote pipe adv to peer/group:"
 						+ roomID);
 		// 如果发现对应的pipe会修改newOutBidipipeAdv
-		group.getDiscoveryService().getRemoteAdvertisements(
-				roomID.toString(), DiscoveryService.ADV, PipeAdvertisement.NameTag,
-				roomID.toString(), 65535, pipeListener);
-		long unittime = 500;
-		long timecount = waittime / unittime;
+		long timecount = waittime / Chatroom.UnitWaitTime;
 		//查找管道广告时间, 固定: 2s : 应根据网络状况调整
-		//TODO 自己的管道保存在数据库里, 当需要时才重建管道.
+		//尽量使用已有广告, 当需要时才重建管道.
+		//获取"最新"广告所用时间(固定)=UnitWaitTime*fetchRemotePipeAdvTimeCount.
 		int fetchRemotePipeAdvTimeCount = 4;
 		// 如果没找到gotPipeAdv或者超时或者在此时间内仍然没有外来连接
 		// (这里有个同步的问题, 在查找过程中, 如果对方主动连接, 而没有修改gotPipeAdv, 则这里会仍然导致超时)
-		while (fetchRemotePipeAdvTimeCount-- > 0 && getOutBidipipe() == null) {
-			try {
-				Thread.sleep(unittime);
-				System.out.println("[" + Thread.currentThread().getName()
-						+ "] timecount:	" + timecount);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		while (fetchRemotePipeAdvTimeCount-- > 0 && outbidipipe == null) {
+			newOutPipeAdv = PipeUtil.findNewestPipeAdv(group, roomID.toString(), Chatroom.UnitWaitTime*2);
 		}
 		// 1: 得到了pipe adv;
 		// 2: timecount <= 0;
@@ -274,14 +262,14 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 					+ "] Attempting to establish a connection on pipe : "
 					+ newOutPipeAdv.getPipeID());
 			System.out.println("timeout: "
-					+ (int) ((timecount + 1) * unittime));
+					+ (int) ((timecount + 1) * Chatroom.UnitWaitTime));
 			while (outbidipipe == null && timecount > 0) {
 				// Try again and again
 				try {
 					// 用四个单位的时间作为超时时间//timecount -= 4;
 					timecount -= 2;
 					outbidipipe = new JxtaBiDiPipe(group, newOutPipeAdv,
-							(int) unittime * 4, this, true);
+							(int) Chatroom.UnitWaitTime * 4, this, true);
 					if (outbidipipe == null) {
 						// 这个if似乎没必要
 						throw new IOException(
@@ -419,6 +407,24 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	/**
+	 * 发送ping消息
+	 */
+	private void sendPongMsg() {
+		NoxPeerStatusUnit status = NoxToolkit.getCheyenne().getStatusUnit();
+		byte[] statBytes = null;
+		try {
+			statBytes = NoxMsgUtil.getBytesFromObject(status);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		SendMsg(XmlMsgFormat.PONGMSG_NAMESPACE_NAME, statBytes, false);
+	}
+
+	private void refreshStatus(NoxPeerStatusUnit stat) {
+		NoxToolkit.getCheyenne().setStatus(roomID, stat);
 	}
 	
 	/**
@@ -603,6 +609,8 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 	 */
 	public void processIncomingMsg(Message msg, boolean verbose) {
 		String incomingMsg = "";
+		//是用户消息, 而不是系统的ping/pong消息
+		boolean isUserMsg = false;
 		
 		try {
 			CountingOutputStream cnt;
@@ -693,6 +701,7 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 				
 				if(curNamespace.equals(XmlMsgFormat.MESSAGE_NAMESPACE_NAME)){
 					//TODO 处理string消息
+					isUserMsg = true;
 					String strmsg = null;
 					
 					if(paramEle != null){
@@ -725,6 +734,7 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 					chatroompane.incomingMsgProcessor(roomname, timeEle.toString(), strmsg);
 				} else if(curNamespace.equals(XmlMsgFormat.PICTUREMSG_NAMESPACE_NAME)){
 					//TODO 处理图片消息
+					isUserMsg = true;
 					ImageIcon incomingPic = null;
 					byte[] picBytes = null;
 					if(paramEle != null){
@@ -764,6 +774,7 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 					chatroompane.incomingMsgProcessor(roomname, timeEle.toString(), incomingPic);
 				} else if(curNamespace.equals(XmlMsgFormat.FILEMSG_NAMESPACE_NAME)){
 					//TODO 处理文件消息
+					isUserMsg = true;
 					NoxFileUnit incomingFile = null;
 					byte[] fileBytes = null;
 					if(paramEle != null){
@@ -824,12 +835,18 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 				            }
 				        }
 					}
-					
 				} else if(curNamespace.equals(XmlMsgFormat.PINGMSG_NAMESPACE_NAME)){
 					//TODO 处理ping消息
+					byte[] statBytes = dataEle.getBytes();
+					NoxPeerStatusUnit stat = (NoxPeerStatusUnit) NoxMsgUtil.getObjectFromBytes(statBytes);
+					refreshStatus(stat);
+					sendPongMsg();
 				} else if(curNamespace.equals(XmlMsgFormat.PONGMSG_NAMESPACE_NAME)){
 					//TODO 处理pong消息
 					//how about doing nothing?
+					byte[] statBytes = dataEle.getBytes();
+					NoxPeerStatusUnit stat = (NoxPeerStatusUnit) NoxMsgUtil.getObjectFromBytes(statBytes);
+					refreshStatus(stat);
 				} else if(curNamespace.equals(XmlMsgFormat.PUBLICKEYENC_NAMESPACE_NAME)){
 					//TODO 处理publickey
 					if(exchangingPubKeys && waiting4PubKey2){
@@ -911,7 +928,7 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 				System.out.println("Have put the message to the Chatroom window...");
 				System.out.println("Did you see the message?");
 				
-				if(!this.isVisible()){
+				if(!this.isVisible() && isUserMsg){
 					//TODO 应该是提示有消息, 而不是强行显示窗口
 					/*this.setVisible(true);
 					System.out.println("The window is not visible, I make it be!");*/
@@ -1039,13 +1056,13 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 		System.out.println("+++End Chatroom pipeMsgEvent()...+++");
 	}
 
-	class localDiscoveryListener implements DiscoveryListener {
+	/*class localDiscoveryListener implements DiscoveryListener {
 		public void discoveryEvent(DiscoveryEvent e) {
 			PipeAdvertisement pipeAdv = null;
 			Enumeration<Advertisement> responses = e.getSearchResults();
-			/**
+			*//**
 			 * TODO 事实上这里似乎不需要while循环; 但是有可能存在广告过期的问题
-			 */
+			 *//*
 			while (responses.hasMoreElements()) {
 				pipeAdv = (PipeAdvertisement) responses.nextElement();
 				if(pipeAdv.getDescription() == null){
@@ -1070,5 +1087,5 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 				}
 			}
 		}
-	}
+	}*/
 }
