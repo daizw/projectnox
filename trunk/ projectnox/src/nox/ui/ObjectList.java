@@ -36,6 +36,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import net.jxta.id.ID;
+import nox.xml.NoxPeerStatusUnit;
 
 public class ObjectList extends JList {
 	/**
@@ -310,6 +311,75 @@ public class ObjectList extends JList {
 		System.out.println("Items now: " + fmod.getSize());
 		return object;
 	}
+	/**
+	 * 更新状态(昵称/签名档/头像/在线状态)
+	 * @param id 目标的ID
+	 * @param stat 含状态信息的数据结构, stat为null则表示离线...
+	 */
+	public void setStatus(ID id, NoxPeerStatusUnit stat) throws SQLException, IOException{
+		// TODO Auto-generated method stub
+		//注意!!!!!!!!因为好友之间才会互ping, 所以如果出现在好友列表中找不到id是不正常的.
+		//同时, 最好能更新数据库中昵称和签名档信息
+		Statement stmt = sqlconn.createStatement();
+		
+		System.out.println("Items before adding: " + fmod.getRealSize());
+		
+		int size =  fmod.getRealSize();
+		for(int index = 0; index <  size; index++){
+			//如果已经有了, 则返回.
+			NoxJListItem curItem = (NoxJListItem)fmod.getRealElementAt(index);
+			if(id.equals(curItem.getUUID())){
+				//更新
+				System.out.println("Refreshing item");
+				String onlingStat;
+				if(stat == null){
+					//离线
+					onlingStat = ItemStatus.OfflineStr;
+					curItem.setName(stat.getNickName() + "[" + onlingStat +"]");
+				}else{
+					if(stat.getStatus().equals(ItemStatus.ONLINE))
+						onlingStat = ItemStatus.OnlineStr;
+					else if(stat.getStatus().equals(ItemStatus.BUSY))
+						onlingStat = ItemStatus.BusyStr;
+					else if(stat.getStatus().equals(ItemStatus.UNAVAILABLE))
+						onlingStat = ItemStatus.UnavailableStr;
+					else
+						onlingStat = ItemStatus.UnknownStr;
+					/**
+					 * @Fixme 这样修改有用吗? curItem是引用吗?
+					 */
+					curItem.setName(stat.getNickName() + "[" + onlingStat +"]");
+					curItem.setDesc(stat.getSign());
+					if(stat.getPortrait() != null)
+						curItem.setPortrait(stat.getPortrait());
+					
+					//删除数据库中该ID
+					stmt.execute("delete from "+
+						tablename + " where ID = '" + id.toString() + "'");
+					//添加到数据库
+					PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
+							tablename + " values (?, ?, ?)");
+					pstmt.setString(1, id.toString());
+					pstmt.setString(2, isGood + "");
+					
+					ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
+					ObjectOutputStream out = new ObjectOutputStream(byteArrayStream);
+					out.writeObject((Serializable)curItem);
+					ByteArrayInputStream input = new ByteArrayInputStream(byteArrayStream.toByteArray());
+					pstmt.setBinaryStream(3, input, byteArrayStream.size());
+					pstmt.executeUpdate();
+					pstmt.close();
+					stmt.close();
+					System.out.println("Got a item that already exist in the list");
+					System.out.println("Items now: " + fmod.getSize());
+				}
+				this.repaint();
+				return;
+			}
+		}
+		System.out.println("好友中未发现该ID, 好诡异~");
+		return;
+	}
 
 	public class NoxJListCellRender extends JPanel implements ListCellRenderer {
 		/**
@@ -508,9 +578,10 @@ public class ObjectList extends JList {
 			getDocument().addDocumentListener(this);
 		}
 
-		private String getHtmlText(String text) {
-			return ("<html><BODY bgColor=#ffffff><Font color=black>" + text + "</Font></BODY></html>");
-	}
+		public String getHtmlText(String text) {
+			return ("<html><BODY bgColor=#ffffff><Font color=black>"
+					+ text + "</Font></BODY></html>");
+		}
 
 		public void changedUpdate(DocumentEvent e) {
 			((FilterModel) getModel()).refilter();

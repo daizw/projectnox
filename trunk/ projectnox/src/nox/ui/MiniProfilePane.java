@@ -16,18 +16,23 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import nox.xml.NoxPeerStatusUnit;
+
 public class MiniProfilePane extends JPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6265273413794252382L;
+
 	// JMapPanel myPortraitPane;
 	JButton myPortrait;
 	JPanel miniProfilePane;
 	JPanel nickAndStat;
-	JLabel nick;
+	JLabel myNick;
 	JComboBox myStatus;
 	JTextField mySign;
+	
+	ImageIcon lastPortrait = null;
 
 	/**
 	 * mini profile 组件
@@ -40,7 +45,8 @@ public class MiniProfilePane extends JPanel {
 	 *            签名档
 	 */
 	MiniProfilePane(final Cheyenne parent, String path_portrait, String nickname, String sign) {
-		myPortrait = new JButton(new ImageIcon(path_portrait));
+		lastPortrait = new ImageIcon(path_portrait);
+		myPortrait = new JButton(lastPortrait);
 		myPortrait.setToolTipText(getHtmlText("This is Me"));
 		myPortrait.setSize(new Dimension(50, 50));
 		myPortrait.setPreferredSize(new Dimension(50, 50));
@@ -86,16 +92,16 @@ public class MiniProfilePane extends JPanel {
 
 		miniProfilePane = new JPanel();
 		nickAndStat = new JPanel();
-		nick = new JLabel(nickname);
-		nick.setToolTipText(getHtmlText("My nickname"));
+		myNick = new JLabel(nickname);
+		myNick.setToolTipText(getHtmlText("My nickname"));
 		myStatus = new JComboBox();
 		// myStatus.setOpaque(false);
 		mySign = new JTextField(sign);
 		
-		myStatus.addItem("Online");
-		myStatus.addItem("Busy");
-		myStatus.addItem("Invisible");
-		myStatus.addItem("Offline");
+		myStatus.addItem(ItemStatus.OnlineStr);
+		myStatus.addItem(ItemStatus.BusyStr);
+		myStatus.addItem(ItemStatus.UnavailableStr);
+		//myStatus.addItem(Offline);
 		myStatus.setToolTipText(getHtmlText("My Status"));
 		myStatus.setSize(new Dimension(75, 20));
 		myStatus.setPreferredSize(new Dimension(75, 20));
@@ -111,7 +117,7 @@ public class MiniProfilePane extends JPanel {
 		nickAndStat.setMinimumSize(new Dimension(150, 20));
 		// nickAndStat.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		nickAndStat.setLayout(new BoxLayout(nickAndStat, BoxLayout.X_AXIS));
-		nickAndStat.add(nick);
+		nickAndStat.add(myNick);
 		nickAndStat.add(Box.createHorizontalStrut(10));
 		nickAndStat.add(myStatus);
 
@@ -135,7 +141,7 @@ public class MiniProfilePane extends JPanel {
 			public void focusLost(FocusEvent arg0) {
 				mySign.setEditable(false);
 				mySign.setOpaque(false);
-				mySign.setForeground(nick.getForeground());
+				mySign.setForeground(myNick.getForeground());
 			}
 		});
 		
@@ -152,8 +158,47 @@ public class MiniProfilePane extends JPanel {
 		this.add(miniProfilePane);
 		this.setOpaque(false);
 	}
+	public NoxPeerStatusUnit getStatusUnit(){
+		ItemStatus stat = null;
+		String statStr = (String) myStatus.getSelectedItem();
+		if(statStr.equals(ItemStatus.OnlineStr))
+			stat = ItemStatus.ONLINE;
+		else if(statStr.equals(ItemStatus.UnavailableStr))
+			stat = ItemStatus.UNAVAILABLE;
+		else if(statStr.equals(ItemStatus.BusyStr))
+			stat = ItemStatus.BUSY;
+		else
+			stat = ItemStatus.UNKNOWN;
+		
+		ImageIcon curPortrait = null;
+		if(lastPortrait.equals((ImageIcon) myPortrait.getIcon())){
+			//头像无变化
+			curPortrait = null;
+		}else{
+			curPortrait = (ImageIcon) myPortrait.getIcon();
+		}
+		
+		return new NoxPeerStatusUnit(myNick.getText(),
+				mySign.getText(),
+				stat,
+				curPortrait); 
+	}
+	public void setPortrait(ImageIcon portrait){
+		myPortrait.setIcon(portrait);
+	}
+	/**
+	 * 设置昵称
+	 * @param name
+	 * @deprecated 还是直接在主界面设置吧!
+	 */
+	public void setNickName(String name){
+		myNick.setText(name);
+	}
+	public void setSign(String sign){
+		mySign.setText(sign);
+	}
 	public void setForegroundColor(Color color){
-		nick.setForeground(color);
+		myNick.setForeground(color);
 		mySign.setForeground(color);
 	}
 	/**

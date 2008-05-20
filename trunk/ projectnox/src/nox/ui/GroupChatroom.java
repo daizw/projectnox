@@ -659,6 +659,14 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 	 */
 	@Override
 	public boolean SendMsg(File file, boolean encrypt) {
+		long size = file.length();
+		/**
+		 * @Fixme msg尺寸上限
+		 */
+		if(size >= 60000){
+			System.out.println("文件尺寸请限制在60K以下");
+			return false;
+		}
 		/**
 		 * 将文件转为byte[]
 		 */

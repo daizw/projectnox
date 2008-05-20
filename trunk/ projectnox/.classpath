@@ -14,9 +14,5 @@
 	<classpathentry kind="lib" path="lib/org.mortbay.jetty.jar"/>
 	<classpathentry kind="lib" path="lib/hsqldb.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-core-2.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/sunjce_provider.jar"/>
-	<classpathentry kind="lib" path="lib/jce1_2_2.jar"/>
-	<classpathentry kind="lib" path="lib/local_policy.jar"/>
-	<classpathentry kind="lib" path="lib/US_export_policy.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
