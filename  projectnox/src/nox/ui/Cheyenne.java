@@ -10,9 +10,16 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
@@ -21,6 +28,7 @@ import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -37,6 +45,7 @@ import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
 import net.jxta.protocol.PipeAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
+import nox.db.DBTableName;
 import nox.net.AuthenticationUtil;
 import nox.net.ConnectionHandler;
 import nox.net.GroupConnectionHandler;
@@ -87,7 +96,7 @@ public class Cheyenne extends NoxFrame {
 	/**
 	 * 个人/系统设置窗口
 	 */
-	ConfigCenterFrame ccf = new ConfigCenterFrame(this);
+	ConfigCenterFrame ccf;
 	/**
 	 * 搜索窗口
 	 */
@@ -122,17 +131,8 @@ public class Cheyenne extends NoxFrame {
 		Cheyenne.this.setMaximumSize(new Dimension(WIDTH_MAX, HEIGHT_MAX));
 		Cheyenne.this.setMinimumSize(new Dimension(WIDTH_MIN, HEIGHT_MIN));
 
-		/**
-		 * mini profile 组件 含: 头像, 昵称, 状态, 签名
-		 */
-		profile = new MiniProfilePane(this, SystemPath.PORTRAIT_RESOURCE_PATH + "portrait.png",
-				NoxToolkit.getNetworkConfigurator().getName(), NoxToolkit.getNetworkManager().getNetPeerGroup().getPeerAdvertisement().getDescription());
-		// profile.setBackground(new Color(0, 255, 0));
-		profile.setSize(new Dimension(WIDTH_DEFLT, 50));
-		profile.setPreferredSize(new Dimension(WIDTH_PREF, 50));
-		profile.setMaximumSize(new Dimension(WIDTH_MAX, 50));
-		profile.setMinimumSize(new Dimension(WIDTH_MIN, 50));
-
+		initMyStatus(conn, DBTableName.ME_SQLTABLE_NAME);
+		
 		tabs = new ListsPane(this, friendlist, grouplist, blacklist);
 
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -156,8 +156,117 @@ public class Cheyenne extends NoxFrame {
 		}, "Connector");
 		addGroupListenerThread.start();
 	}
+	/**
+	 * 初始化个人设置
+	 * @param conn
+	 * @param meSqltableName
+	 */
+	private void initMyStatus(Connection conn, String meSqltableName) {
+		ImageIcon portrait = new ImageIcon(SystemPath.PORTRAIT_RESOURCE_PATH + "portrait.png");
+		String nick = NoxToolkit.getNetworkConfigurator().getName();
+		String sign = NoxToolkit.getNetworkManager().getNetPeerGroup().getPeerAdvertisement().getDescription();
+		try {
+			Statement stmt = sqlconn.createStatement();
+			ResultSet rs = stmt.executeQuery("select * from " +
+					meSqltableName + " where Tag = '" + DBTableName.MYPORTRAIT_TAG_NAME + "'");
+			
+			while(rs.next()){
+				ObjectInputStream objInput = new ObjectInputStream(rs.getBinaryStream("Object"));
+				System.out.println("Found my portrait");
+				portrait = (ImageIcon)objInput.readObject();
+			}
+			
+			rs = stmt.executeQuery("select * from " +
+					meSqltableName + " where Tag = '" + DBTableName.MYNICKNAME_TAG_NAME + "'");
+			
+			while(rs.next()){
+				ObjectInputStream objInput = new ObjectInputStream(rs.getBinaryStream("Object"));
+				System.out.println("Found my nickname");
+				nick = (String)objInput.readObject();
+			}
+			
+			rs = stmt.executeQuery("select * from " +
+					meSqltableName + " where Tag = '" + DBTableName.MYSIGN_TAG_NAME + "'");
+			
+			while(rs.next()){
+				ObjectInputStream objInput = new ObjectInputStream(rs.getBinaryStream("Object"));
+				System.out.println("Found my sign string");
+				sign = (String)objInput.readObject();
+			}
+			stmt.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		/**
+		 * mini profile 组件 含: 头像, 昵称, 状态, 签名
+		 */
+		profile = new MiniProfilePane(this, portrait, nick, sign);
+		// profile.setBackground(new Color(0, 255, 0));
+		profile.setSize(new Dimension(WIDTH_DEFLT, 50));
+		profile.setPreferredSize(new Dimension(WIDTH_PREF, 50));
+		profile.setMaximumSize(new Dimension(WIDTH_MAX, 50));
+		profile.setMinimumSize(new Dimension(WIDTH_MIN, 50));
+	}
+	
 	public NoxPeerStatusUnit getStatusUnit(){
 		return profile.getStatusUnit();
+	}
+	public NoxPeerStatusUnit getFullStatusUnit(){
+		return profile.getFullStatusUnit();
+	}
+	public void setMyPortrait(Icon icon){
+		profile.setPortrait(icon);
+		try {
+			Statement stmt = sqlconn.createStatement();
+			stmt.execute("delete from "+
+					DBTableName.ME_SQLTABLE_NAME + " where Tag = '" + DBTableName.MYPORTRAIT_TAG_NAME + "'");
+			//添加到数据库
+			PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
+					DBTableName.ME_SQLTABLE_NAME + " values (?, ?)");
+			pstmt.setString(1, DBTableName.MYPORTRAIT_TAG_NAME);
+			
+			ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
+			ObjectOutputStream out = new ObjectOutputStream(byteArrayStream);
+			out.writeObject((Serializable)icon);
+			ByteArrayInputStream input = new ByteArrayInputStream(byteArrayStream.toByteArray());
+			pstmt.setBinaryStream(2, input, byteArrayStream.size());
+			pstmt.executeUpdate();
+			pstmt.close();
+			stmt.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public void setMyNickName(String nick){
+		profile.setNickName(nick);
+		try {
+			Statement stmt = sqlconn.createStatement();
+			stmt.execute("delete from "+
+					DBTableName.ME_SQLTABLE_NAME + " where Tag = '" + DBTableName.MYNICKNAME_TAG_NAME + "'");
+			//添加到数据库
+			PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
+					DBTableName.ME_SQLTABLE_NAME + " values (?, ?)");
+			pstmt.setString(1, DBTableName.MYNICKNAME_TAG_NAME);
+			
+			ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
+			ObjectOutputStream out = new ObjectOutputStream(byteArrayStream);
+			out.writeObject((Serializable)nick);
+			ByteArrayInputStream input = new ByteArrayInputStream(byteArrayStream.toByteArray());
+			pstmt.setBinaryStream(2, input, byteArrayStream.size());
+			pstmt.executeUpdate();
+			pstmt.close();
+			stmt.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public void setStatus(ID id, NoxPeerStatusUnit stat){
 		try {
@@ -233,7 +342,7 @@ public class Cheyenne extends NoxFrame {
 						PipeAdvertisement pia = PipeUtil.findNewestPipeAdv(group,
 								peer.getUUID().toString(), 3 * 1000);
 						int timecount = 4;
-						while (bidipipe == null && timecount > 0) {
+						while (pia != null && bidipipe == null && timecount > 0) {
 							// Try again and again
 							try {
 								timecount --;
@@ -598,6 +707,10 @@ public class Cheyenne extends NoxFrame {
             PopupMenu traymenu=new PopupMenu("Tray Menu");
             traymenu.add(new MenuItem("Configure")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
+                	/**
+                	 * 个人/系统设置窗口
+                	 */
+                	ccf = new ConfigCenterFrame(Cheyenne.this);
                 	ccf.setVisible(true);
                 }
             });
@@ -695,6 +808,7 @@ public class Cheyenne extends NoxFrame {
 	 * 显示个人/系统设置窗口
 	 */
 	public void ShowConfigCenter(){
+		ccf = new ConfigCenterFrame(Cheyenne.this);
 		ccf.setVisible(true);
 	}
 	/**
