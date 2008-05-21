@@ -32,9 +32,10 @@ public class MiniProfilePane extends JPanel {
 	JLabel myNick;
 	JComboBox myStatus;
 	JTextField mySign;
-	
 	public static Dimension portriatSize = new Dimension(50, 50);
 	ImageIcon lastPortrait = null;
+	
+	String lastSignStr = "";
 
 	/**
 	 * mini profile ×é¼þ
@@ -100,6 +101,8 @@ public class MiniProfilePane extends JPanel {
 		// myStatus.setOpaque(false);
 		mySign = new JTextField(sign);
 		
+		lastSignStr = sign;
+		
 		myStatus.addItem(ItemStatus.OnlineStr);
 		myStatus.addItem(ItemStatus.BusyStr);
 		myStatus.addItem(ItemStatus.UnavailableStr);
@@ -144,6 +147,8 @@ public class MiniProfilePane extends JPanel {
 				mySign.setEditable(false);
 				mySign.setOpaque(false);
 				mySign.setForeground(myNick.getForeground());
+				if(!lastSignStr.equals(mySign.getText()))
+					parent.savaMySign2DB(mySign.getText());
 			}
 		});
 		

@@ -22,7 +22,7 @@ import javax.swing.JPanel;
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
-class JImgPanel extends JPanel {
+public class JImgPanel extends JPanel {
 	/**
 	 * 
 	 */

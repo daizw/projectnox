@@ -26,7 +26,7 @@ public class NoxPeerStatusUnit implements Serializable{
 	public String getSign(){
 		return sign;
 	}
-	public ItemStatus getStatus(){
+	public ItemStatus getOnlineStatus(){
 		return stat;
 	}
 	public ImageIcon getPortrait(){

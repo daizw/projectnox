@@ -526,12 +526,14 @@ public class ListsPane extends JTabbedPane {
 			//如果连接不上....
 			//如果连接成功....
 			room = new PeerChatroom(listItem, null);
+			room.setVisible(true);
 		}else{
 			//已注册pipe
 			room = roomunit.getChatroom();
 			if(room == null)
 			{//不存在, 开新窗口
 				room = parent.setupNewChatroomOver(roomunit.getOutPipe());
+				room.setVisible(true);
 				//new NoxToolkit().registerChatroom(id, room);
 			}else{
 				room.pack();
@@ -556,7 +558,7 @@ public class ListsPane extends JTabbedPane {
 			//如果连接成功....
 			System.out.println("该ID未注册, 建立并注册之. 如果你看到这条消息, 说明系统初始化时没有成功建立该聊天室对应的pipe.");
 			room = new GroupChatroom(listItem);
-			
+			room.setVisible(true);
 			//注册之, 注意: 应注册ChatroomUnit而不是Chatroom!
 			//因为注册Chatroom只适用于已存在ID-pipe对的情况
 			NoxToolkit.registerChatroomUnit(id, null, null, room);

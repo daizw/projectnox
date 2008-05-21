@@ -180,7 +180,7 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 		/**
 		 * ×Ô¶¯ÏÔÊ¾
 		 */
-		this.setVisible(true);
+		//this.setVisible(true);
 	}
 	
 	public JxtaBiDiPipe getOutBidipipe() {
@@ -190,6 +190,7 @@ public class PeerChatroom extends Chatroom implements PipeMsgListener {
 	public void setOutBidipipe(JxtaBiDiPipe pipe) {
 		if (pipe != null) {
 			outbidipipe = pipe;
+			outbidipipe.setMessageListener(PeerChatroom.this);
 			System.out
 					.println("In setOutBidipipe(), the parameter 'pipe' is not null, good!");
 			rootpane.setVisible(true);

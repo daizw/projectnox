@@ -58,6 +58,8 @@ public class ObjectList extends JList {
 	JLabel portrait;
 	JLabel nick;
 	JLabel sign;
+	
+	Dimension portraitsize = new Dimension(40, 40);
 
 	/**
 	 * 具有自定义列表元素和过滤功能的列表
@@ -320,39 +322,39 @@ public class ObjectList extends JList {
 		// TODO Auto-generated method stub
 		//注意!!!!!!!!因为好友之间才会互ping, 所以如果出现在好友列表中找不到id是不正常的.
 		//同时, 最好能更新数据库中昵称和签名档信息
-		Statement stmt = sqlconn.createStatement();
-		
-		System.out.println("Items before adding: " + fmod.getRealSize());
-		
 		int size =  fmod.getRealSize();
 		for(int index = 0; index <  size; index++){
 			//如果已经有了, 则返回.
 			NoxJListItem curItem = (NoxJListItem)fmod.getRealElementAt(index);
 			if(id.equals(curItem.getUUID())){
 				//更新
-				System.out.println("Refreshing item");
-				String onlingStat;
 				if(stat == null){
 					//离线
-					onlingStat = ItemStatus.OfflineStr;
-					curItem.setName(stat.getNickName() + "[" + onlingStat +"]");
+					System.out.println("该用户不在线");
+					curItem.setOnlineStatus(ItemStatus.OFFLINE);
 				}else{
-					if(stat.getStatus().equals(ItemStatus.ONLINE))
-						onlingStat = ItemStatus.OnlineStr;
-					else if(stat.getStatus().equals(ItemStatus.BUSY))
-						onlingStat = ItemStatus.BusyStr;
-					else if(stat.getStatus().equals(ItemStatus.UNAVAILABLE))
-						onlingStat = ItemStatus.UnavailableStr;
-					else
-						onlingStat = ItemStatus.UnknownStr;
 					/**
 					 * @Fixme 这样修改有用吗? curItem是引用吗?
+					 * 是引用...
 					 */
-					curItem.setName(stat.getNickName() + "[" + onlingStat +"]");
+					//如果没有修改, 则返回, 可以避免频繁的数据库读写操作
+					if(curItem.getName() != null && curItem.getName().equals(stat.getNickName())
+							&& curItem.getDesc() != null && curItem.getDesc().equals(stat.getSign())
+							&& curItem.getPortrait() != null && curItem.getPortrait().equals(stat.getPortrait())
+							&& curItem.getOnlineStatus() != null && curItem.getOnlineStatus().equals(stat.getOnlineStatus())){
+						System.out.println("状态未变, 取消修改...");
+						this.repaint();
+						return;
+					}
+					System.out.println("Refreshing item");
+					
+					curItem.setName(stat.getNickName());
 					curItem.setDesc(stat.getSign());
 					if(stat.getPortrait() != null)
 						curItem.setPortrait(stat.getPortrait());
+					curItem.setOnlineStatus(stat.getOnlineStatus());
 					
+					Statement stmt = sqlconn.createStatement();
 					//删除数据库中该ID
 					stmt.execute("delete from "+
 						tablename + " where ID = '" + id.toString() + "'");
@@ -370,8 +372,7 @@ public class ObjectList extends JList {
 					pstmt.executeUpdate();
 					pstmt.close();
 					stmt.close();
-					System.out.println("Got a item that already exist in the list");
-					System.out.println("Items now: " + fmod.getSize());
+					System.out.println("刷新状态完毕");
 				}
 				this.repaint();
 				return;
@@ -393,7 +394,28 @@ public class ObjectList extends JList {
 			NoxJListItem item = (NoxJListItem) value;
 
 			portrait.setIcon((Icon) item.getPortrait());
-			nick.setText(item.getName());
+			
+			portrait.setSize(portraitsize);
+			portrait.setPreferredSize(portraitsize);
+			portrait.setMaximumSize(portraitsize);
+			portrait.setMinimumSize(portraitsize);
+			
+			String onlingStat = ItemStatus.UnknownStr;
+			if(item.getOnlineStatus() != null){
+				if(item.getOnlineStatus().equals(ItemStatus.ONLINE))
+					onlingStat = ItemStatus.OnlineStr;
+				else if(item.getOnlineStatus().equals(ItemStatus.BUSY))
+					onlingStat = ItemStatus.BusyStr;
+				else if(item.getOnlineStatus().equals(ItemStatus.UNAVAILABLE))
+					onlingStat = ItemStatus.UnavailableStr;
+				else if(item.getOnlineStatus().equals(ItemStatus.OFFLINE))
+					onlingStat = ItemStatus.OfflineStr;
+			}else {
+				item.setOnlineStatus(ItemStatus.UNKNOWN);
+			}
+			
+			nick.setText(item.getName() + "[" + onlingStat + "]");
+			
 			sign.setText("<html><Font color=gray>"
 					+ '('
 					+ item.getDesc()

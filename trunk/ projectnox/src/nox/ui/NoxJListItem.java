@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.swing.ImageIcon;
 
-import net.jxta.document.Advertisement;
 import net.jxta.id.ID;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
@@ -27,24 +26,9 @@ public abstract class NoxJListItem implements Serializable{
 		this.name = name;
 		this.discription = disc;
 		this.id = uuid;
+		this.stat = ItemStatus.UNKNOWN;
 		updateTimeStamp();
 	}
-
-	/**
-	 * 设置状态
-	 * 
-	 * @param adv
-	 *            根据该广告中某元素设置?
-	 */
-	public abstract void setStatus(Advertisement adv);
-
-	/**
-	 * 获取状态
-	 * 
-	 * @return 当前(在线)状态
-	 */
-	public abstract ItemStatus getOnlineStatus();
-
 	/**
 	 * 获取头像
 	 * 
@@ -78,6 +62,14 @@ public abstract class NoxJListItem implements Serializable{
 	public ID getUUID() {
 		return id;
 	}
+	/**
+	 * 获取状态
+	 * 
+	 * @return 当前(在线)状态
+	 */
+	public ItemStatus getOnlineStatus(){
+		return stat;
+	}
 
 	/**
 	 * 获取时间戳
@@ -100,6 +92,7 @@ public abstract class NoxJListItem implements Serializable{
 	 */
 	public void setPortrait(ImageIcon portr) {
 		portrait = portr;
+		updateTimeStamp();
 	}
 
 	/**
@@ -107,12 +100,24 @@ public abstract class NoxJListItem implements Serializable{
 	 */
 	public void setName(String n){
 		name = n;
+		updateTimeStamp();
 	}
 	/**
 	 * 设置签名档(描述)
 	 */
 	public void setDesc(String desc){
 		discription = desc;
+		updateTimeStamp();
+	}
+	/**
+	 * 设置状态
+	 * 
+	 * @param adv
+	 *            根据该广告中某元素设置?
+	 */
+	public void setOnlineStatus(ItemStatus st) {
+		stat = st;
+		updateTimeStamp();
 	}
 }
 
@@ -120,24 +125,6 @@ public abstract class NoxJListItem implements Serializable{
 class PeerItem extends NoxJListItem {
 	PeerItem(ImageIcon portr, PeerAdvertisement adv) {
 		super(portr, adv.getName(), adv.getDescription(), adv.getPeerID());
-	}
-
-	/**
-	 * 根据adv来确定...混乱了...
-	 */
-	@Override
-	public void setStatus(Advertisement adv) {
-		// TODO 根据adv设置状态
-		stat = ItemStatus.ONLINE;
-		updateTimeStamp();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ItemStatus getOnlineStatus() {
-		return stat;
 	}
 }
 
@@ -172,23 +159,5 @@ class GroupItem extends NoxJListItem {
 
 	public int getCount() {
 		return memberCount;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setStatus(Advertisement adv) {
-		// TODO 根据adv设置状态
-		stat = ItemStatus.ONLINE;
-		updateTimeStamp();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ItemStatus getOnlineStatus() {
-		return stat;
 	}
 }

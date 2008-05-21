@@ -1,5 +1,6 @@
 package nox.net;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -19,6 +20,8 @@ import net.jxta.util.JxtaBiDiPipe;
 import net.jxta.util.JxtaServerPipe;
 import nox.net.NoxToolkit.CheckStatusEventHandler;
 import nox.net.NoxToolkit.HuntingEventHandler;
+import nox.ui.login.LoginDialog;
+import nox.ui.login.RegisterDialog;
 /**
  * This is the JXTANetwork class<p/>
  * This class does the following :
@@ -54,6 +57,7 @@ public class JXTANetwork {
 	public static final String Local_Network_Manager_Name = "Local NoX Network Manager";
 
 	String locpeername = "";
+	char[] locpeerpassword;
 	//TODO 这里设为public static, 则NoxToolkit中某些函数可以简化
 	static NetworkManager TheNetworkManager;
 	static NetworkConfigurator TheConfig;
@@ -68,82 +72,137 @@ public class JXTANetwork {
 
 	public JXTANetwork() {
 		// Creating the Network Manager
-		try {
-			System.out.println("Creating the Network Manager");
-			String peername = GetPrincipal();
-
-			TheNetworkManager = new NetworkManager(
-					NetworkManager.ConfigMode.EDGE, Local_Network_Manager_Name,
-					new File(new File(".cache"), peername).toURI());
-			System.out.println("Network Manager created");
-		} catch (IOException ex) {
-			ex.printStackTrace();
-			System.exit(-1);
-		}
-
-		// Persisting it to make sure the Peer ID is not re-created each
-		// time the Network Manager is instantiated
-		TheNetworkManager.setConfigPersistent(true);
-
-		// Since we won't be setting our own relay or rendezvous seed peers we
-		// will use the default (public network) relay and rendezvous seeding.
-		TheNetworkManager.setUseDefaultSeeds(true);
-
-		TheNetworkManager.registerShutdownHook();
-
-		// Retrieving the Network Configurator
-		System.out.println("Retrieving the Network Configurator");
-		try {
-			TheConfig = TheNetworkManager.getConfigurator();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println("Network Configurator retrieved");
-
-		// Does a local peer configuration exist?
-		if (TheConfig.exists()) {
-
-			System.out.println("Local configuration found");
-			// We load it
-			File LocalConfig = new File(TheConfig.getHome(), "PlatformConfig");
+		System.out.println("Creating the Network Manager");
+		
+		while(true){
+			LoginDialog login = new LoginDialog();
+			String retVal = (String) login.showDialog();
 			try {
-				System.out.println("Loading found configuration");
-				TheConfig.load(LocalConfig.toURI());
-				System.out.println("Configuration loaded");
-			} catch (IOException ex) {
-				ex.printStackTrace();
-				System.exit(-1);
-			} catch (CertificateException ex) {
-				// An issue with the existing peer certificate has been
-				// encountered
-				ex.printStackTrace();
-				System.exit(-1);
-			}
-		} else {
-			System.out.println("No local configuration found");
-			String principal = GetPrincipal();
-									
-			TheConfig.setPrincipal(principal);
-			TheConfig.setPassword(GetPassword());
-			TheConfig.setName(principal);
-			TheConfig.setDescription("A NoX Peer");
-			
-			
-			TheConfig.setTcpStartPort(9701);
-			TheConfig.setTcpEndPort(65530);
-
-			System.out.println("Principal: " + TheConfig.getPrincipal());
-			System.out.println("Password : " + TheConfig.getPassword());
-
-			try {
-				System.out.println("Saving new configuration");
-				TheConfig.save();
-				System.out.println("New configuration saved successfully");
+				System.out.println("return value: " + retVal);
+				if(retVal.equals(LoginDialog.REGISTERCMD)){
+					//显示注册窗口
+					RegisterDialog register = new RegisterDialog();
+					while(true){
+						String reg = (String) register.showDialog();
+						System.out.println("register dialog returned value: " + reg);
+						if(reg.equals(RegisterDialog.LOGINCMD)){
+							if(new File(new File(".cache"), register.getUsername()).exists()){
+								//register.setVisible(true);
+								//reg = (String)register.showUsernameAlreadyExistentBalloon();
+								continue;
+							}else{
+								locpeername = register.getUsername();
+								locpeerpassword = register.getPassword();
+								//TODO 创建新用户.............
+								System.out.println("创建新用户..."
+										+ locpeername+ ":" + new String(locpeerpassword));
+								break;
+							}
+						} else {
+							System.exit(0);
+						}
+					}
+				} else if(retVal.equals(LoginDialog.LOGINCMD)){
+					System.out.println(login.getUsername() + ':' + new String(login.getPassword()));
+					
+					locpeername = login.getUsername();
+					locpeerpassword = login.getPassword();
+				} else {
+					System.exit(0);
+				}
+				TheNetworkManager = new NetworkManager(
+						NetworkManager.ConfigMode.EDGE, Local_Network_Manager_Name,
+						new File(new File(".cache"), locpeername).toURI());
+				System.out.println("Network Manager created");
 			} catch (IOException ex) {
 				ex.printStackTrace();
 				System.exit(-1);
 			}
+			// Persisting it to make sure the Peer ID is not re-created each
+			// time the Network Manager is instantiated
+			TheNetworkManager.setConfigPersistent(true);
+
+			// Since we won't be setting our own relay or rendezvous seed peers we
+			// will use the default (public network) relay and rendezvous seeding.
+			TheNetworkManager.setUseDefaultSeeds(true);
+
+			TheNetworkManager.registerShutdownHook();
+
+			// Retrieving the Network Configurator
+			System.out.println("Retrieving the Network Configurator");
+			try {
+				TheConfig = TheNetworkManager.getConfigurator();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			System.out.println("Network Configurator retrieved");
+
+			// Does a local peer configuration exist?
+			if (TheConfig.exists()) {
+				//验证密码!
+				System.out.println("Local configuration found, check the password.......");
+				// We load it
+				File LocalConfig = new File(TheConfig.getHome(), "PlatformConfig");
+				try {
+					System.out.println("Loading found configuration");
+					TheConfig.load(LocalConfig.toURI());
+					System.out.println("Configuration loaded, password:" + TheConfig.getPassword());
+					if(TheConfig.getPassword() != null){
+						if(!TheConfig.getPassword().equals(new String(locpeerpassword))){
+							JOptionPane.showMessageDialog((Component) null,
+			    					"Password Incorrect! Please Check your input.", "Failure!",
+			    					JOptionPane.ERROR_MESSAGE);
+							continue;
+						}else{
+							break;
+						}
+					}else{
+						String pwd = new String(locpeerpassword);
+						if(pwd == null || pwd.equals(""))
+							break;
+						else {
+							JOptionPane.showMessageDialog((Component) null,
+			    					"Password Incorrect! Please Check your input.", "Failure!",
+			    					JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+					}
+				} catch (IOException ex) {
+					ex.printStackTrace();
+					System.exit(-1);
+				} catch (CertificateException ex) {
+					// An issue with the existing peer certificate has been
+					// encountered
+					ex.printStackTrace();
+					System.exit(-1);
+				}
+			} else {
+				System.out.println("No local configuration found");
+										
+				TheConfig.setPrincipal(locpeername);
+				TheConfig.setPassword(new String(locpeerpassword));
+				TheConfig.setName(locpeername);
+				TheConfig.setDescription("A NoX Peer");
+				
+				
+				TheConfig.setTcpStartPort(9701);
+				TheConfig.setTcpEndPort(65530);
+
+				System.out.println("Principal: " + TheConfig.getPrincipal());
+				System.out.println("Password : " + TheConfig.getPassword());
+
+				try {
+					System.out.println("Saving new configuration");
+					TheConfig.save();
+					System.out.println("New configuration saved successfully");
+					break;
+				} catch (IOException ex) {
+					ex.printStackTrace();
+					System.exit(-1);
+				}
+			}
 		}
+		
 		/**
 		 * 初始化NoxToolkit
 		 */
@@ -153,7 +212,7 @@ public class JXTANetwork {
 				cshandler);
 	}
 
-	private String GetPrincipal() {
+	/*private String GetPrincipal() {
 		return locpeername = (String) JOptionPane.showInputDialog(null,
 				"Enter username", "Username", JOptionPane.QUESTION_MESSAGE,
 				null, null, "");
@@ -162,7 +221,7 @@ public class JXTANetwork {
 	private String GetPassword() {
 		return (String) JOptionPane.showInputDialog(null, "Enter password",
 				"Password", JOptionPane.QUESTION_MESSAGE, null, null, "");
-	}
+	}*/
 
 	public void SeekRendezVousConnection() {
 		try {

@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -102,6 +103,10 @@ public class Cheyenne extends NoxFrame {
 	 */
 	SearchingFrame sfrm = new SearchingFrame(Cheyenne.this);
 	/**
+	 * 轮流ping所有好友获取其状态信息
+	 */
+	Thread peersStatusChecker;
+	/**
 	 * 
 	 * @param flist
 	 * @param glist
@@ -145,7 +150,7 @@ public class Cheyenne extends NoxFrame {
 		sfrm.setLocation(100, 60);
 		sfrm.setSize(new Dimension(500, 350));
 		
-		Thread peersStatusChecker = new Thread(new NoOneLivesForeverExceptMe(), "PeersStatusChecker");
+		peersStatusChecker = new Thread(new NoOneLivesForeverExceptMe(), "PeersStatusChecker");
 		peersStatusChecker.start();
 		
 		Thread addGroupListenerThread = new Thread(new Runnable() {
@@ -268,6 +273,30 @@ public class Cheyenne extends NoxFrame {
 			e.printStackTrace();
 		}
 	}
+	public void savaMySign2DB(String text) {
+		try {
+			Statement stmt = sqlconn.createStatement();
+			stmt.execute("delete from "+
+					DBTableName.ME_SQLTABLE_NAME + " where Tag = '" + DBTableName.MYSIGN_TAG_NAME + "'");
+			//添加到数据库
+			PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
+					DBTableName.ME_SQLTABLE_NAME + " values (?, ?)");
+			pstmt.setString(1, DBTableName.MYSIGN_TAG_NAME);
+			
+			ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
+			ObjectOutputStream out = new ObjectOutputStream(byteArrayStream);
+			out.writeObject((Serializable)text);
+			ByteArrayInputStream input = new ByteArrayInputStream(byteArrayStream.toByteArray());
+			pstmt.setBinaryStream(2, input, byteArrayStream.size());
+			pstmt.executeUpdate();
+			pstmt.close();
+			stmt.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	public void setStatus(ID id, NoxPeerStatusUnit stat){
 		try {
 			friendlist.setStatus(id, stat);
@@ -282,10 +311,8 @@ public class Cheyenne extends NoxFrame {
 	
 	private class NoOneLivesForeverExceptMe implements Runnable{
 		FilterModel fmod;
-		int size;
 		NoOneLivesForeverExceptMe(){
 			fmod = (FilterModel) friendlist.getModel();
-			size = fmod.getRealSize();
 		}
 		@Override
 		public void run() {
@@ -293,19 +320,24 @@ public class Cheyenne extends NoxFrame {
 				PeerItem peer;
 				PeerChatroomUnit roomUnit;
 				Message msg = null;
-				for(int index = 0; index < size; index++){
+				for(int index = 0; index < fmod.getRealSize(); index++){
 					JxtaBiDiPipe bidipipe = null;
 					NoxPeerStatusUnit status = profile.getStatusUnit();
 					byte[] statBytes = null;
 					try {
 						statBytes = NoxMsgUtil.getBytesFromObject(status);
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						continue;
 					}
 					
 					peer = (PeerItem) fmod.getRealElementAt(index);
-					
+					long curTime = new Date().getTime();
+					if(curTime - peer.getTimeStamp() > 60 * 1000){
+						//已经一分钟没有收到对方的状态消息了, 视为离线
+						//适用于对方先上线后下线这种情况
+						peer.setOnlineStatus(ItemStatus.OFFLINE);
+					}
 					msg = NoxMsgUtil.generateMsg(
 							XmlMsgFormat.PINGMSG_NAMESPACE_NAME,
 							NoxToolkit.getNetworkConfigurator().getName(),
@@ -334,6 +366,7 @@ public class Cheyenne extends NoxFrame {
 							bidipipe.sendMessage(msg);
 						} catch (IOException e) {
 							e.printStackTrace();
+							continue;
 						}
 					}else{
 						//不存在对应的ChatroomUnit, 需要连接然后注册bidipipe
@@ -350,6 +383,7 @@ public class Cheyenne extends NoxFrame {
 										(int) Chatroom.UnitWaitTime * 4, null, true);
 							} catch (IOException exc) {
 								exc.printStackTrace();
+								continue;
 							}
 						}
 						if(bidipipe == null){
@@ -375,9 +409,9 @@ public class Cheyenne extends NoxFrame {
 
 						/**
 						 * @Fixme comment this
-						 */
+						 *//*
 						//注册pipe, 实际上ConnectionHandler初始化时就注册过了...
-						NoxToolkit.registerChatroomUnit(peer.getUUID(), bidipipe);
+						NoxToolkit.registerChatroomUnit(peer.getUUID(), bidipipe);*/
 						
 						try {
 							bidipipe.sendMessage(msg);

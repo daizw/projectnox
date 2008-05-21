@@ -171,7 +171,7 @@
 	<!-- Creates the release package                                         -->
 	<!-- =================================================================== -->
 	<target name="release" depends="build, source-zip, source-tgz" description="Creates the release package">
-		<jar jarfile="${release.dir}/${application.name}.jar" basedir="${classes.dir}" includes="**" />
+		<jar jarfile="${release.dir}/${application.name}.jar" basedir="${classes.dir}" manifest="./MANIFEST.MF" includes="**" />
 		<!-- create directories -->
 		<mkdir dir="${release.resrc.dir}" />
 		<mkdir dir="${release.lib.dir}" />
