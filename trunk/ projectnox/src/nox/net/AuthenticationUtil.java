@@ -73,7 +73,7 @@ import net.jxta.logging.Logging;
 import net.jxta.membership.Authenticator;
 import net.jxta.membership.MembershipService;
 import net.jxta.peergroup.PeerGroup;
-import nox.ui.AuthenticationPanel;
+import nox.ui.common.AuthenticationPanel;
 
 /**
  * @author james todd [gonzo at jxta dot org]

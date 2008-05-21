@@ -3,8 +3,8 @@ package nox.db;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import nox.ui.NoxJListItem;
-import nox.ui.ObjectList;
+import nox.ui.common.NoxJListItem;
+import nox.ui.common.ObjectList;
 
 public class DBWriter {
 	Statement statement;

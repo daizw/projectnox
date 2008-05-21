@@ -3,8 +3,8 @@ package nox.net;
 import net.jxta.id.ID;
 import net.jxta.pipe.InputPipe;
 import net.jxta.pipe.OutputPipe;
-import nox.ui.Chatroom;
-import nox.ui.GroupChatroom;
+import nox.ui.chat.common.Chatroom;
+import nox.ui.chat.group.GroupChatroom;
 
 public class GroupChatroomUnit implements ChatroomUnit{
 	private ID roomID = null;

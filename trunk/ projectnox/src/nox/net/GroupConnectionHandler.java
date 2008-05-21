@@ -14,7 +14,7 @@ import net.jxta.pipe.OutputPipe;
 import net.jxta.pipe.PipeMsgEvent;
 import net.jxta.pipe.PipeMsgListener;
 import net.jxta.protocol.PipeAdvertisement;
-import nox.ui.GroupChatroom;
+import nox.ui.chat.group.GroupChatroom;
 import nox.xml.NoxMsgUtil;
 import nox.xml.XmlMsgFormat;
 
