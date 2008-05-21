@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import nox.ui.ObjectList;
+import nox.ui.common.ObjectList;
 
 public class DBReader {
 	Statement statement;

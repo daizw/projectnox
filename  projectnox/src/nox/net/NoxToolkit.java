@@ -15,12 +15,12 @@ import net.jxta.pipe.OutputPipe;
 import net.jxta.platform.NetworkConfigurator;
 import net.jxta.platform.NetworkManager;
 import net.jxta.util.JxtaBiDiPipe;
-import nox.ui.AdvTable;
-import nox.ui.Chatroom;
-import nox.ui.Cheyenne;
-import nox.ui.GroupChatroom;
-import nox.ui.NoxJListItem;
-import nox.ui.PeerChatroom;
+import nox.ui.chat.common.Chatroom;
+import nox.ui.chat.group.GroupChatroom;
+import nox.ui.chat.peer.PeerChatroom;
+import nox.ui.common.NoxJListItem;
+import nox.ui.me.Cheyenne;
+import nox.ui.search.AdvTable;
 /**
  * NoX ¹¤¾ß°ü
  * @author shinysky

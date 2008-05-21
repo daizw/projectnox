@@ -2,8 +2,8 @@ package nox.net;
 
 import net.jxta.id.ID;
 import net.jxta.util.JxtaBiDiPipe;
-import nox.ui.Chatroom;
-import nox.ui.PeerChatroom;
+import nox.ui.chat.common.Chatroom;
+import nox.ui.chat.peer.PeerChatroom;
 
 /**
  * Chatroom单元结构,

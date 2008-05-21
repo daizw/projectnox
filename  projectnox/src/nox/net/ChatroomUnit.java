@@ -1,7 +1,7 @@
 package nox.net;
 
 import net.jxta.id.ID;
-import nox.ui.Chatroom;
+import nox.ui.chat.common.Chatroom;
 
 public interface ChatroomUnit {
 	public abstract ID getRoomID();

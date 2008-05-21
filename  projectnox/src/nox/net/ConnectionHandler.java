@@ -8,7 +8,7 @@ import net.jxta.pipe.PipeMsgEvent;
 import net.jxta.pipe.PipeMsgListener;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
-import nox.ui.PeerChatroom;
+import nox.ui.chat.peer.PeerChatroom;
 import nox.xml.NoxMsgUtil;
 import nox.xml.XmlMsgFormat;
 

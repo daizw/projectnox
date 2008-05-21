@@ -17,7 +17,7 @@ import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
-import nox.ui.ItemStatus;
+import nox.ui.common.ItemStatus;
 
 public class TestHSQLDB {
 	

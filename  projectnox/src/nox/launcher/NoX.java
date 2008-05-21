@@ -17,8 +17,8 @@ import nox.db.DBTableName;
 import nox.encrypt.EncryptUtil;
 import nox.net.JXTANetwork;
 import nox.net.NoxToolkit;
-import nox.ui.Cheyenne;
-import nox.ui.ObjectList;
+import nox.ui.common.ObjectList;
+import nox.ui.me.Cheyenne;
 
 public class NoX {
 	public static void main(String args[]) {

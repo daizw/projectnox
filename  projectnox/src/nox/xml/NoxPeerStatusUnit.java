@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import javax.swing.ImageIcon;
 
-import nox.ui.ItemStatus;
+import nox.ui.common.ItemStatus;
 
 @SuppressWarnings("serial")
 public class NoxPeerStatusUnit implements Serializable{

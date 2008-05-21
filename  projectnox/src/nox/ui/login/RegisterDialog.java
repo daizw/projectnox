@@ -20,9 +20,9 @@ import javax.swing.JTextField;
 
 import com.sun.jna.examples.WindowUtils;
 
-import nox.ui.JImgPanel;
-import nox.ui.JNABalloon;
-import nox.ui.SystemPath;
+import nox.ui.common.JImgPanel;
+import nox.ui.common.JNABalloon;
+import nox.ui.common.SystemPath;
 
 @SuppressWarnings("serial")
 public class RegisterDialog extends JDialog implements ActionListener{
