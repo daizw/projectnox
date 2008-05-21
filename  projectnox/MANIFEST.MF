@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Ant-Version: Apache Ant 1.7.0
 Created-By: 10.0-b19 (Sun Microsystems Inc.)
-Main-Class: noxUI.NoX
-Class-Path: lib/examples.jar lib/jna.jar lib/jxta.jar lib/javax.servlet.jar lib/org.mortbay.jetty.jar lib/bcprov-jdk14.jar lib/hsqldb.jar lib/lucene-core-2.3.1.jar lib/jce1_2_2.jar lib/sunjce_provider.jar lib/local_policy.jar lib/US_export_policy.jar
+Main-Class: nox.launcher.NoX
+Class-Path: lib/examples.jar lib/jna.jar lib/jxta.jar lib/javax.servlet.jar lib/org.mortbay.jetty.jar lib/bcprov-jdk14.jar lib/hsqldb.jar lib/lucene-core-2.3.1.jar
 

@@ -116,7 +116,7 @@ public class NoxFrame extends JFrame {
 	 * @see Titlebar
 	 * @see JFrame
 	 */
-	NoxFrame(String title, String path_background, 
+	protected NoxFrame(String title, String path_background, 
 			String path_logo, String path_logo_big,
 			String path_title, final boolean IAmBase) {
 		super(title);

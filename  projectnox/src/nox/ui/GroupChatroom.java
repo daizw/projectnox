@@ -114,7 +114,7 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 		rootpane.add(chatroompane);
 		this.getContainer().setLayout(new BorderLayout());
 		this.getContainer().add(rootpane, BorderLayout.CENTER);
-		this.setVisible(true);
+		//this.setVisible(true);
 		connector = new Thread(new Runnable() {
 			public void run() {
 				/**
@@ -157,7 +157,7 @@ public class GroupChatroom extends Chatroom implements PipeMsgListener {
 		rootpane.add(chatroompane);
 		this.getContainer().setLayout(new BorderLayout());
 		this.getContainer().add(rootpane, BorderLayout.CENTER);
-		this.setVisible(true);
+		//this.setVisible(true);
 	}
 	/*public GroupChatroom(final GroupItem group, GroupItem[] gmembers) {
 		super(group.getNick(), SystemPath.IMAGES_RESOURCE_PATH

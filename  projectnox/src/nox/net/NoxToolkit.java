@@ -74,11 +74,11 @@ public class NoxToolkit {
 
 		public void eventOccured(NoxJListItem item, Advertisement adv,
 				Object src, long delay) {
-			try{
+			/*try{
 				item.setStatus(adv);
 			}catch(Exception ex){
 				ex.printStackTrace();
-			}
+			}*/
 		}
 	}
 	
@@ -206,17 +206,17 @@ public class NoxToolkit {
 			roomunit = (ChatroomUnit)(it.next());
 			System.out.println("Chatroom Iterator here : " + roomunit.getRoomID());
 			if(roomunit.getRoomID() == null || id == null){
-				System.out.println("Error	: This room has no ID or you want to get a Chatroom without any id, it's very strange!!");
+				System.out.println("Error	: This roomunit has no ID or you want to get a Chatroom without any id, it's very strange!!");
 				network.StopNetwork();
 				System.exit(-1);
 			}
 			if(id.equals(roomunit.getRoomID())){
-				System.out.println("I find the room, it exist already");
+				System.out.println("I find the roomunit, it exist already");
 				return roomunit;
 			}else
-				System.out.println("Unfortunately, this room is not what we're look for.");
+				System.out.println("Unfortunately, this roomunit is not what we're look for.");
 		}
-		System.out.println("Unfortunately, the room doesn't exist yet, I find nothing here.");
+		System.out.println("Unfortunately, the roomunit doesn't exist yet, I find nothing here.");
 		return null;
 	}
 	

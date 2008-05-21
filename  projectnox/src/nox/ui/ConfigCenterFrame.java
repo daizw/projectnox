@@ -16,7 +16,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -32,7 +31,6 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.border.MatteBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
@@ -313,7 +311,7 @@ class PersonalBasicConfigPane extends JPanel implements ActionListener {
 					}
 				};
 				chooser.setFileFilter(filter);
-				chooser.setDialogTitle("请选择所要发送的图片");
+				chooser.setDialogTitle("请选择头像图片(建议尺寸大小为40x40)");
 				int returnVal = chooser.showOpenDialog(null);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					// getJtf_pic().setText(chooser.getSelectedFile().getPath());
