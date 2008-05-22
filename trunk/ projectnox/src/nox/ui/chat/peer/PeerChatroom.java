@@ -101,9 +101,7 @@ public class PeerChatroom extends Chatroom {
 		glassPane.stop();
 		glassPane.setVisible(false);
 		rootpane.setVisible(true);
-		rootpane.repaint();
 		this.repaint();
-		super.repaint();
 	}
 	public void incomingMsgProcessor(String sender, String time, Object msgdata) {
 		if(msgdata instanceof NoxFileUnit){
