@@ -141,7 +141,7 @@ public class JXTANetwork {
 			// Does a local peer configuration exist?
 			if (TheConfig.exists()) {
 				//验证密码!
-				System.out.println("Local configuration found, check the password.......");
+				System.out.println("Local configuration found, checking the password.......");
 				// We load it
 				File LocalConfig = new File(TheConfig.getHome(), "PlatformConfig");
 				try {
@@ -185,6 +185,8 @@ public class JXTANetwork {
 				TheConfig.setName(locpeername);
 				TheConfig.setDescription("A NoX Peer");
 				
+				System.setProperty("net.jxta.tls.principal", locpeername);
+	            System.setProperty("net.jxta.tls.password", new String(locpeerpassword));
 				
 				TheConfig.setTcpStartPort(9701);
 				TheConfig.setTcpEndPort(65530);
@@ -196,6 +198,8 @@ public class JXTANetwork {
 					System.out.println("Saving new configuration");
 					TheConfig.save();
 					System.out.println("New configuration saved successfully");
+					System.out.println("saved Principal: " + TheConfig.getPrincipal());
+					System.out.println("saved Password : " + TheConfig.getPassword());
 					break;
 				} catch (IOException ex) {
 					ex.printStackTrace();
@@ -204,6 +208,9 @@ public class JXTANetwork {
 			}
 		}
 		
+		System.out.println("system principle: " + System.getProperty("net.jxta.tls.principal"));
+        System.out.println("system password: " + System.getProperty("net.jxta.tls.password"));
+        
 		/**
 		 * 初始化NoxToolkit
 		 */

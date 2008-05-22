@@ -143,7 +143,9 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 						} else {
 							System.out.println("连接成功!!");
 							//TryToConnect()已自动注册ID-connectionHandler并监听
+							room.setVisible(false);
 							room.removeMask();
+							room.setVisible(true);
 							break;
 						}
 					}

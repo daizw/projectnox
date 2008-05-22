@@ -68,6 +68,7 @@ public class SlideInNotification extends Object {
         animatingSheet = new AnimatingSheet ();
         animatingSheet.setSource (contents);
         window.getContentPane().add (animatingSheet);
+        window.setAlwaysOnTop(true);
     }
 
     public void showAt (int x) {
