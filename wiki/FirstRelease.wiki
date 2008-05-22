@@ -1,11 +1,11 @@
-#summary NoX 0.99 release today!
+#summary NoX 0.99d released today!
 #labels Featured
 
 = News =
 
-NoX 0.99 release today!
+NoX 0.99 released today!
 
 
 = Details =
 
-After two month's coding, NoX's first version release finally!
+After two month's coding, NoX's first version released finally!
