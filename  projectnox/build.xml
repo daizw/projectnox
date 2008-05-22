@@ -39,7 +39,7 @@
 		<echo message="Useful ant commands for Project NoX:" />
 		<echo message="'ant build' to compile the source directory" />
 		<echo message="'ant nox' to run NoX GUI" />
-		<echo message="'ant run -DAPP [classname]' to run the class" />
+		<echo message="'ant run -DAPP [classname]' to run the specified thread" />
 		<echo message="'ant jar' to build the jar package(s)" />
 		<echo message="'ant release' to build a release package" />
 		<echo message="'ant source-zip' to creates source zip file" />
@@ -103,7 +103,7 @@
 	<target name="run" description="Run the NoX" depends="run-logging,run-default-logging" />
 	
 	<target name="nox" depends="build" description="Run the NoX UI" if="java.util.logging.config.file">
-		<java classname="noxUI.NoX" failonerror="yes" fork="yes">
+		<java classname="nox.launcher.NoX" failonerror="yes" fork="yes">
 			<classpath>
 				<!--fileset refid="nox.files" /-->
 				<fileset refid="lib.files" />
