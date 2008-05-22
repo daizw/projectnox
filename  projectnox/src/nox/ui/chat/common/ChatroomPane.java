@@ -574,74 +574,13 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 	 * @param strs
 	 *            1:sender;2:receiver;3:time;4:msg
 	 * @param incomingPic 外来图片
-	 */
-	/*public void incomingMsgProcessor(final String[] strs, ImageIcon incomingPic) {// 1:sender;2:receiver;3:time;4:msg
-		System.out.println("playAudio()...");
-		// System.out.println("public void receiveMsgAndAccess(String[] strs)");
-		// System.out.println("currentUsername :" + currentUsername);
-
-		*//**
-		 * 处理外部传来的消息字符串
-		 *//*
-		StringBuffer strbuf_msg = new StringBuffer(strs[4]);
-		int caretPos = -1;
-
-		for (; (caretPos = strbuf_msg.indexOf("^n", caretPos + 1)) >= 0;) {
-			// 把"^n"替换为"\n"
-			strbuf_msg.replace(caretPos, caretPos + 2, "\n");
-		}
-
-		String whoami = "ME";
-		whoami = NoxToolkit.getNetworkConfigurator().getPeerID().toString();
-
-		if (strs[2].equals(whoami))// 此处要获取当前用户的用户名
-		{
-			String label = "[" + strs[1] + "@" + strs[3] + "]";
-			Thread playThd = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					if (strs[4].equals(shakeMsg))
-						playShakeAudio();
-					else
-						playAudio();
-				}
-			}, "Beeper");
-			playThd.start();
-			appendToHMsg(label, strbuf_msg.toString(), incomingPic, true, false);
-		} else if (strs[0].equals(GroupChatroom.FROMALLSTR))// 群聊消息
-		{
-			System.out.println("noDisturb " + noDisturb);
-			String label = "[" + strs[1] + "@" + strs[3] + "]";
-			// appendToHMsg(label, strbuf_msg.toString(), !noDisturb);
-			if (noDisturb)// 且 防打扰打开
-			{
-				appendToHMsg(label, strbuf_msg.toString(), incomingPic, false, false);
-				return;
-			} else// 防打扰未打开
-			{
-				appendToHMsg(label, strbuf_msg.toString(), incomingPic, true, false);
-				Thread playThd = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						if (strs[4].equals(shakeMsg))
-							playShakeAudio();
-						else
-							playAudio();
-					}
-				}, "Beeper");
-				playThd.start();
-			}
-		}
-	}*/
-	
+	 */	
 	public void incomingMsgProcessor(String sender, String time,
-			String strmsg){
-		incomingMsgProcessor(sender, time, strmsg, null);
-	}
-	
-	public void incomingMsgProcessor(String sender, String time,
-			ImageIcon incomingPic){
-		incomingMsgProcessor(sender, time, null, incomingPic);
+			Object msgdata){
+		if(msgdata instanceof String)
+			incomingMsgProcessor(sender, time, (String)msgdata, null);
+		else if(msgdata instanceof ImageIcon)
+			incomingMsgProcessor(sender, time, null, (ImageIcon)msgdata);
 	}
 	
 	public void incomingMsgProcessor(String sender, String time,
@@ -675,34 +614,6 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		}
 		
 		appendToHMsg(label, (strbuf_msg != null)?strbuf_msg.toString():null, incomingPic, true, false);
-		
-		/*if (strs[2].equals(whoami))// 此处要获取当前用户的用户名
-		{
-			
-		} else if (strs[0].equals(GroupChatroom.FROMALLSTR))// 群聊消息
-		{
-			System.out.println("noDisturb " + noDisturb);
-			String label = "[" + strs[1] + "@" + strs[3] + "]";
-			// appendToHMsg(label, strbuf_msg.toString(), !noDisturb);
-			if (noDisturb)// 且 防打扰打开
-			{
-				appendToHMsg(label, strbuf_msg.toString(), incomingPic, false, false);
-				return;
-			} else// 防打扰未打开
-			{
-				appendToHMsg(label, strbuf_msg.toString(), incomingPic, true, false);
-				Thread playThd = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						if (strs[4].equals(shakeMsg))
-							playShakeAudio();
-						else
-							playAudio();
-					}
-				}, "Beeper");
-				playThd.start();
-			}
-		}*/
 	}
 
 	/**

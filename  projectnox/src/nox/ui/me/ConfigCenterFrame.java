@@ -293,7 +293,7 @@ class PersonalBasicConfigPane extends JPanel implements ActionListener {
 		myPortrait.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser chooser = new JFileChooser();
+				JFileChooser chooser = new JFileChooser(SystemPath.PORTRAIT_RESOURCE_PATH);
 				FileFilter filter = new FileFilter() {
 					public boolean accept(File f) {
 						return f.isDirectory()

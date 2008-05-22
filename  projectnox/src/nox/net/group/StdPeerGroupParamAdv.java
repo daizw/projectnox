@@ -54,7 +54,7 @@
  *  This license is based on the BSD license adopted by the Apache Foundation. 
  */
 
-package nox.net;
+package nox.net.group;
 
 
 import net.jxta.document.Advertisement;

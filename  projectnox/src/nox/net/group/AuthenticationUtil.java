@@ -53,7 +53,7 @@
  *  $Id: AuthenticationUtil.java,v 1.12 2007/06/10 21:15:12 nano Exp $
  */
 
-package nox.net;
+package nox.net.group;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -73,6 +73,7 @@ import net.jxta.logging.Logging;
 import net.jxta.membership.Authenticator;
 import net.jxta.membership.MembershipService;
 import net.jxta.peergroup.PeerGroup;
+import nox.net.common.NoxToolkit;
 import nox.ui.common.AuthenticationPanel;
 
 /**

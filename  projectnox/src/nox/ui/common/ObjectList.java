@@ -343,6 +343,7 @@ public class ObjectList extends JList {
 							&& curItem.getPortrait() != null && curItem.getPortrait().equals(stat.getPortrait())
 							&& curItem.getOnlineStatus() != null && curItem.getOnlineStatus().equals(stat.getOnlineStatus())){
 						System.out.println("状态未变, 取消修改...");
+						curItem.updateTimeStamp();
 						this.repaint();
 						return;
 					}

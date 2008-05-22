@@ -6,8 +6,6 @@ import java.util.Date;
 import javax.swing.ImageIcon;
 
 import net.jxta.id.ID;
-import net.jxta.protocol.PeerAdvertisement;
-import net.jxta.protocol.PeerGroupAdvertisement;
 
 public abstract class NoxJListItem implements Serializable{
 	protected ImageIcon portrait;
@@ -18,7 +16,10 @@ public abstract class NoxJListItem implements Serializable{
 	protected String name;
 	protected String discription;
 	protected ID id;
-	protected ItemStatus stat;
+	/**
+	 * 在线状态信息不需要保存
+	 */
+	protected transient ItemStatus stat;
 	protected Long timeStamp;
 
 	NoxJListItem(ImageIcon portr, String name, String disc, ID uuid) {

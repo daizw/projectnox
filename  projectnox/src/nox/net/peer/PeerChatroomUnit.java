@@ -1,7 +1,8 @@
-package nox.net;
+package nox.net.peer;
 
 import net.jxta.id.ID;
 import net.jxta.util.JxtaBiDiPipe;
+import nox.net.common.ChatroomUnit;
 import nox.ui.chat.common.Chatroom;
 import nox.ui.chat.peer.PeerChatroom;
 
@@ -10,7 +11,7 @@ import nox.ui.chat.peer.PeerChatroom;
  * 用于保存roomID, outpipe, 和chatroom的对应关系.
  * 
  * @author shinysky
- *
+ * @deprecated
  */
 public class PeerChatroomUnit implements ChatroomUnit{
 	private ID roomID = null;
@@ -39,7 +40,7 @@ public class PeerChatroomUnit implements ChatroomUnit{
 		outbidipipe = pipe;
 		//同步room的outpipe
 		if(room != null)
-			room.setOutBidipipe(pipe);
+			;//room.setOutBidipipe(pipe);
 	}
 	@Override
 	public PeerChatroom getChatroom(){

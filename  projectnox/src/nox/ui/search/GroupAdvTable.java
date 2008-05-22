@@ -2,7 +2,7 @@ package nox.ui.search;
 
 import net.jxta.document.Advertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
-import nox.net.NoxToolkit;
+import nox.net.common.NoxToolkit;
 
 public class GroupAdvTable extends AdvTable{
 

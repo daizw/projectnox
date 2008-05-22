@@ -15,8 +15,8 @@ import java.sql.Statement;
 
 import nox.db.DBTableName;
 import nox.encrypt.EncryptUtil;
-import nox.net.JXTANetwork;
-import nox.net.NoxToolkit;
+import nox.net.common.JXTANetwork;
+import nox.net.common.NoxToolkit;
 import nox.ui.common.ObjectList;
 import nox.ui.me.Cheyenne;
 
@@ -139,6 +139,7 @@ public class NoX {
 	 * 
 	 * @param sqlconn 数据库连接
 	 * @param tablename 数据库表名
+	 * @deprecated
 	 */
 	private static void initMyKeyPair(Connection sqlconn, String tablename) {
 		Statement stmt;

@@ -1,4 +1,4 @@
-package nox.net;
+package nox.net.common;
 
 import net.jxta.document.Advertisement;
 /**

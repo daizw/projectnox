@@ -1,11 +1,8 @@
 package nox.ui.chat.group;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -222,21 +219,6 @@ public class GroupMemberList extends JList {
 								+ item.getUUID() + "<br></Font></BODY></html>");
 			}
 			return this;
-		}
-
-		private void addWithGridBag(Component comp, Container cont, int x,
-				int y, int width, int height, int anchor, int fill,
-				int weightx, int weighty) {
-			GridBagConstraints gbc = new GridBagConstraints();
-			gbc.gridx = x;
-			gbc.gridy = y;
-			gbc.gridwidth = width;
-			gbc.gridheight = height;
-			gbc.anchor = anchor;
-			gbc.fill = fill;
-			gbc.weightx = weightx;
-			gbc.weighty = weighty;
-			cont.add(comp, gbc);
 		}
 	}
 

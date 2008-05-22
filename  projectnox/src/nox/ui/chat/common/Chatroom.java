@@ -6,7 +6,6 @@ import java.io.File;
 
 import javax.swing.JSplitPane;
 
-import net.jxta.endpoint.Message;
 import net.jxta.id.ID;
 import nox.ui.common.NoxFrame;
 
@@ -29,9 +28,6 @@ public abstract class Chatroom extends NoxFrame{
 	
 	protected JSplitPane rootpane;
 	protected ChatroomPane chatroompane;
-	
-	public static final int UnitWaitTime = 500;		// 远程发现的等待时间，需根据网络情况调整
-	public static final int MAXRETRIES = 5;		// 远程发现时的重试次数，需根据网络情况调整
 	
 	/**
 	 * 私聊: 该值为对方ID;
@@ -61,15 +57,14 @@ public abstract class Chatroom extends NoxFrame{
 		rootpane.setResizeWeight(0.2d);
 	}
 	/**
-	 * TODO comment this method
-	 * @return room ID
+	 * 获取聊天室名称(对方昵称或组名)
+	 * @return 对方昵称或组名
 	 */
-	public ID getRoomID() {
-		return roomID;
-	}
-
-	public String getRoomName() {
+	public String getRoomName(){
 		return roomname;
+	}
+	public ID getRoomID(){
+		return roomID;
 	}
 	/**
 	 * 向外发送文本消息
@@ -95,22 +90,4 @@ public abstract class Chatroom extends NoxFrame{
 	 * @return succeed or not
 	 */
 	public abstract boolean SendMsg(File file, boolean encrypt);
-	/**
-	 * 向外发送字节数组, 实际是供SendMsg(string/image/file)调用.<br>
-	 * 当然, 也可独立使用.<br>
-	 * 
-	 * @param namespace 消息namespace, 表明消息数据类型(text/image/file)
-	 * @param data
-	 * @return
-	 */
-	public abstract boolean SendMsg(String namespace, byte[] data, boolean encrypt);
-
-	/**
-	 * 从指定的namespace中解析出数据, 然后传递给chatroompane处理.
-	 * @param namespace
-	 * @param msg
-	 * @return 是否成功, 是否正常
-	 * @deprecated 暂时用不到
-	 */
-	public abstract boolean ExtractDataAndProcess(String namespace, Message msg);
 }
