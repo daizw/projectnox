@@ -1,1 +1,1 @@
-cd . && cls && ant run -DAPP noxUI.NoX && cmd
+cd . && cls && ant run -DAPP nox.launcher.NoX && cmd
