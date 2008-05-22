@@ -28,12 +28,11 @@ import net.jxta.discovery.DiscoveryEvent;
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
-import net.jxta.id.ID;
+import net.jxta.peer.PeerID;
 import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PeerAdvertisement;
-import nox.net.NoxToolkit;
-import nox.net.PeerChatroomUnit;
-import nox.ui.chat.peer.PeerChatroom;
+import nox.net.common.NoxToolkit;
+import nox.net.peer.PeerConnectionHandler;
 import nox.ui.common.PeerItem;
 import nox.ui.common.SystemPath;
 import nox.ui.me.ListsPane;
@@ -243,26 +242,16 @@ public class GroupChatroomSidePane extends JSplitPane{
 	 * @param listItem
 	 */
 	private void showPeerChatroom(PeerItem listItem) {
-		ID id = listItem.getUUID();
-		PeerChatroomUnit roomunit = (PeerChatroomUnit) NoxToolkit.getChatroomUnit(id);
-		PeerChatroom room;
 		
-		if(roomunit == null){
-			//未注册pipe, 更无chatroom.
-			//新建聊天室, 会试图连接.
-			//如果连接不上....
-			//如果连接成功....
-			room = new PeerChatroom(listItem, null);
+		PeerConnectionHandler handler = NoxToolkit.getPeerConnectionHandler((PeerID) listItem.getUUID());
+		if(handler != null){
+			handler.showChatroom();
 		}else{
-			//已注册pipe
-			room = roomunit.getChatroom();
-			if(room == null)
-			{//不存在, 开新窗口
-				room = NoxToolkit.getCheyenne().setupNewChatroomOver(roomunit.getOutPipe());
-				//new NoxToolkit().registerChatroom(id, room);
-			}else{
-				room.pack();
-				room.setVisible(true);
+			//不存在对应的handler, 需要连接然后注册handler
+			try {
+				handler = new PeerConnectionHandler(listItem, true);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}

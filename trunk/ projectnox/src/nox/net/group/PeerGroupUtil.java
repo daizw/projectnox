@@ -54,7 +54,7 @@
  *  $Id: PeerGroupUtil.java,v 1.7 2007/05/28 22:00:51 nano Exp $
  */
 
-package nox.net;
+package nox.net.group;
 
 import java.io.IOException;
 import java.net.URI;

@@ -1,8 +1,6 @@
 package nox.ui.common;
 
-import java.io.Serializable;
-
-public enum ItemStatus implements Serializable{
+public enum ItemStatus{
 	ONLINE(),//在线
 	OFFLINE(),//离线
 	INVISIBLE(),//隐身

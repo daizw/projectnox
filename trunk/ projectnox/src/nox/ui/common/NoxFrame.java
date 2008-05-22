@@ -32,7 +32,7 @@ import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import nox.net.NoxToolkit;
+import nox.net.common.NoxToolkit;
 
 import com.sun.jna.examples.WindowUtils;
 

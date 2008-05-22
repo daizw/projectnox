@@ -69,11 +69,11 @@ public class LoginDialog extends JDialog implements ActionListener{
 	/**
 	 * ”√ªß√˚JTextField
 	 */
-	final JTextField t_name = new JTextField(20);
+	final JTextField t_name = new JTextField(18);
 	/**
 	 * √‹¬ÎJPasswordField
 	 */
-	final JPasswordField t_pwd = new JPasswordField("", 20);
+	final JPasswordField t_pwd = new JPasswordField("", 18);
 	
 	JPanel p_buttons = new JPanel();
 	final JButton b_login = new JButton("Login");
@@ -166,6 +166,11 @@ public class LoginDialog extends JDialog implements ActionListener{
 		 
 		 this.setBounds((ScrWidth-LOGINDIALOGWIDTH)/2, (ScrHeight-LOGINDIALOGHEIGHT)/2,
 				 LOGINDIALOGWIDTH, LOGINDIALOGHEIGHT);
+		 this.setSize(new Dimension(LOGINDIALOGWIDTH, LOGINDIALOGHEIGHT));
+		 this.setPreferredSize(new Dimension(LOGINDIALOGWIDTH, LOGINDIALOGHEIGHT));
+		 this.setMaximumSize(new Dimension(LOGINDIALOGWIDTH, LOGINDIALOGHEIGHT));
+		 this.setMinimumSize(new Dimension(LOGINDIALOGWIDTH, LOGINDIALOGHEIGHT));
+		 
 		 this.setAlwaysOnTop(true);
 		 this.setOpacity(0.8f);
 		 this.setRoundRecangle();
@@ -199,7 +204,7 @@ public class LoginDialog extends JDialog implements ActionListener{
 	public boolean setRoundRecangle(){
 		RoundRectangle2D.Float mask = 
 			new RoundRectangle2D.Float(0, 0, 
-					LOGINDIALOGWIDTH - 10, LOGINDIALOGHEIGHT - 10, 60, 60);
+					LOGINDIALOGWIDTH, LOGINDIALOGHEIGHT , 60, 60);
 	    WindowUtils.setWindowMask(this, mask);
 	    return true;
 	}

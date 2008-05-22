@@ -35,28 +35,20 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.jxta.endpoint.Message;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.id.ID;
+import net.jxta.peer.PeerID;
 import net.jxta.peergroup.PeerGroup;
 import net.jxta.peergroup.PeerGroupID;
-import net.jxta.pipe.InputPipe;
-import net.jxta.pipe.OutputPipe;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
-import net.jxta.protocol.PipeAdvertisement;
-import net.jxta.util.JxtaBiDiPipe;
 import nox.db.DBTableName;
-import nox.net.AuthenticationUtil;
-import nox.net.ConnectionHandler;
-import nox.net.GroupConnectionHandler;
-import nox.net.NoxToolkit;
-import nox.net.PeerChatroomUnit;
-import nox.net.PeerGroupUtil;
-import nox.net.PipeUtil;
-import nox.ui.chat.common.Chatroom;
-import nox.ui.chat.group.GroupChatroom;
-import nox.ui.chat.peer.PeerChatroom;
+import nox.net.common.LANTimeLimit;
+import nox.net.common.NoxToolkit;
+import nox.net.group.AuthenticationUtil;
+import nox.net.group.GroupConnectionHandler;
+import nox.net.group.PeerGroupUtil;
+import nox.net.peer.PeerConnectionHandler;
 import nox.ui.common.CreateNewGroupDialog;
 import nox.ui.common.GroupItem;
 import nox.ui.common.ItemStatus;
@@ -66,9 +58,7 @@ import nox.ui.common.PeerItem;
 import nox.ui.common.SystemPath;
 import nox.ui.common.ObjectList.FilterModel;
 import nox.ui.search.SearchingFrame;
-import nox.xml.NoxMsgUtil;
 import nox.xml.NoxPeerStatusUnit;
-import nox.xml.XmlMsgFormat;
 /**
  * 
  * @author shinysky
@@ -167,7 +157,7 @@ public class Cheyenne extends NoxFrame {
 		Thread addGroupListenerThread = new Thread(new Runnable() {
 			public void run() {
 				System.out.println("Begining initGroupListener()");
-				initGroupListener();
+				initGroupListenerWithoutReauthenticating();
 			}
 		}, "Connector");
 		addGroupListenerThread.start();
@@ -312,10 +302,8 @@ public class Cheyenne extends NoxFrame {
 		try {
 			friendlist.setStatus(id, stat);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -329,104 +317,28 @@ public class Cheyenne extends NoxFrame {
 		public void run() {
 			while(true){
 				PeerItem peer;
-				PeerChatroomUnit roomUnit;
-				Message msg = null;
-				for(int index = 0; index < fmod.getRealSize(); index++){
-					JxtaBiDiPipe bidipipe = null;
-					NoxPeerStatusUnit status = profile.getStatusUnit();
-					byte[] statBytes = null;
-					try {
-						statBytes = NoxMsgUtil.getBytesFromObject(status);
-					} catch (Exception e) {
-						e.printStackTrace();
-						continue;
-					}
-					
+				PeerConnectionHandler handler;
+				
+				for(int index = 0; index < fmod.getRealSize(); index++){					
 					peer = (PeerItem) fmod.getRealElementAt(index);
 					long curTime = new Date().getTime();
-					if(curTime - peer.getTimeStamp() > 60 * 1000){
+					if(curTime - peer.getTimeStamp() > LANTimeLimit.OFFLINE_TIMELIMIT){
 						//已经一分钟没有收到对方的状态消息了, 视为离线
 						//适用于对方先上线后下线这种情况
 						peer.setOnlineStatus(ItemStatus.OFFLINE);
 					}
-					msg = NoxMsgUtil.generateMsg(
-							XmlMsgFormat.PINGMSG_NAMESPACE_NAME,
-							NoxToolkit.getNetworkConfigurator().getName(),
-							NoxToolkit.getNetworkConfigurator().getPeerID().toString(),
-							peer.getName(),
-							peer.getUUID().toString(),
-							statBytes);
-					
-					roomUnit = (PeerChatroomUnit) NoxToolkit.getChatroomUnit(peer.getUUID());
-					if(roomUnit != null){
-						if(roomUnit.getChatroom() != null){
-							//已经存在chatroom, 则取chatroom中的bidipipe使用之
-							bidipipe = roomUnit.getChatroom().getOutBidipipe();
-							if(bidipipe == null){
-								roomUnit.getChatroom().TryToConnectAgain(5 * 1000);
-							}
-							if(bidipipe == null)
-								continue;
-						}else{
-							//没有chatroom, 取Unit中bidipipe使用之
-							bidipipe = roomUnit.getOutPipe();
-							if(bidipipe == null)
-								continue;
-						}
-						try {
-							bidipipe.sendMessage(msg);
-						} catch (IOException e) {
-							e.printStackTrace();
-							continue;
-						}
+					System.out.println("Pinging: " + peer.getName());
+					handler = NoxToolkit.getPeerConnectionHandler((PeerID) peer.getUUID());
+					if(handler != null){
+						handler.sendPingMsg();
 					}else{
-						//不存在对应的ChatroomUnit, 需要连接然后注册bidipipe
-						PeerGroup group = NoxToolkit.getNetworkManager()
-								.getNetPeerGroup();
-						PipeAdvertisement pia = PipeUtil.findNewestPipeAdv(group,
-								peer.getUUID().toString(), 3 * 1000);
-						int timecount = 4;
-						while (pia != null && bidipipe == null && timecount > 0) {
-							// Try again and again
-							try {
-								timecount --;
-								bidipipe = new JxtaBiDiPipe(group, pia,
-										(int) Chatroom.UnitWaitTime * 4, null, true);
-							} catch (IOException exc) {
-								exc.printStackTrace();
-								continue;
-							}
-						}
-						if(bidipipe == null){
-							//说明连接超时, 应该设之为离线状态(第二个参数为null)
-							try {
-								friendlist.setStatus(peer.getUUID(), null);
-							} catch (SQLException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							continue;
-						}
-						roomUnit = (PeerChatroomUnit) NoxToolkit.getChatroomUnit(peer.getUUID());
-						//防止对方连过来活在主动连过去建了聊天室?
-						if(roomUnit != null && roomUnit.getChatroom() == null){
-							Thread thread = new Thread(	new ConnectionHandler(	bidipipe),
-									"Incoming Connection Handler");
-							thread.start();
-						}
-
-						/**
-						 * @Fixme comment this
-						 *//*
-						//注册pipe, 实际上ConnectionHandler初始化时就注册过了...
-						NoxToolkit.registerChatroomUnit(peer.getUUID(), bidipipe);*/
-						
+						//不存在对应的handler, 需要连接然后注册handler
+						//!!!同步方式!!!!!!!!!!!!!!!!!!
 						try {
-							bidipipe.sendMessage(msg);
-						} catch (IOException e) {
+							handler = new PeerConnectionHandler(peer, false);
+							if(handler.isConnected())
+								handler.sendPingMsg();
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
@@ -442,9 +354,96 @@ public class Cheyenne extends NoxFrame {
 		}
 	}
 	/**
-	 * 重新加入各组, 然后为组添加管道监听器
+	 * 为所有组添加管道监听器, 而不进行重新认证.
+	 * 一轮添加后
 	 */
-	private void initGroupListener(){
+	private void initGroupListenerWithoutReauthenticating(){
+		System.out.println("Begining initGroupListenerWithoutReauthenticating()");
+		
+		FilterModel fmod = (FilterModel) grouplist.getModel();
+		
+		GroupItem group;
+		GroupConnectionHandler handler;
+		//是否全部添加成功
+		boolean finished = false;
+		
+		while(!finished){
+			//标志位, 如果有个组不存在监听器, 则设为false, 以进行下一轮循环.
+			//如果经过一轮循环, 发现所有组都有监听器, 则该值不会被修改.
+			//从而跳出循环
+			finished = true;
+			
+			for(int index = 0; index < fmod.getRealSize(); index++){					
+				group = (GroupItem) fmod.getRealElementAt(index);
+				handler = NoxToolkit.getGroupConnectionHandler((PeerGroupID) group.getUUID());
+				
+				if(handler != null){
+					//do nothing
+					//handler.sendPingMsg();
+				}else{
+					//不存在对应的handler, 需要连接然后注册handler
+					/*PeerGroupAdvertisement pga	= PeerGroupUtil.getLocalAdvByID(
+								NoxToolkit.getNetworkManager().getNetPeerGroup(), group.getUUID().toString());
+					addGroupPipeListener(pga, group);*/
+					finished = false;
+					//!!!同步方式!!
+					try {
+						handler = new GroupConnectionHandler(group, false);
+						if(handler.isConnected())
+							handler.sendGreetingMessages();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			//一轮添加之后休息一段时间(InterStatusCheckingsSleepTime)
+			try {
+				Thread.sleep(Cheyenne.InterStatusCheckingsSleepTime);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				continue;
+			}
+		}
+		
+		System.out.println("Ending initGroupListenerWithoutReauthenticating()");
+	}
+	/**
+	 * 根据广告建立组, 然后启动新线程初始化GroupConnectionHandler
+	 * @param adv
+	 * @param item
+	 * @return
+	 * @deprecated
+	 */
+	private boolean addGroupPipeListener(PeerGroupAdvertisement adv, GroupItem item){
+		PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
+		PeerGroup pg = null;
+		try {
+            pg = ppg.newGroup(adv);
+        } catch (PeerGroupException pge) {
+        	System.out.println("Creating pg with pga failed, what's wrong?");
+        	pge.printStackTrace();
+        	return false;
+        }
+        if (pg != null) {
+        	Thread groupPipeListener;
+			try {
+				groupPipeListener = new Thread(new GroupConnectionHandler(pg, item),
+					"Incoming Group Connection Handler");
+				System.out.println("Starting groupPipeListener Thread...");
+				groupPipeListener.start();
+				return true;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+        }
+        return false;
+	}
+	/**
+	 * 为所有组添加管道监听器, 并进行重新认证
+	 * @deprecated
+	 */
+	private void initGroupListenerWithReauthenticating(){
 		System.out.println("Begining grouplist.getGroupIDPwds()");
 		Map<ID, String> idpwds = grouplist.getGroupIDPwds();
 		if(idpwds == null){
@@ -464,38 +463,22 @@ public class Cheyenne extends NoxFrame {
 			count++;
 			/*boolean auth = authenticateThisGroup(pga, (String)entry.getValue());
 			System.out.println("Authenticating result: " + auth);*/
-			//TODO 为每个组建立inputPipe并添加监听器
-			boolean isListening = addGroupPipeListener(pga);
+			//为每个组建立inputPipe并添加监听器,
+			/**
+			 * @Fixme 得到GroupItem用来初始化监听器(GroupConnectiongListener)
+			 */
+			boolean isListening = addGroupPipeListener(pga, null);
 			System.out.println("addGroupPipeListener result: " + isListening);
 		}
-	}
-	private boolean addGroupPipeListener(PeerGroupAdvertisement adv){
-		PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
-		PeerGroup pg = null;
-		try {
-            pg = ppg.newGroup(adv);
-        } catch (PeerGroupException pge) {
-        	System.out.println("Creating pg with pga failed, what's wrong?");
-        	pge.printStackTrace();
-        	return false;
-        }
-        if (pg != null) {
-        	Thread groupPipeListener = new Thread(new GroupConnectionHandler(pg),
-			"Incoming Group Connection Handler");
-			System.out.println("Starting groupPipeListener Thread...");
-			groupPipeListener.start();
-			return true;
-        }
-        return false;
 	}
 	/**
 	 * 为所有组重新认证, 并添加监听器, 暂时用不到...
 	 * @param adv
 	 * @param password
 	 * @return
+	 * @deprecated
 	 */
-	@SuppressWarnings("unused")
-	private boolean authenticateThisGroup(PeerGroupAdvertisement adv, String password) {
+	private boolean authenticateThisGroup(PeerGroupAdvertisement adv, String password, GroupItem item) {
 		PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
 		PeerGroup pg = null;
 
@@ -509,11 +492,17 @@ public class Cheyenne extends NoxFrame {
         if (pg != null) {
         	if(AuthenticationUtil.isAuthenticated(pg)){
         		//无密码组
-        		Thread groupPipeListener = new Thread(new GroupConnectionHandler(pg),
-				"Incoming Group Connection Handler");
-				System.out.println("Starting groupPipeListener Thread...");
-				groupPipeListener.start();
-				return true;
+				try {
+					Thread groupPipeListener;
+					groupPipeListener = new Thread(new GroupConnectionHandler(pg, item),
+					"Incoming Group Connection Handler");
+					System.out.println("Starting groupPipeListener Thread...");
+					groupPipeListener.start();
+					return true;
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
         	}
         	else{
         		boolean joined = PeerGroupUtil.joinPeerGroup(pg, PeerGroupUtil.MEMBERSHIP_ID, password);
@@ -522,11 +511,17 @@ public class Cheyenne extends NoxFrame {
             		System.out.println("您已成功加入该组. 可在组列表中查看.");
             		//InputPipe inpipe = pg.getPipeService().createInputPipe(adv,);
             		//为组建立管道, 并添加监听器
-            		Thread groupPipeListener = new Thread(new GroupConnectionHandler(pg),
-            				"Incoming Group Connection Handler");
-            		System.out.println("Starting groupPipeListener Thread...");
-            		groupPipeListener.start();
-            		return true;
+            		try {
+    					Thread groupPipeListener;
+    					groupPipeListener = new Thread(new GroupConnectionHandler(pg, item),
+    					"Incoming Group Connection Handler");
+    					System.out.println("Starting groupPipeListener Thread...");
+    					groupPipeListener.start();
+    					return true;
+    				} catch (Exception e) {
+    					e.printStackTrace();
+    					return false;
+    				}
             	}
             	else{
             		System.out.println("未能成功加入该组, 密码错误?");
@@ -547,8 +542,6 @@ public class Cheyenne extends NoxFrame {
 	 * @return 好友的列表元素
 	 */
 	public PeerItem add2PeerList(PeerAdvertisement adv, boolean good){
-		//TODO 将广告所代表的peer添加到好友列表中
-		
 		PeerItem newFriend = new PeerItem(new ImageIcon(
 				SystemPath.PORTRAIT_RESOURCE_PATH + "user.png"), adv);
 		
@@ -568,7 +561,7 @@ public class Cheyenne extends NoxFrame {
 		return newFriend;
 	}
 	/**
-	 * 将广告所代表的peer添加到好友列表中
+	 * 将广告所代表的peer添加到好友列表中, 并添加监听器.
 	 * TODO 这部分可以参考JXTA Prog Guide2.5的Membership Service 一章中对InteractiveAuthenticator的介绍.
 	 * 
 	 * @param adv 要添加的peer的广告 
@@ -587,6 +580,7 @@ public class Cheyenne extends NoxFrame {
             pg = ppg.newGroup(adv);
         } catch (PeerGroupException pge) {
         	pge.printStackTrace();
+        	return false;
         }
      // if the group was successfully created join it
         if (pg != null) {
@@ -601,44 +595,55 @@ public class Cheyenne extends NoxFrame {
         		}else{
         			//如果列表中没有, 说明该组不需要密码, 正常提示加入成功.
         			//将该组加入列表中
-        			add2GroupList(adv, "");
+        			GroupItem item = add2GroupList(adv, "");
 	        		System.out.println("您已成功加入该组. 可在组列表中查看.");
 	        		JOptionPane.showMessageDialog((Component) null,
 	    					"您已成功加入该组. 可在组列表中查看.", "Succeed!",
 	    					JOptionPane.INFORMATION_MESSAGE);
 	        		//添加监听器
-	        		Thread groupPipeListener = new Thread(new GroupConnectionHandler(pg),
-					"Incoming Group Connection Handler");
-					System.out.println("Starting groupPipeListener Thread...");
-					groupPipeListener.start();
+					try {
+						Thread groupPipeListener;
+						groupPipeListener = new Thread(new GroupConnectionHandler(pg, item),
+							"Incoming Group Connection Handler");
+						System.out.println("Starting groupPipeListener Thread...");
+						groupPipeListener.start();
+					} catch (Exception e) {
+						e.printStackTrace();
+						return false;
+					}
         		}
         		return true;
     		}
         	
         	System.out.println("尝试加入组");
-        	String password = GetPassword();
+        	String password = getJoiningGroupPassword();
         	if(password == null || password.trim().equals("")){
         		//TODO 可以获取更多信息的密码输入窗口:
         		//1. 用户点击了OK;--密码错误
         		//2. 用户点击Cancel;--忽略
         		//3. 用户直接关闭窗口.--忽略
-        		System.out.println("The user just canceled the joining process?");
+        		System.out.println("Password inputted is empty/null");
         		return false;
         	}
         	//pg.getMembershipService().
         	boolean joined = PeerGroupUtil.joinPeerGroup(pg, PeerGroupUtil.MEMBERSHIP_ID, password);
         	
         	if(joined){
-        		add2GroupList(adv, password);
+        		GroupItem item = add2GroupList(adv, password);
         		JOptionPane.showMessageDialog((Component) null,
     					"您已成功加入该组. 可在组列表中查看.", "Succeed!",
     					JOptionPane.INFORMATION_MESSAGE);
         		//添加监听器
-        		Thread groupPipeListener = new Thread(new GroupConnectionHandler(pg),
-				"Incoming Group Connection Handler");
-				System.out.println("Starting groupPipeListener Thread...");
-				groupPipeListener.start();
-				
+        		try {
+					Thread groupPipeListener;
+					groupPipeListener = new Thread(new GroupConnectionHandler(pg, item),
+						"Incoming Group Connection Handler");
+					System.out.println("Starting groupPipeListener Thread...");
+					groupPipeListener.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
         		return true;
         	}
         	else{
@@ -656,6 +661,12 @@ public class Cheyenne extends NoxFrame {
 			return false;
         }
 	}
+	/**
+	 * 由调用者为新组添加监听器, 本函数不直接添加.
+	 * @param adv
+	 * @param password
+	 * @return
+	 */
 	public GroupItem add2GroupList(PeerGroupAdvertisement adv, String password){
 		//将该组加入列表中
 		GroupItem newGroupItem = new GroupItem(new ImageIcon(
@@ -672,38 +683,16 @@ public class Cheyenne extends NoxFrame {
 		tabs.repaint();
 		return newGroupItem;
 	}
-	private String GetPassword() {
+	private String getJoiningGroupPassword() {
 		return (String) JOptionPane.showInputDialog(this, "Please enter the password:",
 				"Password Needed", JOptionPane.QUESTION_MESSAGE, null, null, "");
-	}
-	/**
-	 * 在存在对应ID-Pipe对, 而不存在对应聊天室的情况下:
-	 * <li>如果是好友的消息, 则(暂时)建立聊天室显示之.
-	 * (应当)提示有新消息</li>
-	 * <li>如果不是好友的消息, 则(暂时)将之添加为好友建立聊天室并显示之.
-	 * (应当)提示有来自陌生人的新消息</li>
-	 * @param connhandler 用于管理连接的ConnectionHandler
-	 * @return 新建立的chatroom, 用于注册到NoxToolkit
-	 */
-	public PeerChatroom setupNewChatroomOver(JxtaBiDiPipe pipe){
-		//添加到好友列表
-		//如果已经添加, 则在做无用功.
-		PeerItem friend = add2PeerList(pipe.getRemotePeerAdvertisement(), true);
-		//打开聊天室
-		PeerChatroom chatroom = new PeerChatroom(friend, pipe);
-		//注册之
-		NoxToolkit.registerChatroom(friend.getUUID(), chatroom);
-		//TODO comment this
-		chatroom.setVisible(true);
-		
-		return chatroom;
 	}
 	/**
 	 * 在不存在对应ID-Pipe对, 更不存在对应聊天室的情况下调用
 	 * @param connhandler 用于管理连接的ConnectionHandler
 	 * @return 新建立的chatroom, 用于注册到NoxToolkit
 	 */
-	public GroupChatroom setupNewChatroomOver(GroupItem group){
+	/*public GroupChatroom setupNewChatroomOver(GroupItem group){
 		//打开聊天室
 		GroupChatroom chatroom = new GroupChatroom(group);
 		//注册之
@@ -712,7 +701,7 @@ public class Cheyenne extends NoxFrame {
 		chatroom.setVisible(true);
 		
 		return chatroom;
-	}
+	}*/
 	/**
 	 * 大多数情况下(系统初始化时成功建立管道并监听之), 调用此函数建立组聊天室.</p>
 	 * 在存在对应ID-Pipe对, 而不存在对应聊天室的情况下:
@@ -723,7 +712,7 @@ public class Cheyenne extends NoxFrame {
 	 * @param connhandler 用于管理连接的ConnectionHandler
 	 * @return 新建立的chatroom, 用于注册到NoxToolkit
 	 */
-	public GroupChatroom setupNewChatroomOver(PeerGroupAdvertisement pga, InputPipe ipipe, OutputPipe opipe){
+	/*public GroupChatroom setupNewChatroomOver(PeerGroupAdvertisement pga, InputPipe ipipe, OutputPipe opipe){
 		//打开聊天室
 		GroupChatroom chatroom = new GroupChatroom(pga, ipipe, opipe);
 		//注册之
@@ -732,7 +721,7 @@ public class Cheyenne extends NoxFrame {
 		chatroom.setVisible(true);
 		
 		return chatroom;
-	}
+	}*/
 	
 	/*public boolean setupGroupChatroom(PeerGroupAdvertisement adv){
 		//打开群聊窗口

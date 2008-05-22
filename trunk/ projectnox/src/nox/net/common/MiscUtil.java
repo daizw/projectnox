@@ -1,4 +1,4 @@
-package nox.net;
+package nox.net.common;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

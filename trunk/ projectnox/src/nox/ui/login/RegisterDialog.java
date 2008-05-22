@@ -32,9 +32,9 @@ public class RegisterDialog extends JDialog implements ActionListener{
 		System.out.println(login.showDialog());
 		System.out.println(login.getUsername() + ':' + new String(login.getPassword()));
 	}
-	public static final int LOGOSIZE = 260;
+	public static final int LOGOSIZE = 250;
 	public static final int REGISTERDIALOGWIDTH = 310;
-	public static final int REGISTERDIALOGHEIGHT = 140 + LOGOSIZE;
+	public static final int REGISTERDIALOGHEIGHT = 150 + LOGOSIZE;
 	
 	public static final String LOGINCMD = "LOGIN";
 	public static final String CANCELCMD = "CANCEL";
@@ -60,7 +60,7 @@ public class RegisterDialog extends JDialog implements ActionListener{
 	/**
 	 * ”√ªß√˚JTextField
 	 */
-	JTextField t_name = new JTextField(20);
+	JTextField t_name = new JTextField(18);
 	
 	/**
 	 * √‹¬ÎJPanel
@@ -73,7 +73,7 @@ public class RegisterDialog extends JDialog implements ActionListener{
 	/**
 	 * √‹¬ÎJPasswordField
 	 */
-	JPasswordField t_pwd = new JPasswordField("", 20);
+	JPasswordField t_pwd = new JPasswordField("", 18);
 	
 	/**
 	 * √‹¬ÎJPanel
@@ -82,11 +82,11 @@ public class RegisterDialog extends JDialog implements ActionListener{
 	/**
 	 * √‹¬ÎJLabel
 	 */
-	JLabel l_vfpwd = new JLabel("    Verify:");
+	JLabel l_vfpwd = new JLabel("       Verify:");
 	/**
 	 * √‹¬ÎJPasswordField
 	 */
-	JPasswordField t_vfpwd = new JPasswordField("", 20);
+	JPasswordField t_vfpwd = new JPasswordField("", 18);
 	
 	JPanel p_buttons = new JPanel();
 	JButton b_login = new JButton("OK");
@@ -110,7 +110,7 @@ public class RegisterDialog extends JDialog implements ActionListener{
         this.setModal(true);
         
 		tk = Toolkit.getDefaultToolkit();
-		background = tk.getImage(SystemPath.IMAGES_RESOURCE_PATH + "loginbkgrd.png");
+		background = tk.getImage(SystemPath.IMAGES_RESOURCE_PATH + "registerbkgrd.png");
 		img_logo = tk.getImage(SystemPath.LOGO_RESOURCE_PATH + "NoXlogo_48.png");
 		
 		this.prepareImage(background, rootpane);
@@ -173,7 +173,7 @@ public class RegisterDialog extends JDialog implements ActionListener{
 		rootpane.add(Box.createVerticalStrut(LOGOSIZE));
 		rootpane.add(p_input);
 		rootpane.add(p_buttons);
-		//rootpane.add(Box.createVerticalStrut(15));
+		rootpane.add(Box.createVerticalStrut(45));
 		
 		getRootPane().setDefaultButton(b_login);
 		this.setContentPane(rootpane);
@@ -184,6 +184,11 @@ public class RegisterDialog extends JDialog implements ActionListener{
 		 
 		 this.setBounds((ScrWidth-REGISTERDIALOGWIDTH)/2, (ScrHeight-REGISTERDIALOGHEIGHT)/2,
 				 REGISTERDIALOGWIDTH, REGISTERDIALOGHEIGHT);
+		 this.setSize(new Dimension(REGISTERDIALOGWIDTH, REGISTERDIALOGHEIGHT));
+		 this.setPreferredSize(new Dimension(REGISTERDIALOGWIDTH, REGISTERDIALOGHEIGHT));
+		 this.setMaximumSize(new Dimension(REGISTERDIALOGWIDTH, REGISTERDIALOGHEIGHT));
+		 this.setMinimumSize(new Dimension(REGISTERDIALOGWIDTH, REGISTERDIALOGHEIGHT));
+		 
 		 this.setAlwaysOnTop(true);
 		 this.setOpacity(0.8f);
 		 this.setRoundRecangle();
@@ -242,7 +247,7 @@ public class RegisterDialog extends JDialog implements ActionListener{
 	public boolean setRoundRecangle(){
 		RoundRectangle2D.Float mask = 
 			new RoundRectangle2D.Float(0, 0, 
-					REGISTERDIALOGWIDTH - 10, REGISTERDIALOGHEIGHT - 10, 60, 60);
+					REGISTERDIALOGWIDTH , REGISTERDIALOGHEIGHT , 60, 60);
 	    WindowUtils.setWindowMask(this, mask);
 	    return true;
 	}

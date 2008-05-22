@@ -1,4 +1,4 @@
-package nox.net;
+package nox.net.common;
 
 import java.io.IOException;
 import java.net.URI;
@@ -18,8 +18,8 @@ import net.jxta.protocol.PipeAdvertisement;
 public class PipeUtil {
 	private static final Logger LOG = Logger.getLogger(PipeUtil.class.getName());
 	
-	private static final int WaitTime = 500;		// 远程发现的等待时间，需根据网络情况调整
-	private static final int MAXRETRIES = 20;		// 远程发现时的重试次数，需根据网络情况调整
+	private static final long WaitTime = LANTimeLimit.UNIT_TIME;		// 远程发现的等待时间，需根据网络情况调整
+	private static final int MAXRETRIES = LANTimeLimit.FETCH_PIPEADV_MAXRETRIES;		// 远程发现时的重试次数，需根据网络情况调整
 	
 	/**
 	 * 获取管道广告，首先从本地缓存中发现管道广告，如果没有发现，再从远程发现管道广告，如果没有发现，那么创建管道广告。
@@ -168,6 +168,7 @@ public class PipeUtil {
 	 * @param pg	节点组，在该节点组内发现管道广告
 	 * @param name	管道广告名称，可使用通配符
 	 * @return		管道广告对象，如果没有找到或发现过程发生异常，那么返回null
+	 * @deprecated
 	 */
 	public static PipeAdvertisement findPipeAdv(PeerGroup pg, String name) {
 		DiscoveryService discovery = pg.getDiscoveryService();

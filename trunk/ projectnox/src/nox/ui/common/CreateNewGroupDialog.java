@@ -24,9 +24,9 @@ import net.jxta.peergroup.PeerGroup;
 import net.jxta.pipe.PipeService;
 import net.jxta.protocol.PeerGroupAdvertisement;
 import net.jxta.protocol.PipeAdvertisement;
-import nox.net.NoxToolkit;
-import nox.net.PeerGroupUtil;
-import nox.net.PipeUtil;
+import nox.net.common.NoxToolkit;
+import nox.net.common.PipeUtil;
+import nox.net.group.PeerGroupUtil;
 import nox.ui.me.Cheyenne;
 
 @SuppressWarnings("serial")

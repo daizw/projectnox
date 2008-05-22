@@ -53,7 +53,7 @@
  *  
  *  This license is based on the BSD license adopted by the Apache Foundation. 
  */
-package nox.net;
+package nox.net.common;
 
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;

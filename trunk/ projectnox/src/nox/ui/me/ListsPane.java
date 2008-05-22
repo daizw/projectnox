@@ -29,15 +29,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
 
-import net.jxta.id.ID;
-import net.jxta.protocol.PeerGroupAdvertisement;
+import net.jxta.peer.PeerID;
+import net.jxta.peergroup.PeerGroupID;
 import nox.db.DBTableName;
-import nox.net.GroupChatroomUnit;
-import nox.net.NoxToolkit;
-import nox.net.PeerChatroomUnit;
-import nox.net.PeerGroupUtil;
-import nox.ui.chat.group.GroupChatroom;
-import nox.ui.chat.peer.PeerChatroom;
+import nox.net.common.NoxToolkit;
+import nox.net.group.GroupConnectionHandler;
+import nox.net.peer.PeerConnectionHandler;
 import nox.ui.common.GroupItem;
 import nox.ui.common.NoxJListItem;
 import nox.ui.common.ObjectList;
@@ -52,7 +49,7 @@ public class ListsPane extends JTabbedPane {
 	private JScrollPane grpListScrPane;
 	private JScrollPane blkListScrPane;
 	
-	JButton myFriends = new JButton("My Friends("+7+'/'+15+')');
+	JButton myFriends = new JButton("My Friends");
 	JButton blacklist = new JButton("Blacklist");
 
 	NoxJListItem listItem = null;
@@ -339,25 +336,6 @@ public class ListsPane extends JTabbedPane {
 		grplistpane.setLayout(new BorderLayout());
 		grplistpane.add(grpListScrPane, BorderLayout.CENTER);
 		grplistpane.add(glist.getFilterField(), BorderLayout.NORTH);
-
-		/**
-		 * 组成员列表, 测试用
-		 * TODO 从数据库产生一个GroupItem[], 然后传值给objectlist构造函数
-		 * 或者 群聊窗口中组成员列表可以由聊天室窗口直接从数据库获取? 无所谓..最好在这里根据GroupID来获取列表然后传值,
-		 * 尽量把数据库操作集中在一个java文件中
-		 */
-		/*String[] flistItems = {};
-
-		final GroupItem[] gmembers = new GroupItem[flistItems.length];
-		// ArrayList<FriendItem> friends = new ArrayList<FriendItem>();
-
-		PeerGroupID groupID = null;
-		//TODO 得到grouproom 的ID, 然后传值;
-		for (int i = 0; i < flistItems.length; i++) {
-			gmembers[i] = new GroupItem(new ImageIcon(
-					SystemPath.PORTRAIT_RESOURCE_PATH + "user.png"),
-					flistItems[i], "欢迎加入我们: " + flistItems[i], groupID, 0, 0);
-		}*/
 		
 		glist.addMouseListener(new MouseListener(){
 			@SuppressWarnings("serial")
@@ -523,28 +501,16 @@ public class ListsPane extends JTabbedPane {
 	 * @param listItem
 	 */
 	private void showPeerChatroom(PeerItem listItem) {
-		ID id = listItem.getUUID();
-		PeerChatroomUnit roomunit = (PeerChatroomUnit) NoxToolkit.getChatroomUnit(id);
-		PeerChatroom room;
 		
-		if(roomunit == null){
-			//未注册pipe, 更无chatroom.
-			//新建聊天室, 会试图连接.
-			//如果连接不上....
-			//如果连接成功....
-			room = new PeerChatroom(listItem, null);
-			room.setVisible(true);
+		PeerConnectionHandler handler = NoxToolkit.getPeerConnectionHandler((PeerID) listItem.getUUID());
+		if(handler != null){
+			handler.showChatroom();
 		}else{
-			//已注册pipe
-			room = roomunit.getChatroom();
-			if(room == null)
-			{//不存在, 开新窗口
-				room = parent.setupNewChatroomOver(roomunit.getOutPipe());
-				room.setVisible(true);
-				//new NoxToolkit().registerChatroom(id, room);
-			}else{
-				room.pack();
-				room.setVisible(true);
+			//不存在对应的handler, 需要连接然后注册handler
+			try {
+				handler = new PeerConnectionHandler(listItem, true);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -554,40 +520,17 @@ public class ListsPane extends JTabbedPane {
 	 * @param listItem
 	 */
 	private void showGroupChatroom(GroupItem listItem) {
-		ID id = listItem.getUUID();
-		GroupChatroomUnit roomunit = (GroupChatroomUnit)NoxToolkit.getChatroomUnit(id);
-		GroupChatroom room;
-		
-		if(roomunit == null){
-			//未注册pipe, 更无chatroom.
-			//新建聊天室, 会试图连接.
-			//如果连接不上....
-			//如果连接成功....
-			System.out.println("该ID未注册, 建立并注册之. 如果你看到这条消息, 说明系统初始化时没有成功建立该聊天室对应的pipe.");
-			room = new GroupChatroom(listItem);
-			room.setVisible(true);
-			//注册之, 注意: 应注册ChatroomUnit而不是Chatroom!
-			//因为注册Chatroom只适用于已存在ID-pipe对的情况
-			NoxToolkit.registerChatroomUnit(id, null, null, room);
-		}else{
-			//已注册pipe
-			room = roomunit.getChatroom();
-			if(room == null)
-			{//不存在, 开新窗口
-				PeerGroupAdvertisement pga
-					= PeerGroupUtil.getLocalAdvByID(NoxToolkit.getNetworkManager().getNetPeerGroup(), id.toString());
-				if(pga == null){
-					System.out.println("in showGroupChatroom(): 找不到该组的广告");
-					return;
-				}
-
-				room = parent.setupNewChatroomOver(pga, roomunit.getInPipe(), roomunit.getOutPipe());
-				NoxToolkit.registerChatroom(id, room);
-			}else{
-				room.pack();
-				room.setVisible(true);
+		PeerGroupID id = (PeerGroupID) listItem.getUUID();
+		GroupConnectionHandler handler = NoxToolkit.getGroupConnectionHandler(id);
+		if(handler == null)
+			try {
+				handler = new GroupConnectionHandler(listItem);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return;
 			}
-		}
+		
+		handler.showChatroom();
 	}
 	/**
 	 * 切换列表时播放提示音

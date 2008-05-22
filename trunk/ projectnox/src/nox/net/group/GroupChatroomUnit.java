@@ -1,11 +1,16 @@
-package nox.net;
+package nox.net.group;
 
 import net.jxta.id.ID;
 import net.jxta.pipe.InputPipe;
 import net.jxta.pipe.OutputPipe;
+import nox.net.common.ChatroomUnit;
 import nox.ui.chat.common.Chatroom;
 import nox.ui.chat.group.GroupChatroom;
-
+/**
+ * 
+ * @author shinysky
+ * @deprecated
+ */
 public class GroupChatroomUnit implements ChatroomUnit{
 	private ID roomID = null;
 	private InputPipe inpipe = null;

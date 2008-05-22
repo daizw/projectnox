@@ -26,8 +26,8 @@ import net.jxta.document.Advertisement;
 import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
-import nox.net.JXTANetwork;
-import nox.net.NoxToolkit;
+import nox.net.common.JXTANetwork;
+import nox.net.common.NoxToolkit;
 import nox.ui.common.InfiniteProgressPanel;
 import nox.ui.me.Cheyenne;
 

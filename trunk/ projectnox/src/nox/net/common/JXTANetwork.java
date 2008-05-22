@@ -1,4 +1,4 @@
-package nox.net;
+package nox.net.common;
 
 import java.awt.Component;
 import java.io.File;
@@ -18,8 +18,9 @@ import net.jxta.platform.NetworkManager;
 import net.jxta.protocol.PipeAdvertisement;
 import net.jxta.util.JxtaBiDiPipe;
 import net.jxta.util.JxtaServerPipe;
-import nox.net.NoxToolkit.CheckStatusEventHandler;
-import nox.net.NoxToolkit.HuntingEventHandler;
+import nox.net.common.NoxToolkit.CheckStatusEventHandler;
+import nox.net.common.NoxToolkit.HuntingEventHandler;
+import nox.net.peer.PeerConnectionHandler;
 import nox.ui.login.LoginDialog;
 import nox.ui.login.RegisterDialog;
 /**
@@ -356,37 +357,18 @@ public class JXTANetwork {
 					System.out.println("JxtaBidiPipe accepted from: "
 							+ outbidipipe.getRemotePeerAdvertisement().getName());
 					// Send messages
-					Thread thread = new Thread(	new ConnectionHandler(	outbidipipe),
-							"Incoming Connection Handler");
-					thread.start();
+					Thread thread = null;
+					try {
+						thread = new Thread(	new PeerConnectionHandler(outbidipipe),
+								"Incoming Connection Handler");
+						thread.start();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	/**
-	 * Gets a new pipeAdvertisement
-	 * 
-	 * @return The pipeAdvertisement
-	 */
-	/*public static PipeAdvertisement getPipeAdvertisement() {
-		PipeAdvertisement advertisement = (PipeAdvertisement) AdvertisementFactory
-				.newAdvertisement(PipeAdvertisement.getAdvertisementType());
-
-		PipeID BIDI_PIPEID = (PipeID)IDFactory.newPipeID(
-				NoxToolkit.getNetworkManager().getNetPeerGroup().getPeerGroupID());
-		System.out.println("BIDI_PIPEID built(using it): " + BIDI_PIPEID);
-		
-		PipeID BIDI_TUTORIAL_PIPEID = PipeID.create(URI.create("urn:jxta:uuid-59616261646162614E50472050325033251CBAB70EC44D04BB66F83CEB93747F04"));
-		
-		advertisement.setPipeID(BIDI_PIPEID);
-		advertisement.setType(PipeService.UnicastType);
-		advertisement.setName(TheNetPeerGroup.getPeerID().toString());
-		advertisement.setDescription(new Date().getTime() + "");
-
-		//System.out.println(advertisement);
-		
-		return advertisement;
-	}*/
 }
