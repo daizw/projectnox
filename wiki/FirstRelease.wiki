@@ -1,4 +1,4 @@
-#summary NoX 0.99d released today!
+#summary NoX 0.99 released today!
 #labels Featured
 
 = News =
