@@ -1073,14 +1073,16 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 	/**
 	 * Closes the output pipe and stops the platform
 	 */
-	@SuppressWarnings("unused")
-	private void stop() {
-		try {
-			outbidipipe.close();
-			room.dispose();
-		} catch (IOException e) {
-			e.printStackTrace();
+	public void stop() {
+		if(outbidipipe != null){
+			try {
+				outbidipipe.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		if(room != null)
+			room.dispose();
 	}
 	/**
 	 * {@inheritDoc}
@@ -1117,5 +1119,8 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 		}
 		
 		room.setVisible(true);
+	}
+	public void setBiDiPipe(JxtaBiDiPipe outbidipipe) {
+		this.outbidipipe = outbidipipe;
 	}
 }

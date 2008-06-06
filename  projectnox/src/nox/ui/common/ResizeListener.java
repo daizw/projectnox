@@ -7,19 +7,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 public class ResizeListener implements MouseListener, MouseMotionListener {
 	JFrame frame;
-	JButton butt;
+	JComponent resizeArea;
 	Point start_drag;
 
 	// Cursor defaultCursor;
 
-	public ResizeListener(JFrame parent, JButton resizeButn) {
+	public ResizeListener(JFrame parent, JComponent resizeArea) {
 		this.frame = parent;
-		this.butt = resizeButn;
+		this.resizeArea = resizeArea;
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class ResizeListener implements MouseListener, MouseMotionListener {
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		Point frameLoc = frame.getLocationOnScreen();
-		Point buttLoc = butt.getLocationOnScreen();
+		Point buttLoc = resizeArea.getLocationOnScreen();
 		Dimension newSize = new Dimension(
 				(int) (e.getX() + buttLoc.getX() - frameLoc.getX()), (int) (e
 						.getY()

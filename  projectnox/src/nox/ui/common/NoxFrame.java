@@ -638,7 +638,7 @@ class FootPane extends JPanel {
 	private static final long serialVersionUID = 9009828062432005570L;
 
 	// 位于窗口右下角用于resize
-	JButton resizeButn;
+	JLabel resizeArea;
 	ResizeListener resizer;
 
 	/**
@@ -648,24 +648,24 @@ class FootPane extends JPanel {
 	 *            父组件, 用于重设尺寸
 	 */
 	FootPane(JFrame parent) {
-		resizeButn = new JButton(new AngledLinesWindowsCornerIcon());
-		resizeButn.setBorderPainted(false);
-		resizeButn.setContentAreaFilled(false);
+		resizeArea = new JLabel(new AngledLinesWindowsCornerIcon());
+		//resizeButn.setBorderPainted(false);
+		//resizeButn.setContentAreaFilled(false);
 		Dimension btnsize = new Dimension(NoxFrame.FOOT_HEIGHT, NoxFrame.FOOT_HEIGHT);
-		resizeButn.setSize(btnsize);
-		resizeButn.setPreferredSize(btnsize);
-		resizeButn.setMaximumSize(btnsize);
-		resizeButn.setMinimumSize(btnsize);
+		resizeArea.setSize(btnsize);
+		resizeArea.setPreferredSize(btnsize);
+		resizeArea.setMaximumSize(btnsize);
+		resizeArea.setMinimumSize(btnsize);
 		// resizeButn.setOpaque(false);
 		//resizeButn.setMargin(new Insets(0,0,0,0));
 
-		resizer = new ResizeListener(parent, resizeButn);
-		resizeButn.addMouseListener(resizer);
-		resizeButn.addMouseMotionListener(resizer);
+		resizer = new ResizeListener(parent, resizeArea);
+		resizeArea.addMouseListener(resizer);
+		resizeArea.addMouseMotionListener(resizer);
 
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.add(Box.createHorizontalGlue());
-		this.add(resizeButn);
+		this.add(resizeArea);
 		this.setOpaque(false);
 	}
 
@@ -673,8 +673,8 @@ class FootPane extends JPanel {
 	 * 该操作暂时不可逆转; 即不能重新添加监听器
 	 */
 	public void removeResizeListener() {
-		resizeButn.removeMouseListener(resizer);
-		resizeButn.removeMouseMotionListener(resizer);
+		resizeArea.removeMouseListener(resizer);
+		resizeArea.removeMouseMotionListener(resizer);
 	}
 }
 

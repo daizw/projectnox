@@ -174,7 +174,7 @@ class PeerSearchPanel extends SearchPanel{
 					searchResultTable.getSelectionModel()
 							.setLeadSelectionIndex(row);
 
-					ResultOprMenu.add(new AbstractAction("Add him/her to my friendlist") {
+					ResultOprMenu.add(new AbstractAction("Add to my friend list") {
 						public void actionPerformed(ActionEvent e) {
 							// TODO 添加到好友列表
 							int[] selected = searchResultTable

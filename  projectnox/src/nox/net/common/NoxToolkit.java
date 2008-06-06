@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import net.jxta.document.Advertisement;
+import net.jxta.exception.PeerGroupException;
 import net.jxta.peer.PeerID;
 import net.jxta.peergroup.PeerGroupID;
 import net.jxta.platform.NetworkConfigurator;
@@ -216,6 +217,37 @@ public class NoxToolkit {
 	public static boolean forceRegisterGroupConnectionHandler(PeerGroupID gid, GroupConnectionHandler handler){
 		if(gid != null && handler != null){
 			gconnHdlerCache.put(gid, handler);
+			return true;
+		}
+		return false;
+	}
+	/**
+	 * 从cache中移除connection handler<br>
+	 * 一般将好友添加到黑名单或直接删除时需要使用此函数
+	 * 
+	 * @param pid 好友的ID
+	 * @return 如果该好友ID为空或不存在于cache中，返回false；否则返回true
+	 */
+	public static boolean removePeer(PeerID pid){
+		if(pid != null && pconnHdlerCache.containsKey(pid)){
+			PeerConnectionHandler handler = pconnHdlerCache.get(pid);
+			handler.stop();
+			pconnHdlerCache.remove(pid);
+			return true;
+		}
+		return false;
+	}
+	/**
+	 * 退出组
+	 * 
+	 * @param gid 要退出的组的ID
+	 * @return 如果该组为空或不存在于cache中，返回false；否则返回true
+	 */
+	public static boolean resignGroup(PeerGroupID gid){
+		if(gid != null && gconnHdlerCache.containsKey(gid)){
+			GroupConnectionHandler handler = gconnHdlerCache.get(gid);
+			handler.resign();
+			gconnHdlerCache.remove(gid);
 			return true;
 		}
 		return false;

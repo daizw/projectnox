@@ -71,7 +71,7 @@ import nox.ui.common.SystemPath;
 public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseListener
 {
 	/**
-	 * we don't know more about it
+	 * we don't know much about it
 	 */
 	private static final long serialVersionUID = -1915394855935441419L;
 
