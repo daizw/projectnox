@@ -270,6 +270,16 @@ public class JXTANetwork {
 		System.out.println(MessageFormat.format("Connected :{0}", connected));
 	}
 
+	/**
+	 * 搜索广告
+	 * @param peerid
+	 * @param AdvType
+	 * @param attribute
+	 * @param value
+	 * @param threshold
+	 * @param listener
+	 * @deprecated
+	 */
 	public void GoHunting(String peerid, int AdvType, String attribute,
 			String value, int threshold, DiscoveryListener listener) {
 		disocveryClient = new AdvHunter(TheNetworkManager);
@@ -298,6 +308,10 @@ public class JXTANetwork {
 		}
 	}
 
+	/**
+	 * 停止搜索广告
+	 * @deprecated
+	 */
 	public void StopHunting() {
 		System.out.println("Stop Hunting...");
 		StopDiscovery = true;

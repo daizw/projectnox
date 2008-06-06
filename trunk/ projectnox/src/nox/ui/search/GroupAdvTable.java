@@ -18,6 +18,10 @@ public class GroupAdvTable extends AdvTable{
 	public void addRow(Advertisement adv) {
 		addRow(adv, "Unknown", -1);
 	}
+	@Override
+	public void addRow(Advertisement adv, long delay) {
+		addRow(adv, "Unknown", delay);
+	}
 
 	/**
 	 * 向搜索结果列表中添加一行. 添加之前判断表中是否已有该元素, 没有才需要添加. TODO 以后根据具体情况还需要改
