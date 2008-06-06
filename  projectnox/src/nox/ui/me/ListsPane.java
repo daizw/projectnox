@@ -28,6 +28,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.MenuElement;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.jxta.peer.PeerID;
 import net.jxta.peergroup.PeerGroupID;
@@ -54,6 +56,8 @@ public class ListsPane extends JTabbedPane {
 
 	NoxJListItem listItem = null;
 	Cheyenne parent;
+	
+	private int selectedIndex = 0;
 	
 	public ListsPane(Cheyenne par, final ObjectList flist, final ObjectList glist, final ObjectList blist) {
 		frdlistpane = new JPanel();
@@ -432,6 +436,16 @@ public class ListsPane extends JTabbedPane {
 		this.setToolTipTextAt(0, getHtmlText("Friends"));
 		this.setToolTipTextAt(1, getHtmlText("Groups"));
 		
+		this.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent ce) {
+				int temp = ListsPane.this.getSelectedIndex();
+				//如果选择的标签是好友列表或组列表，则更新选中标签索引。
+				if(temp < 2)
+					selectedIndex = temp;
+				//System.out.println("selectedIndex" + selectedIndex);
+			}
+		});
 		JPanel searchPane = new JPanel();
 		searchPane.setBackground(Color.WHITE);
 		this.addTab(null, new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "search_25.png"), searchPane);
@@ -448,6 +462,7 @@ public class ListsPane extends JTabbedPane {
 			}
 			@Override
 			public void componentShown(ComponentEvent arg0) {
+				ListsPane.this.setSelectedIndex(selectedIndex);
 				parent.showSearchingFrame();
 			}
 		});
@@ -467,6 +482,7 @@ public class ListsPane extends JTabbedPane {
 			}
 			@Override
 			public void componentShown(ComponentEvent arg0) {
+				ListsPane.this.setSelectedIndex(selectedIndex);
 				parent.ShowConfigCenter();
 			}
 		});
@@ -487,6 +503,7 @@ public class ListsPane extends JTabbedPane {
 			}
 			@Override
 			public void componentShown(ComponentEvent arg0) {
+				ListsPane.this.setSelectedIndex(selectedIndex);
 				parent.ShowCreateNewGroupDialog();
 			}
 		});

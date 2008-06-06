@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -22,13 +23,17 @@ import javax.swing.MenuElement;
 
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
+import net.jxta.peer.PeerID;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
 import nox.net.common.NoxToolkit;
+import nox.net.peer.PeerConnectionHandler;
 import nox.ui.common.InfiniteProgressPanel;
+import nox.ui.common.PeerItem;
+import nox.ui.common.SystemPath;
 import nox.ui.me.Cheyenne;
 
-public abstract class SearchPanel extends JPanel{
+public abstract class SearchPanel extends JPanel {
 	int advType;
 	protected InfiniteProgressPanel glassPane;
 	Container infinitePane = new JPanel();
@@ -36,14 +41,12 @@ public abstract class SearchPanel extends JPanel{
 	AdvTable searchResultTable;
 	AdvTableModel model;
 
-	//JXTANetwork MyLogin;
 	Cheyenne parent;
 	long startTime;
-	
-	protected SearchPanel(int type, Cheyenne chy){
+
+	protected SearchPanel(int type, Cheyenne chy) {
 		advType = type;
-		parent =chy;
-		//this.MyLogin = NoxToolkit.getNetwork();
+		parent = chy;
 
 		String[] columns = { "Name", "Description", "UUID", "Delay/ms", "Adv" };
 		Object[][] data = {};
@@ -52,29 +55,30 @@ public abstract class SearchPanel extends JPanel{
 	}
 
 	protected abstract void AddMouseListener();
-	
+
 	public void StopSearching() {
 		System.out.println("Stop Hunting...");
 		glassPane.stop();
 		searchPeersBtn.setText("Search");
-		//MyLogin.StopHunting();
 	}
 
-	private void processDiscoveryResults(Enumeration<Advertisement> advEnum){
+	private void processDiscoveryResults(Enumeration<Advertisement> advEnum) {
 		Advertisement adv;
 		long curTime = new Date().getTime();
 		System.out.println(curTime);
 		// let's get the responding peer's advertisement
 		System.out.println(curTime + ": [Got a Discovery Response]");
-		
+
 		if (advEnum != null) {
 			while (advEnum.hasMoreElements()) {
 				adv = (Advertisement) advEnum.nextElement();
-				//System.out.println("peer: " + ((PeerAdvertisement)adv).getPeerID());
+				// System.out.println("peer: " +
+				// ((PeerAdvertisement)adv).getPeerID());
 				searchResultTable.addRow(adv, curTime - startTime);
 			}
 		}
 	}
+
 	protected Container buildInfinitePanel() {
 		JPanel pane = new JPanel(new BorderLayout());
 
@@ -90,7 +94,7 @@ public abstract class SearchPanel extends JPanel{
 		searchPeersBtn.setPreferredSize(size);
 		searchPeersBtn.setMaximumSize(size);
 		searchPeersBtn.setMinimumSize(size);
-		
+
 		searchPeersBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				if (searchPeersBtn.getText() == "Search") {
@@ -110,26 +114,32 @@ public abstract class SearchPanel extends JPanel{
 					indicating.start();
 					Thread hunter = new Thread(new Runnable() {
 						public void run() {
-							//(String peerid, int AdvType, 
-							//String attribute, String value, int threshold, DiscoveryListener listener) 
-							//MyLogin.GoHunting(null, advType, null, null, 100, listener);
-							//本地和远程搜索广告
-							DiscoveryService ds = NoxToolkit.getNetworkManager().getNetPeerGroup().getDiscoveryService();
+							// (String peerid, int AdvType,
+							// String attribute, String value, int threshold,
+							// DiscoveryListener listener)
+							// MyLogin.GoHunting(null, advType, null, null, 100,
+							// listener);
+							// 本地和远程搜索广告
+							DiscoveryService ds = NoxToolkit
+									.getNetworkManager().getNetPeerGroup()
+									.getDiscoveryService();
 							Enumeration<Advertisement> result = null;
-							while(searchPeersBtn.getText() == "Stop"){
-								//获取远程广告到本地
-								ds.getRemoteAdvertisements(null, advType, null, null, 65535);
-								//获取本地广告
+							while (searchPeersBtn.getText() == "Stop") {
+								// 获取远程广告到本地
+								ds.getRemoteAdvertisements(null, advType, null,
+										null, 65535);
+								// 获取本地广告
 								try {
-									result = ds.getLocalAdvertisements(advType, null, null);
+									result = ds.getLocalAdvertisements(advType,
+											null, null);
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
-								//处理得到的广告
+								// 处理得到的广告
 								processDiscoveryResults(result);
-								//线程暂停5s
+								// 线程暂停5s
 								try {
-									Thread.sleep(5*1000);
+									Thread.sleep(5 * 1000);
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
@@ -141,7 +151,7 @@ public abstract class SearchPanel extends JPanel{
 				} else if (searchPeersBtn.getText() == "Stop") {
 					glassPane.stop();
 					searchPeersBtn.setText("Search");
-					//MyLogin.StopHunting();
+					// MyLogin.StopHunting();
 				}
 			}
 		});
@@ -153,18 +163,39 @@ public abstract class SearchPanel extends JPanel{
 }
 
 @SuppressWarnings("serial")
-class PeerSearchPanel extends SearchPanel{
+class PeerSearchPanel extends SearchPanel {
 	public PeerSearchPanel(Cheyenne chy) {
 		super(DiscoveryService.PEER, chy);
 		searchResultTable = new PeerAdvTable(model);
 		AddMouseListener();
 		JScrollPane scrollPane = new JScrollPane(searchResultTable);
-		
+
 		infinitePane = buildInfinitePanel();
 
 		this.setLayout(new BorderLayout());
 		this.add(BorderLayout.NORTH, infinitePane);
 		this.add(BorderLayout.CENTER, scrollPane);
+	}
+
+	/**
+	 * (在节点搜索列表双击节点时被调用)弹出聊天窗口.
+	 * 
+	 * @param listItem
+	 */
+	private void showPeerChatroom(PeerItem listItem) {
+
+		PeerConnectionHandler handler = NoxToolkit
+				.getPeerConnectionHandler((PeerID) listItem.getUUID());
+		if (handler != null) {
+			handler.showChatroom();
+		} else {
+			// 不存在对应的handler, 需要连接然后注册handler
+			try {
+				handler = new PeerConnectionHandler(listItem, true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -182,7 +213,8 @@ class PeerSearchPanel extends SearchPanel{
 					searchResultTable.getSelectionModel()
 							.setLeadSelectionIndex(row);
 
-					ResultOprMenu.add(new AbstractAction("Add to my friend list") {
+					ResultOprMenu.add(new AbstractAction(
+							"Add to my friend list") {
 						public void actionPerformed(ActionEvent e) {
 							// TODO 添加到好友列表
 							int[] selected = searchResultTable
@@ -190,16 +222,26 @@ class PeerSearchPanel extends SearchPanel{
 							for (int i = 0; i < selected.length; i++) {
 								Advertisement adv = (Advertisement) searchResultTable
 										.getAdvAt(selected[i]);
-								//System.out.println(adv);
+								// System.out.println(adv);
 								// TODO 根据广告标签确定添加好友是否需要验证; 暂时直接添加
 								// adv.getID();
-								parent.add2PeerList((PeerAdvertisement) adv, true);
+								parent.add2PeerList((PeerAdvertisement) adv,
+										true);
 							}
 						}
 					});
 					ResultOprMenu.add(new AbstractAction("Talk to him/her") {
 						public void actionPerformed(ActionEvent e) {
-							// TODO 打开聊天窗口
+							//打开聊天窗口
+							int[] selected = searchResultTable.getSelectedRows();
+							for (int i = 0; i < selected.length; i++) {
+								Advertisement adv = (Advertisement) searchResultTable
+										.getAdvAt(selected[i]);
+								PeerItem peer = new PeerItem(new ImageIcon(
+										SystemPath.PORTRAIT_RESOURCE_PATH
+												+ "user.png"), (PeerAdvertisement) adv);
+								showPeerChatroom(peer);
+							}
 						}
 					});
 					MenuElement els[] = ResultOprMenu.getSubElements();
@@ -214,6 +256,7 @@ class PeerSearchPanel extends SearchPanel{
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 			}
+
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 			}
@@ -229,7 +272,7 @@ class PeerSearchPanel extends SearchPanel{
 }
 
 @SuppressWarnings("serial")
-class GroupSearchPanel extends SearchPanel{
+class GroupSearchPanel extends SearchPanel {
 	public GroupSearchPanel(Cheyenne chy) {
 		super(DiscoveryService.GROUP, chy);
 		searchResultTable = new GroupAdvTable(model);
@@ -237,7 +280,7 @@ class GroupSearchPanel extends SearchPanel{
 		JScrollPane scrollPane = new JScrollPane(searchResultTable);
 
 		infinitePane = buildInfinitePanel();
-		
+
 		this.setLayout(new BorderLayout());
 		this.add(BorderLayout.NORTH, infinitePane);
 		this.add(BorderLayout.CENTER, scrollPane);
@@ -266,7 +309,8 @@ class GroupSearchPanel extends SearchPanel{
 							for (int i = 0; i < selected.length; i++) {
 								Advertisement adv = (Advertisement) searchResultTable
 										.getAdvAt(selected[i]);
-								parent.joinThisGroup((PeerGroupAdvertisement)adv);
+								parent
+										.joinThisGroup((PeerGroupAdvertisement) adv);
 							}
 						}
 					});
@@ -284,16 +328,20 @@ class GroupSearchPanel extends SearchPanel{
 							.getPoint().x, me.getPoint().y);
 				}
 			}
+
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 			}
+
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 			}
+
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 				// AdvTable.this.getSelectedRow();
 			}
+
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 			}
