@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.exception.PeerGroupException;
+import net.jxta.peer.PeerID;
 import net.jxta.peergroup.PeerGroup;
 import net.jxta.pipe.PipeService;
 import net.jxta.platform.NetworkConfigurator;
@@ -363,14 +364,20 @@ public class JXTANetwork {
 				if (outbidipipe != null) {
 					System.out.println("JxtaBidiPipe accepted from: "
 							+ outbidipipe.getRemotePeerAdvertisement().getName());
-					// Send messages
-					Thread thread = null;
-					try {
-						thread = new Thread(	new PeerConnectionHandler(outbidipipe),
-								"Incoming Connection Handler");
-						thread.start();
-					} catch (Exception e) {
-						e.printStackTrace();
+					PeerID pid = outbidipipe.getRemotePeerAdvertisement().getPeerID();
+					PeerConnectionHandler handler = NoxToolkit.getPeerConnectionHandler(pid);
+					if(handler == null){
+						Thread thread = null;
+						try {
+							thread = new Thread(	new PeerConnectionHandler(outbidipipe),
+									"Incoming Connection Handler");
+							thread.start();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}else{
+						//¸üÐÂbidipipe
+						handler.setBiDiPipe(outbidipipe);
 					}
 				}
 			}

@@ -187,11 +187,13 @@ public class ListsPane extends JTabbedPane {
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
 						}
 					});
-					friendOprMenu.add(new AbstractAction("Add to the blacklist") {
+					friendOprMenu.add(new AbstractAction("Move to the blacklist") {
 						public void actionPerformed(ActionEvent e) {
-							//TODO add to the blacklist
+							//move to the blacklist
 							int index = flist.getSelectedIndex();
 							PeerItem temppeer = (PeerItem)flist.deleteItem(parent.getSQLConnection(), DBTableName.PEER_SQLTABLE_NAME, true, index);
+							if(temppeer == null)
+								return;
 							try {
 								blist.addItem(temppeer);
 							} catch (SQLException e1) {
@@ -200,13 +202,16 @@ public class ListsPane extends JTabbedPane {
 								e1.printStackTrace();
 							}
 							ListsPane.this.repaint();
+							NoxToolkit.removePeer((PeerID) temppeer.getUUID());
 						}
 					});
 					friendOprMenu.add(new AbstractAction("Delete") {
 						public void actionPerformed(ActionEvent e) {
 							int index = flist.getSelectedIndex();
-							flist.deleteItem(parent.getSQLConnection(), DBTableName.PEER_SQLTABLE_NAME, true, index);
+							PeerItem temppeer = (PeerItem)flist.deleteItem(parent.getSQLConnection(), DBTableName.PEER_SQLTABLE_NAME, true, index);
 							ListsPane.this.repaint();
+							if(temppeer != null)
+								NoxToolkit.removePeer((PeerID) temppeer.getUUID());
 						}
 					});
 					MenuElement els[] = friendOprMenu.getSubElements();
@@ -289,9 +294,11 @@ public class ListsPane extends JTabbedPane {
 					});
 					blacklistOprMenu.add(new AbstractAction("Add to the friendlist") {
 						public void actionPerformed(ActionEvent e) {
-							//TODO add to the blacklist
+							//move to the friendlist
 							int index = blist.getSelectedIndex();
 							PeerItem temppeer = (PeerItem)blist.deleteItem(parent.getSQLConnection(), DBTableName.PEER_SQLTABLE_NAME, false, index);
+							if(temppeer == null)
+								return;
 							try {
 								flist.addItem(temppeer);
 							} catch (SQLException e1) {
@@ -304,7 +311,6 @@ public class ListsPane extends JTabbedPane {
 					});
 					blacklistOprMenu.add(new AbstractAction("Delete") {
 						public void actionPerformed(ActionEvent e) {
-							//TODO add to the blacklist
 							int index = blist.getSelectedIndex();
 							blist.deleteItem(parent.getSQLConnection(), DBTableName.PEER_SQLTABLE_NAME, false, index);
 							ListsPane.this.repaint();
@@ -387,9 +393,8 @@ public class ListsPane extends JTabbedPane {
 							int index = glist.getSelectedIndex();
 							GroupItem group = (GroupItem)glist.deleteItem(index);
 							ListsPane.this.repaint();
-							//TODO É¾³ýÈÏÖ¤Êé, É¾³ýChatroomUnit, É¾³ý¹ÜµÀ¼àÌýÆ÷.
-							//from: myJXTA:
-							//peerGroup.getMembershipService().resign();
+							//É¾³ýÈÏÖ¤Êé, É¾³ýChatroom, É¾³ý¹ÜµÀ¼àÌýÆ÷.
+							NoxToolkit.resignGroup((PeerGroupID) group.getUUID());
 						}
 					});
 					MenuElement els[] = groupOprMenu.getSubElements();

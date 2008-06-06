@@ -127,7 +127,7 @@ public class LoginDialog extends JDialog implements ActionListener{
 		p_input.setLayout(new BoxLayout(p_input, BoxLayout.Y_AXIS));
 		//			p_input.setBounds(10,10,20,400);
 		p_input.add(p_name);
-		p_input.add(p_pwd);
+		//p_input.add(p_pwd);
 		p_input.setOpaque(false);
 		/**
 		 * Ìí¼Ó¿ì½Ý¼ü

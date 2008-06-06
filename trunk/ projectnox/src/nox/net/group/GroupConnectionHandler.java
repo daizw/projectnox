@@ -829,7 +829,6 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 	/**
 	 * Closes the output pipe and stops the platform
 	 */
-	@SuppressWarnings("unused")
 	private void stop() {
 		if(inpipe != null)
 			inpipe.close();
@@ -848,5 +847,19 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 
 		this.processIncomingMsg(msg, false);
 		System.out.println("+++End Chatroom pipeMsgEvent()...+++");
+	}
+	/**
+	 * ÍË³ö¸Ã×é
+	 */
+	public void resign(){
+		stop();
+		if(peergroup != null)
+			try {
+				peergroup.getMembershipService().resign();
+			} catch (PeerGroupException e) {
+				e.printStackTrace();
+			}
+		if(room != null)
+			room.dispose();
 	}
 }
