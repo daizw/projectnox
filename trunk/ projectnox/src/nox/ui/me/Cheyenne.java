@@ -537,8 +537,9 @@ public class Cheyenne extends NoxFrame {
 		return sqlconn;
 	}
 	/**
-	 * 将广告所代表的peer添加到好友列表中
-	 * @param adv 要添加的peer的广告 
+	 * 将广告所代表的peer添加到好友列表或黑名单中
+	 * @param adv 要添加的peer的广告
+	 * @param good  好友还是黑名单
 	 * @return 好友的列表元素
 	 */
 	public PeerItem add2PeerList(PeerAdvertisement adv, boolean good){
