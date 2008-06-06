@@ -62,6 +62,7 @@ import net.jxta.platform.NetworkManager;
 
 /**
  * Illustrates the use of the Discovery Service
+ * @deprecated
  */
 public class AdvHunter {
 

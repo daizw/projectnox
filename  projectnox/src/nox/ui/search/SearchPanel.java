@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 
@@ -19,14 +20,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.MenuElement;
 
-import net.jxta.discovery.DiscoveryEvent;
-import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
-import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
-import nox.net.common.JXTANetwork;
 import nox.net.common.NoxToolkit;
 import nox.ui.common.InfiniteProgressPanel;
 import nox.ui.me.Cheyenne;
@@ -39,14 +36,14 @@ public abstract class SearchPanel extends JPanel{
 	AdvTable searchResultTable;
 	AdvTableModel model;
 
-	JXTANetwork MyLogin;
+	//JXTANetwork MyLogin;
 	Cheyenne parent;
 	long startTime;
 	
 	protected SearchPanel(int type, Cheyenne chy){
 		advType = type;
 		parent =chy;
-		this.MyLogin = NoxToolkit.getNetwork();
+		//this.MyLogin = NoxToolkit.getNetwork();
 
 		String[] columns = { "Name", "Description", "UUID", "Delay/ms", "Adv" };
 		Object[][] data = {};
@@ -57,11 +54,27 @@ public abstract class SearchPanel extends JPanel{
 	protected abstract void AddMouseListener();
 	
 	public void StopSearching() {
+		System.out.println("Stop Hunting...");
 		glassPane.stop();
 		searchPeersBtn.setText("Search");
-		MyLogin.StopHunting();
+		//MyLogin.StopHunting();
 	}
 
+	private void processDiscoveryResults(Enumeration<Advertisement> advEnum){
+		Advertisement adv;
+		long curTime = new Date().getTime();
+		System.out.println(curTime);
+		// let's get the responding peer's advertisement
+		System.out.println(curTime + ": [Got a Discovery Response]");
+		
+		if (advEnum != null) {
+			while (advEnum.hasMoreElements()) {
+				adv = (Advertisement) advEnum.nextElement();
+				//System.out.println("peer: " + ((PeerAdvertisement)adv).getPeerID());
+				searchResultTable.addRow(adv, curTime - startTime);
+			}
+		}
+	}
 	protected Container buildInfinitePanel() {
 		JPanel pane = new JPanel(new BorderLayout());
 
@@ -77,32 +90,6 @@ public abstract class SearchPanel extends JPanel{
 		searchPeersBtn.setPreferredSize(size);
 		searchPeersBtn.setMaximumSize(size);
 		searchPeersBtn.setMinimumSize(size);
-
-		final DiscoveryListener listener = new DiscoveryListener(){
-			@Override
-			public void discoveryEvent(DiscoveryEvent event) {
-				DiscoveryResponseMsg res = event.getResponse();
-
-				// let's get the responding peer's advertisement
-				System.out.println(" [  Got a Discovery Response ["
-						+ res.getResponseCount() + " elements]  from peer : "
-						+ event.getSource() + "  ]");
-
-				long curTime = new Date().getTime();
-				System.out.println(curTime);
-
-				Advertisement adv;
-				Enumeration<Advertisement> advEnum = res.getAdvertisements();
-
-				if (advEnum != null) {
-					while (advEnum.hasMoreElements()) {
-						adv = (Advertisement) advEnum.nextElement();
-						//System.out.println("peer: " + ((PeerAdvertisement)adv).getPeerID());
-						searchResultTable.addRow(adv, event.getSource(), curTime - startTime);
-					}
-				}
-			}
-		};
 		
 		searchPeersBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -125,7 +112,28 @@ public abstract class SearchPanel extends JPanel{
 						public void run() {
 							//(String peerid, int AdvType, 
 							//String attribute, String value, int threshold, DiscoveryListener listener) 
-							MyLogin.GoHunting(null, advType, null, null, 100, listener);
+							//MyLogin.GoHunting(null, advType, null, null, 100, listener);
+							//本地和远程搜索广告
+							DiscoveryService ds = NoxToolkit.getNetworkManager().getNetPeerGroup().getDiscoveryService();
+							Enumeration<Advertisement> result = null;
+							while(searchPeersBtn.getText() == "Stop"){
+								//获取远程广告到本地
+								ds.getRemoteAdvertisements(null, advType, null, null, 65535);
+								//获取本地广告
+								try {
+									result = ds.getLocalAdvertisements(advType, null, null);
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+								//处理得到的广告
+								processDiscoveryResults(result);
+								//线程暂停5s
+								try {
+									Thread.sleep(5*1000);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
 						}
 					}, "Hunter");
 					startTime = new Date().getTime();
@@ -133,7 +141,7 @@ public abstract class SearchPanel extends JPanel{
 				} else if (searchPeersBtn.getText() == "Stop") {
 					glassPane.stop();
 					searchPeersBtn.setText("Search");
-					MyLogin.StopHunting();
+					//MyLogin.StopHunting();
 				}
 			}
 		});
