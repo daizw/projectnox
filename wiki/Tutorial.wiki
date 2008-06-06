@@ -48,7 +48,7 @@ http://code.google.com/p/projectnox/issues/list
 
 = 使用说明 =
 
-下面以第三章的测试为例对本系统的使用过程进行介绍。
+下面对本系统的使用过程进行介绍。
 
 (1) 启动系统
 
@@ -137,4 +137,3 @@ http://code.google.com/p/projectnox/issues/list
 
 (3) 请不要在很短的时间内连续执行NoX.jar文件，由于文件系统对并发读写操作进行限制，所以如果在很短时间内连续执行
 多次NoX.jar文件，可能会出现系统不能够正常启动。
-
