@@ -58,10 +58,10 @@ public class ConfigCenterFrame extends NoxFrame {
 	public static int MenuItemHeight = 20;
 
 	JPanel menuPane;
-	JButton personalConfigSideBtn = new JButton("个人设置");
+	JButton personalConfigSideBtn = new JButton("个人设置");//personal settings
 	JPanel perConfigSidePane = new JPanel();
 	JScrollPane perConfigSideScrPane;
-	JButton systemConfigSideBtn = new JButton("系统设置");
+	JButton systemConfigSideBtn = new JButton("系统设置");//system settings
 	JPanel sysConfigSidePane = new JPanel();
 	JScrollPane sysConfigSideScrPane;
 
@@ -94,16 +94,20 @@ public class ConfigCenterFrame extends NoxFrame {
 		/**
 		 * 个人设置列表
 		 */
-		String[] pclistItems = { "  个人资料", "  联系方式", "  身份验证", "  What!",
-				"  dfa", "  fdas" };
+		//String[] pclistItems = { "  个人资料", "  联系方式", "  身份验证", "  What!",
+		//		"  dfa", "  fdas" };
+		String[] pclistItems = { "  Profile", "  Phone", "  Access", "  What!",
+						"  dfa", "  fdas" };
 
 		JList pclist = new JList(pclistItems);
 
 		/**
 		 * 系统设置列表
 		 */
-		String[] sclistItems = { "  基本设置", "  登录设置", "  代理设置", "  安全设置",
-				"  外观设置", "  fda" };
+		//String[] sclistItems = { "  基本设置", "  登录设置", "  代理设置", "  安全设置",
+		//		"  外观设置", "  fda" };
+		String[] sclistItems = { "  Basic", "  Login", "  Proxy", "  Security",
+				"  Look&Feel", "  fda" };
 
 		JList sclist = new JList(sclistItems);
 
@@ -313,7 +317,7 @@ class PersonalBasicConfigPane extends JPanel implements ActionListener {
 					}
 				};
 				chooser.setFileFilter(filter);
-				chooser.setDialogTitle("请选择头像图片(建议尺寸大小为40x40)");
+				chooser.setDialogTitle("Please choose a portrait(40x40 preferred)");
 				int returnVal = chooser.showOpenDialog(null);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					// getJtf_pic().setText(chooser.getSelectedFile().getPath());
@@ -387,8 +391,8 @@ class SysBasicConfigPane extends JPanel implements ActionListener {
 	SysBasicConfigPane(Cheyenne prt) {
 		parent = prt;
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		this.add(java = new JRadioButton("java主题", true));
-		this.add(system = new JRadioButton("系统主题"));
+		this.add(java = new JRadioButton("Java Look&Feel", true));
+		this.add(system = new JRadioButton("System Look&Feel"));
 		ButtonGroup bg=new ButtonGroup();
         bg.add(java);
         bg.add(system);

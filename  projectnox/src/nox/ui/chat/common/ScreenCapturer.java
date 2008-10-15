@@ -266,7 +266,7 @@ public class ScreenCapturer extends JPanel implements MouseListener,
 	public  void doSave(BufferedImage get){
         try{
             if(get==null){
-                JOptionPane.showMessageDialog(this,"图片不能为空!!","错误",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,"The picture can't be empty!!","Error",JOptionPane.ERROR_MESSAGE);
                 return;
             }
             JFileChooser jfc=new JFileChooser(".");
@@ -309,9 +309,9 @@ public class ScreenCapturer extends JPanel implements MouseListener,
                     }
                 }
                 if(ImageIO.write(get,about,file)){
-                    JOptionPane.showMessageDialog(this,"保存成功！");
+                    JOptionPane.showMessageDialog(this,"Saved successfully！");
                 } else
-                    JOptionPane.showMessageDialog(this,"保存失败！");
+                    JOptionPane.showMessageDialog(this,"Saving failed！");
             }
         } catch(Exception exe){
             exe.printStackTrace();
@@ -323,7 +323,7 @@ public class ScreenCapturer extends JPanel implements MouseListener,
     public void doCopy(final BufferedImage image){
         try{
             if(get==null){
-                JOptionPane.showMessageDialog(this,"图片不能为空!!","错误",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,"The picture can't be empty!!","Error",JOptionPane.ERROR_MESSAGE);
                 return;
             }
             Transferable trans = new Transferable(){
@@ -341,10 +341,10 @@ public class ScreenCapturer extends JPanel implements MouseListener,
                 
             };
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trans, null);
-            JOptionPane.showMessageDialog(this,"已复制到系统粘帖板!!");
+            JOptionPane.showMessageDialog(this,"Copied to paste board successfully!!");
         }catch(Exception exe){
             exe.printStackTrace();
-            JOptionPane.showMessageDialog(this,"复制到系统粘帖板出错!!","错误",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,"Failed to copy to paste board!!","Error",JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -436,7 +436,7 @@ public class ScreenCapturer extends JPanel implements MouseListener,
 			g.drawRect(p.x, p.y, 225, 20);
 			// 画文字
 			g.setColor(Color.BLACK);
-			g.drawString(" 请按住鼠标左键不放选择截图区, 右键退出", p.x, p.y + 15);
+			g.drawString(" Please keep the mouse left button pressed to choose snapping area, right click to cancel", p.x, p.y + 15);
 		}
 	}
 

@@ -1055,7 +1055,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 				}
 			};
 			chooser.setFileFilter(filter);
-			chooser.setDialogTitle("请选择所要发送的图片");
+			chooser.setDialogTitle("Please choose a picture to send");
 			int returnVal = chooser.showOpenDialog(this);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				// getJtf_pic().setText(chooser.getSelectedFile().getPath());
@@ -1075,7 +1075,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 				}
 			};
 			chooser.setFileFilter(filter);
-			chooser.setDialogTitle("请选择所要发送的文件");
+			chooser.setDialogTitle("Please choose a file to send");
 			int returnVal = chooser.showOpenDialog(this);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				// getJtf_pic().setText(chooser.getSelectedFile().getPath());

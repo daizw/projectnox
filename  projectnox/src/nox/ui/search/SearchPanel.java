@@ -83,7 +83,7 @@ public abstract class SearchPanel extends JPanel {
 	protected Container buildInfinitePanel() {
 		JPanel pane = new JPanel(new BorderLayout());
 
-		glassPane = new InfiniteProgressPanel("搜索中, 请稍候...", 12);
+		glassPane = new InfiniteProgressPanel("Searching, please wait...", 12);
 		glassPane.setScale(0.2d);
 		Dimension size = new Dimension(100, 100);
 		glassPane.setSize(size);
