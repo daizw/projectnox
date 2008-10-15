@@ -122,7 +122,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 	 */
 	public PeerConnectionHandler(final PeerItem friend, boolean showChatroom) throws Exception{
 		if(friend == null){
-			throw new Exception("PeerConnectionHandler 初始化PeerItem参数为空.");
+			throw new Exception("PeerConnectionHandler initial param is null.");
 		}
 		this.friend = friend;
 		
@@ -141,7 +141,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 						if(outbidipipe == null){
 							retry = room.showTimeOutMsg();
 						} else {
-							System.out.println("连接成功!!");
+							System.out.println("Connection succeed!!");
 							//TryToConnect()已自动注册ID-connectionHandler并监听
 							room.setVisible(false);
 							room.removeMask();
@@ -1015,7 +1015,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 			        bobPubKey = aliceKeyFac.generatePublic(x509KeySpec);
 			        waiting4PubKey2 = false;
 				} else {
-					System.out.println("该消息格式不被此版本支持.");
+					System.out.println("The message format is not supported by this version.");
 					return;
 				}
 			}
@@ -1038,7 +1038,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 			}
 		};
 		chooser.setFileFilter(filter);
-		chooser.setDialogTitle("收到一条加密消息, 请选择解密所用的DES Key文件, 没有则点击取消.");
+		chooser.setDialogTitle("Received an encoded message, please choose DES Key to decode it. Click cancel if you totally have no idea.");
 		int returnVal = chooser.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			// getJtf_pic().setText(chooser.getSelectedFile().getPath());

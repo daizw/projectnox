@@ -599,7 +599,7 @@ public class Cheyenne extends NoxFrame {
         			GroupItem item = add2GroupList(adv, "");
 	        		System.out.println("您已成功加入该组. 可在组列表中查看.");
 	        		JOptionPane.showMessageDialog((Component) null,
-	    					"您已成功加入该组. 可在组列表中查看.", "Succeed!",
+	    					"Join group successfully. Please check out the group list.", "Succeed!",
 	    					JOptionPane.INFORMATION_MESSAGE);
 	        		//添加监听器
 					try {
@@ -632,7 +632,7 @@ public class Cheyenne extends NoxFrame {
         	if(joined){
         		GroupItem item = add2GroupList(adv, password);
         		JOptionPane.showMessageDialog((Component) null,
-    					"您已成功加入该组. 可在组列表中查看.", "Succeed!",
+    					"Join group successfully. Please check out the group list.", "Succeed!",
     					JOptionPane.INFORMATION_MESSAGE);
         		//添加监听器
         		try {
@@ -649,7 +649,7 @@ public class Cheyenne extends NoxFrame {
         	}
         	else{
         		JOptionPane.showMessageDialog((Component) null,
-    					"未能成功加入该组, 密码错误?", "Failure!",
+    					"Failed to join this group, you have a wrong password?", "Failure!",
     					JOptionPane.ERROR_MESSAGE);
         		return false;
         	}
@@ -657,7 +657,7 @@ public class Cheyenne extends NoxFrame {
             System.out.println("Error: failed to create new group");
             System.out.println("使用组广告创建组失败");
 			JOptionPane.showMessageDialog((Component) null,
-					"使用组广告创建组失败", "Phew~",
+					"Failed to create new group", "Phew~",
 					JOptionPane.ERROR_MESSAGE);
 			return false;
         }

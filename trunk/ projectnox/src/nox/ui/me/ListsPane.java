@@ -175,16 +175,16 @@ public class ListsPane extends JTabbedPane {
 									+ System.getProperty("file.separator")
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+ "chat.png\"><br>"
-									+"<Font color=black>昵称:</Font> <Font color=blue>"
+									+"<Font color=black>Nickname:</Font> <Font color=blue>"
 									+ listItem.getName()
 									+"<br></Font>"
-									+"<Font color=black>签名档:</Font> <Font color=blue>"
+									+"<Font color=black>Status message:</Font> <Font color=blue>"
 									+ listItem.getDesc()
 									+"<br></Font>"
-									+"<Font color=black>联系方式:</Font> <Font color=blue>"
+									+"<Font color=black>Phone:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font>"
-									+"<Font color=black>个人说明:</Font> <Font color=blue>"
+									+"<Font color=black>Description:</Font> <Font color=blue>"
 									+ listItem.getName() + " owns me so much MONEY!! "
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
@@ -253,16 +253,16 @@ public class ListsPane extends JTabbedPane {
 							+ System.getProperty("file.separator")
 							+ SystemPath.PORTRAIT_RESOURCE_PATH
 							+ "chat.png\"><br>"
-							+"<Font color=black>昵称:</Font> <Font color=blue>"
+							+"<Font color=black>Nickname:</Font> <Font color=blue>"
 							+ listItem.getName()
 							+"<br></Font>"
-							+"<Font color=black>签名档:</Font> <Font color=blue>"
+							+"<Font color=black>Status message:</Font> <Font color=blue>"
 							+ listItem.getDesc()
 							+"<br></Font>"
-							+"<Font color=black>联系方式:</Font> <Font color=blue>"
+							+"<Font color=black>Phone:</Font> <Font color=blue>"
 							+ "110, 119, 120, 114, 117"
 							+"<br></Font>"
-							+"<Font color=black>个人说明:</Font> <Font color=blue>"
+							+"<Font color=black>Description:</Font> <Font color=blue>"
 							+ listItem.getName() + " owns me so much MONEY!! "
 							+"<br></Font></BODY></html>",
 							"User Information", JOptionPane.INFORMATION_MESSAGE);
@@ -280,16 +280,16 @@ public class ListsPane extends JTabbedPane {
 									+ System.getProperty("file.separator")
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+ "chat.png\"><br>"
-									+"<Font color=black>昵称:</Font> <Font color=blue>"
+									+"<Font color=black>Nickname:</Font> <Font color=blue>"
 									+ listItem.getName()
 									+"<br></Font>"
-									+"<Font color=black>签名档:</Font> <Font color=blue>"
+									+"<Font color=black>Status message:</Font> <Font color=blue>"
 									+ listItem.getDesc()
 									+"<br></Font>"
-									+"<Font color=black>联系方式:</Font> <Font color=blue>"
+									+"<Font color=black>Phone:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font>"
-									+"<Font color=black>个人说明:</Font> <Font color=blue>"
+									+"<Font color=black>Description:</Font> <Font color=blue>"
 									+ listItem.getName() + " owns me so much MONEY!! "
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
@@ -379,13 +379,13 @@ public class ListsPane extends JTabbedPane {
 									+ System.getProperty("file.separator")
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+"chat.png\"><br>"
-									+"<Font color=black>组名:</Font> <Font color=blue>"
+									+"<Font color=black>Group name:</Font> <Font color=blue>"
 									+ listItem.getName()
 									+"<br></Font>"
-									+"<Font color=black>公告:</Font> <Font color=blue>"
+									+"<Font color=black>Description:</Font> <Font color=blue>"
 									+ listItem.getDesc()
 									+"<br></Font>"
-									+"<Font color=black>成员数量:</Font> <Font color=blue>"
+									+"<Font color=black>NO of members:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);

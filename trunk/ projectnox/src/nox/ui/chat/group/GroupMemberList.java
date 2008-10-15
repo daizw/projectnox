@@ -183,16 +183,16 @@ public class GroupMemberList extends JList {
 								+ System.getProperty("file.separator")
 								+ SystemPath.PORTRAIT_RESOURCE_PATH
 								+"chat.png\"><br>"
-								+ "<Font color=black>昵称:</Font> <Font color=blue>"
+								+ "<Font color=black>Nickname:</Font> <Font color=blue>"
 								+ item.getName()
 								+ "<br></Font>"
-								+ "<Font color=black>签名档:</Font> <Font color=blue>"
+								+ "<Font color=black>Status Message:</Font> <Font color=blue>"
 								+ item.getDesc()
 								+ "<br></Font>"
-								+ "<Font color=black>联系方式:</Font> <Font color=blue>"
+								+ "<Font color=black>Phone:</Font> <Font color=blue>"
 								+ "110, 119, 120, 114, 117"
 								+ "<br></Font>"
-								+ "<Font color=black>个人说明:</Font> <Font color=blue>"
+								+ "<Font color=black>Description:</Font> <Font color=blue>"
 								+ item.getName()
 								+ " owns me so much MONEY!! "
 								+ "<br></Font>"
@@ -206,13 +206,13 @@ public class GroupMemberList extends JList {
 								+ System.getProperty("file.separator")
 								+ SystemPath.PORTRAIT_RESOURCE_PATH
 								+ "chat.png\"><br>"
-								+ "<Font color=black>组名:</Font> <Font color=blue>"
+								+ "<Font color=black>Group Name:</Font> <Font color=blue>"
 								+ item.getName()
 								+ "<br></Font>"
-								+ "<Font color=black>公告:</Font> <Font color=blue>"
+								+ "<Font color=black>Description:</Font> <Font color=blue>"
 								+ item.getDesc()
 								+ "<br></Font>"
-								+ "<Font color=black>成员数量:</Font> <Font color=blue>"
+								+ "<Font color=black>No of Members:</Font> <Font color=blue>"
 								+ "110, 119, 120, 114, 117"
 								+ "<br></Font>"
 								+ "<Font color=black>UUID:</Font> <Font color=blue>"
@@ -287,7 +287,7 @@ public class GroupMemberList extends JList {
 
 		public FilterField(int width) {
 			super(width);
-			this.setToolTipText(getHtmlText("输入关键字以搜索列表"));
+			this.setToolTipText(getHtmlText("Input keywords to search"));
 			getDocument().addDocumentListener(this);
 		}
 

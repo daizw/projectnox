@@ -143,9 +143,9 @@ class CreateNewGroupPane extends JPanel{
 				String vPwdStr = new String(verifyPwdPwdFd.getPassword());
 				
 				if(privateChkBox.isSelected() && ! pwdStr.equals(vPwdStr)){
-					System.out.println("两次输入的密码不相符,请检查输入.	" + pwdStr + ":" + vPwdStr);
+					System.out.println("The passwords you input are not identical, please check your input." + pwdStr + ":" + vPwdStr);
 					JOptionPane.showMessageDialog((Component) null,
-							"两次输入的密码不相符,请检查输入!", "ERROR!",
+							"The passwords you input are not identical, please check your input!", "ERROR!",
 							JOptionPane.ERROR_MESSAGE);
 				}else {
 					if(doCreatNewGroup())
@@ -233,7 +233,7 @@ class CreateNewGroupPane extends JPanel{
                 	
                 	if(joined){
                 		JOptionPane.showMessageDialog((Component) null,
-        					"成功创建组, 您已自动加入该组. 可在组列表中查看.", "Succeed!",
+        					"Group creating succeed, you've join it automatically. Please check out the group list.", "Succeed!",
         					JOptionPane.INFORMATION_MESSAGE);
                 		if(parent.add2GrouList(pga)){
                 			System.out.println("加入成功, 但是没有成功添加到组列表, it's weird!");
@@ -241,14 +241,14 @@ class CreateNewGroupPane extends JPanel{
                 	}
                 	else
                 		JOptionPane.showMessageDialog((Component) null,
-            					"成功创建组, 但是未能成功加入该组, it's weird!", "Information",
+            					"Group creating succeed, but failed to join it, it's weird!", "Information",
             					JOptionPane.INFORMATION_MESSAGE);
         			return true;
                 } else {
                     System.out.println("Error: failed to create new group");
                     System.out.println("创建组失败");
         			JOptionPane.showMessageDialog((Component) null,
-        					"创建组失败", "Phew~",
+        					"Failed to create new group", "Phew~",
         					JOptionPane.WARNING_MESSAGE);
         			return false;
                 }

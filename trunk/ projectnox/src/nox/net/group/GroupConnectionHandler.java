@@ -91,7 +91,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 	 */
 	public GroupConnectionHandler(final GroupItem groupItem, boolean showChatroom) throws Exception{
 		if(groupItem == null)
-			throw new Exception("GroupConnectionHandler 初始化参数为空.");
+			throw new Exception("GroupConnectionHandler initial parameter is null.");
 		
 		PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
 		PeerGroupAdvertisement pga	= PeerGroupUtil.getLocalAdvByID(
@@ -115,7 +115,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 						if(outpipe == null){
 							retry = room.showTimeOutMsg();
 						} else {
-							System.out.println("连接成功!!");
+							System.out.println("Connection succeed!!");
 							//TryToConnect()已自动注册ID-connectionHandler并监听
 							room.removeMask();
 							break;
@@ -150,7 +150,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 	 */
 	public GroupConnectionHandler(PeerGroup pg, GroupItem groupItem) throws Exception{
 		if(pg == null || groupItem == null)
-			throw new Exception("GroupConnectionHandler 初始化参数为空.");
+			throw new Exception("GroupConnectionHandler initial parameter is null.");
 		
 		this.peergroup = pg;
 		this.groupItem = groupItem;
@@ -262,7 +262,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 		try {
 			javax.imageio.ImageIO.write(bufImg, "PNG", byteArrayOS);
 		} catch (IOException e) {
-			System.out.println("ImageIO.write(bufImg, \"PNG\", byteArrayOS)出错!");
+			System.out.println("ImageIO.write(bufImg, \"PNG\", byteArrayOS) Error!");
 			e.printStackTrace();
 			return false;
 		}finally{
@@ -293,7 +293,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 		 * @Fixme msg尺寸上限
 		 */
 		if(size >= 60000){
-			System.out.println("文件尺寸请限制在60K以下");
+			System.out.println("Please keep the file size smaller than 60K");
 			return false;
 		}
 		/**
@@ -398,7 +398,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 					e.printStackTrace();
 				}
 			} else {
-				System.out.println("导入DES密钥失败!");
+				System.out.println("Failed to import DES key!");
 				return false;
 			}
 		} else {
@@ -735,7 +735,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 				} else if(curNamespace.equals(XmlMsgFormat.PUBLICKEYENC2_NAMESPACE_NAME)){
 					//TODO 处理publickey2
 				} else {
-					System.out.println("该消息格式不被此版本支持.");
+					System.out.println("The message format is not supported by this version.");
 					return;
 				}
 			}
@@ -758,7 +758,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 			}
 		};
 		chooser.setFileFilter(filter);
-		chooser.setDialogTitle("收到一条加密消息, 请选择加解密所用的DES Key文件, 没有则点击取消.");
+		chooser.setDialogTitle("Received an encoded message, please choose DES Key to decode it. Click cancel if you totally have no idea.");
 		int returnVal = chooser.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			// getJtf_pic().setText(chooser.getSelectedFile().getPath());

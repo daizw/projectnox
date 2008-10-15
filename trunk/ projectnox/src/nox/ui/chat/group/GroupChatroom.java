@@ -61,7 +61,7 @@ public class GroupChatroom extends Chatroom {
 		rootpane.add(gcsp);
 		rootpane.add(chatroompane);
 		
-		glassPane = new InfiniteProgressPanel("连接中, 请稍候...", 12);
+		glassPane = new InfiniteProgressPanel("Connecting, please wait...", 12);
 		glassPane.setBounds(0, -NoxFrame.TITLE_HEIGHT, WIDTH_PREF, HEIGHT_PREF
 				- NoxFrame.TITLE_HEIGHT * 2);
 
@@ -152,7 +152,7 @@ public class GroupChatroom extends Chatroom {
 			byte[] fileDataBytes = incomingFile.getData();
 			
 			JFileChooser chooser=new JFileChooser(".");
-			chooser.setDialogTitle("保存:请输入文件名");
+			chooser.setDialogTitle("Save:please input the filename");
 			chooser.setSelectedFile( new File(filename) );
 			int returnVal = chooser.showSaveDialog(GroupChatroom.this);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
