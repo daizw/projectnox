@@ -24,13 +24,10 @@ public class ResizeListener implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
 		// defaultCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 		Cursor cur = Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
 		frame.setCursor(cur);
@@ -38,7 +35,6 @@ public class ResizeListener implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 

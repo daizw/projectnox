@@ -23,7 +23,6 @@ public class MoveMouseListener implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseClicked(MouseEvent me) {
-		// TODO Auto-generated method stub
 		if(me.getClickCount() == 2)//Ë«»÷
 		{
 			int state = frame.getExtendedState();
@@ -51,14 +50,10 @@ public class MoveMouseListener implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -71,7 +66,6 @@ public class MoveMouseListener implements MouseListener, MouseMotionListener {
 	}
 
 	private JFrame getFrame(JComponent target2) {
-		// TODO Auto-generated method stub
 		return frame;
 	}
 
@@ -105,8 +99,6 @@ public class MoveMouseListener implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
