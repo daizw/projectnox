@@ -1,6 +1,6 @@
 /**
  * SearchingFrame.java
- * ËÑË÷½Úµã/×é´°¿Ú
+ * æœç´¢èŠ‚ç‚¹/ç»„çª—å£
  */
 package nox.ui.search;
 
@@ -17,7 +17,7 @@ import nox.ui.common.SystemPath;
 import nox.ui.me.Cheyenne;
 
 /**
- * ËÑË÷´°¿Ú, ÓÃÓÚËÑË÷peer/group
+ * æœç´¢çª—å£, ç”¨äºæœç´¢peer/group
  * @author shinysky
  */
 @SuppressWarnings("serial")

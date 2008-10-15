@@ -7,8 +7,8 @@ import nox.ui.chat.common.Chatroom;
 import nox.ui.chat.peer.PeerChatroom;
 
 /**
- * Chatroomµ¥Ôª½á¹¹,
- * ÓÃÓÚ±£´æroomID, outpipe, ºÍchatroomµÄ¶ÔÓ¦¹ØÏµ.
+ * Chatroomå•å…ƒç»“æ„,
+ * ç”¨äºä¿å­˜roomID, outpipe, å’Œchatroomçš„å¯¹åº”å…³ç³».
  * 
  * @author shinysky
  * @deprecated
@@ -33,12 +33,12 @@ public class PeerChatroomUnit implements ChatroomUnit{
 		return outbidipipe;
 	}
 	/**
-	 * ÉèÖÃChatroomUnitµÄoutbidipipe, ²¢Í¬²½¸üĞÂChatroom(Èç¹û´æÔÚ)µÄoutbidipipe
+	 * è®¾ç½®ChatroomUnitçš„outbidipipe, å¹¶åŒæ­¥æ›´æ–°Chatroom(å¦‚æœå­˜åœ¨)çš„outbidipipe
 	 * @param pipe
 	 */
 	public void setOutPipe(JxtaBiDiPipe pipe){
 		outbidipipe = pipe;
-		//Í¬²½roomµÄoutpipe
+		//åŒæ­¥roomçš„outpipe
 		if(room != null)
 			;//room.setOutBidipipe(pipe);
 	}

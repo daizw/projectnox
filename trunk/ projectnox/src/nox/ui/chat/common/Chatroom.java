@@ -12,7 +12,7 @@ import nox.ui.common.NoxFrame;
 @SuppressWarnings("serial")
 public abstract class Chatroom extends NoxFrame{
 	/**
-	 * Ä¬ÈÏ³ß´ç³£Á¿
+	 * é»˜è®¤å°ºå¯¸å¸¸é‡
 	 */
 	public static final int WIDTH_DEFLT = 700;
 	public static final int WIDTH_PREF = 700;
@@ -30,8 +30,8 @@ public abstract class Chatroom extends NoxFrame{
 	protected ChatroomPane chatroompane;
 	
 	/**
-	 * Ë½ÁÄ: ¸ÃÖµÎª¶Ô·½ID;
-	 * ÈºÁÄ:Îª×éID
+	 * ç§èŠ: è¯¥å€¼ä¸ºå¯¹æ–¹ID;
+	 * ç¾¤èŠ:ä¸ºç»„ID
 	 */
 	protected ID roomID;
 	protected String roomname;
@@ -57,8 +57,8 @@ public abstract class Chatroom extends NoxFrame{
 		rootpane.setResizeWeight(0.2d);
 	}
 	/**
-	 * »ñÈ¡ÁÄÌìÊÒÃû³Æ(¶Ô·½êÇ³Æ»ò×éÃû)
-	 * @return ¶Ô·½êÇ³Æ»ò×éÃû
+	 * è·å–èŠå¤©å®¤åç§°(å¯¹æ–¹æ˜µç§°æˆ–ç»„å)
+	 * @return å¯¹æ–¹æ˜µç§°æˆ–ç»„å
 	 */
 	public String getRoomName(){
 		return roomname;
@@ -67,7 +67,7 @@ public abstract class Chatroom extends NoxFrame{
 		return roomID;
 	}
 	/**
-	 * ÏòÍâ·¢ËÍÎÄ±¾ÏûÏ¢
+	 * å‘å¤–å‘é€æ–‡æœ¬æ¶ˆæ¯
 	 * 
 	 * @param strmsg
 	 *            string msg
@@ -75,7 +75,7 @@ public abstract class Chatroom extends NoxFrame{
 	 */
 	public abstract boolean SendMsg(String strmsg, boolean encrypt);
 	/**
-	 * ÏòÍâ·¢ËÍÍ¼Æ¬
+	 * å‘å¤–å‘é€å›¾ç‰‡
 	 * 
 	 * @param bufImg
 	 *            buffered image
@@ -83,7 +83,7 @@ public abstract class Chatroom extends NoxFrame{
 	 */
 	public abstract boolean SendMsg(BufferedImage bufImg, boolean encrypt);
 	/**
-	 * ÏòÍâ·¢ËÍÎÄ¼ş
+	 * å‘å¤–å‘é€æ–‡ä»¶
 	 * 
 	 * @param file
 	 *            file to be sent out

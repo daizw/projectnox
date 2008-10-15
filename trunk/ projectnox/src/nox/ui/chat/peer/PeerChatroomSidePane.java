@@ -73,4 +73,3 @@ public class PeerChatroomSidePane extends JSplitPane{
 		this.add(myPane);		
 	}
 }
-

@@ -26,14 +26,14 @@ public abstract class AdvTable extends JTable {
 	public abstract void addRow(Advertisement adv, long delay);
 
 	/**
-	 * ÏòËÑË÷½á¹ûÁĞ±íÖĞÌí¼ÓÒ»ĞĞ. Ìí¼ÓÖ®Ç°ÅĞ¶Ï±íÖĞÊÇ·ñÒÑÓĞ¸ÃÔªËØ, Ã»ÓĞ²ÅĞèÒªÌí¼Ó. TODO ÒÔºó¸ù¾İ¾ßÌåÇé¿ö»¹ĞèÒª¸Ä
+	 * å‘æœç´¢ç»“æœåˆ—è¡¨ä¸­æ·»åŠ ä¸€è¡Œ. æ·»åŠ ä¹‹å‰åˆ¤æ–­è¡¨ä¸­æ˜¯å¦å·²æœ‰è¯¥å…ƒç´ , æ²¡æœ‰æ‰éœ€è¦æ·»åŠ . TODO ä»¥åæ ¹æ®å…·ä½“æƒ…å†µè¿˜éœ€è¦æ”¹
 	 * 
 	 * @param adv
-	 *            »ñÈ¡µÄ¹ã¸æ
+	 *            è·å–çš„å¹¿å‘Š
 	 * @param src
-	 *            ´Ósrc´¦»ñÈ¡µÄ¹ã¸æ
+	 *            ä»srcå¤„è·å–çš„å¹¿å‘Š
 	 * @param delay
-	 *            Ê±¼äÑÓ³Ù
+	 *            æ—¶é—´å»¶è¿Ÿ
 	 */
 	public abstract void addRow(Advertisement adv, Object src, long delay);
 

@@ -22,7 +22,7 @@ import nox.ui.me.Cheyenne;
 
 public class NoX {
 	public static void main(String args[]) {
-		System.setProperty("sun.java2d.noddraw", "true");// Îª°ëÍ¸Ã÷×ö×¼±¸
+		System.setProperty("sun.java2d.noddraw", "true");// ä¸ºåŠé€æ˜åšå‡†å¤‡
 		System.setProperty("net.jxta.logging.Logging", "INFO");
 		System.setProperty("net.jxta.level", "INFO");
 		System.setProperty("java.util.logging.config.file",
@@ -32,7 +32,7 @@ public class NoX {
 		MyLogin = new JXTANetwork();
 		MyLogin.Start();
 
-		// Êı¾İ¿âÃû
+		// æ•°æ®åº“å
 		String username = NoxToolkit.getNetworkConfigurator().getName();
 		try {
 			Class.forName("org.hsqldb.jdbcDriver").newInstance();
@@ -45,7 +45,7 @@ public class NoX {
 				stmt.execute("create table " + DBTableName.ME_SQLTABLE_NAME
 						+ " (Tag VARCHAR not null, Object OTHER not null)");
 			} catch (SQLException e) {
-				System.out.println("Êı¾İ¿â±íMEÒÑ´æÔÚ");
+				System.out.println("æ•°æ®åº“è¡¨MEå·²å­˜åœ¨");
 				e.printStackTrace();
 			}
 
@@ -57,7 +57,7 @@ public class NoX {
 								+ DBTableName.PEER_SQLTABLE_NAME
 								+ " (ID VARCHAR not null, Good BOOLEAN not null, Object OTHER not null)");
 			} catch (SQLException e) {
-				System.out.println("Êı¾İ¿â±íPEERÒÑ´æÔÚ");
+				System.out.println("æ•°æ®åº“è¡¨PEERå·²å­˜åœ¨");
 				e.printStackTrace();
 			}
 		
@@ -70,29 +70,29 @@ public class NoX {
 								+ " (ID VARCHAR not null, Good BOOLEAN, Object OTHER not null)");
 				stmt.close();
 			} catch (SQLException e) {
-				System.out.println("Êı¾İ¿â±íGROUPÒÑ´æÔÚ");
+				System.out.println("æ•°æ®åº“è¡¨GROUPå·²å­˜åœ¨");
 				e.printStackTrace();
 			}
-			// TODO ³õÊ¼»¯(ÏµÍ³/¸öÈË)ÉèÖÃ
-			// ¶ÁÈ¡¹«Ë½Ô¿
+			// TODO åˆå§‹åŒ–(ç³»ç»Ÿ/ä¸ªäºº)è®¾ç½®
+			// è¯»å–å…¬ç§é’¥
 			//initMyKeyPair(conn, DBTableName.ME_SQLTABLE_NAME);
 			initEcryption(conn, DBTableName.ME_SQLTABLE_NAME);
-			//»òÕßÓÉCheyenne³õÊ¼»¯
+			//æˆ–è€…ç”±Cheyenneåˆå§‹åŒ–
 			initMyStatus(conn, DBTableName.ME_SQLTABLE_NAME);
 
-			// ³õÊ¼»¯ÁĞ±í
+			// åˆå§‹åŒ–åˆ—è¡¨
 			/**
-			 * ºÃÓÑÁĞ±í
+			 * å¥½å‹åˆ—è¡¨
 			 */
 			ObjectList flist = new ObjectList(conn,
 					DBTableName.PEER_SQLTABLE_NAME, true);
 			/**
-			 * ºÚÃûµ¥
+			 * é»‘åå•
 			 */
 			ObjectList blist = new ObjectList(conn,
 					DBTableName.PEER_SQLTABLE_NAME, false);
 			/**
-			 * ×éÁĞ±í
+			 * ç»„åˆ—è¡¨
 			 */
 			ObjectList glist = new ObjectList(conn,
 					DBTableName.GROUP_SQLTABLE_NAME, true);
@@ -101,7 +101,7 @@ public class NoX {
 			chyn.pack();
 			chyn.setVisible(true);
 		} catch (SQLException e) {
-			System.out.println("Êı¾İ¿âÒì³£");
+			System.out.println("æ•°æ®åº“å¼‚å¸¸");
 			e.printStackTrace();
 		} catch (InstantiationException e) {
 			e.printStackTrace();
@@ -113,7 +113,7 @@ public class NoX {
 	}
 
 	/**
-	 * ³õÊ¼»¯¸öÈËÉèÖÃ
+	 * åˆå§‹åŒ–ä¸ªäººè®¾ç½®
 	 * @param conn
 	 * @param meSqltableName
 	 */
@@ -121,22 +121,22 @@ public class NoX {
 	}
 
 	/**
-	 * ´ÓÊı¾İ¿âÖĞ¶ÁÈ¡ÃÜÔ¿(SecretKey), ±£´æµ½EncryptUtilÖĞ.</p>
-	 * Èç¹ûÃ»ÓĞÔòĞÂ½¨²¢±£´æµ½Êı¾İ¿âÖĞ.</p>
+	 * ä»æ•°æ®åº“ä¸­è¯»å–å¯†é’¥(SecretKey), ä¿å­˜åˆ°EncryptUtilä¸­.</p>
+	 * å¦‚æœæ²¡æœ‰åˆ™æ–°å»ºå¹¶ä¿å­˜åˆ°æ•°æ®åº“ä¸­.</p>
 	 * 
-	 * @param sqlconn Êı¾İ¿âÁ¬½Ó
-	 * @param tablename Êı¾İ¿â±íÃû
+	 * @param sqlconn æ•°æ®åº“è¿æ¥
+	 * @param tablename æ•°æ®åº“è¡¨å
 	 */
 	private static void initEcryption(Connection conn, String meSqltableName) {
 		//do nothing
 	}
 
 	/**
-	 * ´ÓÊı¾İ¿âÖĞ¶ÁÈ¡¹«Ë½Ô¿(KeyPair), ±£´æµ½EncryptUtilÖĞ.</p>
-	 * Èç¹ûÃ»ÓĞÔòĞÂ½¨²¢±£´æµ½Êı¾İ¿âÖĞ.</p>
+	 * ä»æ•°æ®åº“ä¸­è¯»å–å…¬ç§é’¥(KeyPair), ä¿å­˜åˆ°EncryptUtilä¸­.</p>
+	 * å¦‚æœæ²¡æœ‰åˆ™æ–°å»ºå¹¶ä¿å­˜åˆ°æ•°æ®åº“ä¸­.</p>
 	 * 
-	 * @param sqlconn Êı¾İ¿âÁ¬½Ó
-	 * @param tablename Êı¾İ¿â±íÃû
+	 * @param sqlconn æ•°æ®åº“è¿æ¥
+	 * @param tablename æ•°æ®åº“è¡¨å
 	 * @deprecated
 	 */
 	private static void initMyKeyPair(Connection sqlconn, String tablename) {
@@ -166,7 +166,7 @@ public class NoX {
 			System.out.println("KeyPair == null, now create a new one");
 			KeyPair mykeys = EncryptUtil.generateKeyPair();
 			if(mykeys == null){
-				System.out.println("Éú³ÉÃÜÔ¿¶Ô°Ü");
+				System.out.println("ç”Ÿæˆå¯†é’¥å¯¹è´¥");
 				return;
 			}
 				
@@ -174,12 +174,12 @@ public class NoX {
 			System.out.println("inserting this new keypair into database...");
 			try {
 				stmt = sqlconn.createStatement();
-				// É¾³ıÊı¾İ¿âÖĞ¸ÃTag±íÏî
+				// åˆ é™¤æ•°æ®åº“ä¸­è¯¥Tagè¡¨é¡¹
 				System.out.println("stmt.execute:delete from " + tablename
 						+ " where Tag = '" + EncryptUtil.MYKEYPAIR_TAG + "'");
 				stmt.execute("delete from " + tablename + " where Tag = '"
 						+ EncryptUtil.MYKEYPAIR_TAG + "'");
-				// Ìí¼Óµ½Êı¾İ¿â
+				// æ·»åŠ åˆ°æ•°æ®åº“
 				PreparedStatement pstmt = sqlconn.prepareStatement("insert into " + tablename
 								+ " values (?, ?)");
 				pstmt.setString(1, EncryptUtil.MYKEYPAIR_TAG);

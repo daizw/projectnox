@@ -254,7 +254,7 @@ public class AuthenticationUtil {
 					}
 				}
 			} else {
-				// ÃÜÂëÎª¿Õ, Ó¦¸ÃÔõÃ´°ì?
+				// å¯†ç ä¸ºç©º, åº”è¯¥æ€ä¹ˆåŠ?
 				JFrame parent = null;
 				AuthenticationPanel ap = new AuthenticationPanel(parent, pg);
 				JDialog jd = new JDialog(parent, "Login", true);

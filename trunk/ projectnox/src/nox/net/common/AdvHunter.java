@@ -92,7 +92,7 @@ public class AdvHunter {
 	 * send discovery message, attempting to discover advertisements
 	 * 
 	 * @param model
-	 *            向搜索结果列表中添加行需要用到的"句柄"
+	 *            鍚戞悳绱㈢粨鏋滃垪琛ㄤ腑娣诲姞琛岄渶瑕佺敤鍒扮殑"鍙ユ焺"
 	 */
 	public void LookAround(String peerid, int type, String attribute,
 			String value, int threshold, DiscoveryListener listener, long starttime) {

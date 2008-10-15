@@ -9,18 +9,18 @@ import net.jxta.id.ID;
 public interface ConnectionHandler {
 	/**
 	 * TODO comment this method
-	 * »ñÈ¡¶Ô·½ID(PeerID/GroupID)
+	 * è·å–å¯¹æ–¹ID(PeerID/GroupID)
 	 * @return room ID
 	 */
 	public abstract ID getRoomID();
 
 	/**
-	 * »ñÈ¡ÁÄÌìÊÒÃû³Æ(¶Ô·½êÇ³Æ»ò×éÃû)
-	 * @return ¶Ô·½êÇ³Æ»ò×éÃû
+	 * è·å–èŠå¤©å®¤åç§°(å¯¹æ–¹æ˜µç§°æˆ–ç»„å)
+	 * @return å¯¹æ–¹æ˜µç§°æˆ–ç»„å
 	 */
 	public abstract String getRoomName();
 	/**
-	 * ÏòÍâ·¢ËÍÎÄ±¾ÏûÏ¢
+	 * å‘å¤–å‘é€æ–‡æœ¬æ¶ˆæ¯
 	 * 
 	 * @param strmsg
 	 *            string msg
@@ -28,7 +28,7 @@ public interface ConnectionHandler {
 	 */
 	public abstract boolean SendMsg(String strmsg, boolean encrypt);
 	/**
-	 * ÏòÍâ·¢ËÍÍ¼Æ¬
+	 * å‘å¤–å‘é€å›¾ç‰‡
 	 * 
 	 * @param bufImg
 	 *            buffered image
@@ -36,7 +36,7 @@ public interface ConnectionHandler {
 	 */
 	public abstract boolean SendMsg(BufferedImage bufImg, boolean encrypt);
 	/**
-	 * ÏòÍâ·¢ËÍÎÄ¼ş
+	 * å‘å¤–å‘é€æ–‡ä»¶
 	 * 
 	 * @param file
 	 *            file to be sent out
@@ -44,21 +44,21 @@ public interface ConnectionHandler {
 	 */
 	public abstract boolean SendMsg(File file, boolean encrypt);
 	/**
-	 * ÏòÍâ·¢ËÍ×Ö½ÚÊı×é, Êµ¼ÊÊÇ¹©SendMsg(string/image/file)µ÷ÓÃ.<br>
-	 * µ±È», Ò²¿É¶ÀÁ¢Ê¹ÓÃ.<br>
+	 * å‘å¤–å‘é€å­—èŠ‚æ•°ç»„, å®é™…æ˜¯ä¾›SendMsg(string/image/file)è°ƒç”¨.<br>
+	 * å½“ç„¶, ä¹Ÿå¯ç‹¬ç«‹ä½¿ç”¨.<br>
 	 * 
-	 * @param namespace ÏûÏ¢namespace, ±íÃ÷ÏûÏ¢Êı¾İÀàĞÍ(text/image/file)
+	 * @param namespace æ¶ˆæ¯namespace, è¡¨æ˜æ¶ˆæ¯æ•°æ®ç±»å‹(text/image/file)
 	 * @param data
 	 * @return
 	 */
 	public abstract boolean SendMsg(String namespace, byte[] data, boolean encrypt);
 
 	/**
-	 * ´ÓÖ¸¶¨µÄnamespaceÖĞ½âÎö³öÊı¾İ, È»ºó´«µİ¸øchatroompane´¦Àí.
+	 * ä»æŒ‡å®šçš„namespaceä¸­è§£æå‡ºæ•°æ®, ç„¶åä¼ é€’ç»™chatroompaneå¤„ç†.
 	 * @param namespace
 	 * @param msg
-	 * @return ÊÇ·ñ³É¹¦, ÊÇ·ñÕı³£
-	 * @deprecated ÔİÊ±ÓÃ²»µ½
+	 * @return æ˜¯å¦æˆåŠŸ, æ˜¯å¦æ­£å¸¸
+	 * @deprecated æš‚æ—¶ç”¨ä¸åˆ°
 	 */
 	public abstract boolean ExtractDataAndProcess(String namespace, Message msg);
 }

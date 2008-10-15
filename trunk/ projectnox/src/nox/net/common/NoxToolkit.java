@@ -7,7 +7,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import net.jxta.document.Advertisement;
-import net.jxta.exception.PeerGroupException;
 import net.jxta.peer.PeerID;
 import net.jxta.peergroup.PeerGroupID;
 import net.jxta.platform.NetworkConfigurator;
@@ -18,13 +17,13 @@ import nox.ui.common.NoxJListItem;
 import nox.ui.me.Cheyenne;
 import nox.ui.search.AdvTable;
 /**
- * NoX ¹¤¾ß°ü
+ * NoX å·¥å…·åŒ…
  * @author shinysky
  */
 public class NoxToolkit {
 	/**
-	 * ËÑË÷ÊÂ¼ş´¦ÀíÆ÷,
-	 * Ä¿Ç°ÎŞÓÃ
+	 * æœç´¢äº‹ä»¶å¤„ç†å™¨,
+	 * ç›®å‰æ— ç”¨
 	 * @author shinysky
 	 *
 	 */
@@ -49,7 +48,7 @@ public class NoxToolkit {
 		}
 	}
 	/**
-	 * ÓÃÓÚ¼ì²éÔÚÏß×´Ì¬µÄÊÂ¼ş´¦ÀíÆ÷
+	 * ç”¨äºæ£€æŸ¥åœ¨çº¿çŠ¶æ€çš„äº‹ä»¶å¤„ç†å™¨
 	 * @author shinysky
 	 *
 	 */
@@ -85,7 +84,7 @@ public class NoxToolkit {
 	private static HuntingEventHandler hehandler;
 	private static CheckStatusEventHandler cshandler;
 	private static Cheyenne cheyenne;
-	//TODO ¿¼ÂÇÊ¹ÓÃMap, Ê¹ÓÃ·½·¨¿É²Î¿¼tutorialÖĞµÄPropagatedPipServerÀà
+	//TODO è€ƒè™‘ä½¿ç”¨Map, ä½¿ç”¨æ–¹æ³•å¯å‚è€ƒtutorialä¸­çš„PropagatedPipServerç±»
 	//private static Set<ChatroomUnit> chatrooms;
 	//private transient Map<PeerID, JxtaBiDiPipe> bidipipeCache = new Hashtable<PeerID, JxtaBiDiPipe>();
 	private static transient Map<PeerID, PeerConnectionHandler> pconnHdlerCache = new Hashtable<PeerID, PeerConnectionHandler>();
@@ -136,12 +135,12 @@ public class NoxToolkit {
 		Opacity = opa;
 	}
 	////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	////+++++                       ½Úµã                                                             +++++++
+	////+++++                       èŠ‚ç‚¹                                                             +++++++
 	////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	/**
-	 * ·µ»ØID¶ÔÓ¦µÄ½ÚµãÁ¬½Ó¹ÜÀíÆ÷. Èç¹û²»º¬¸ÃIDĞÅÏ¢, ·µ»Ønull.
-	 * @param pid Òª²éÑ¯µÄID
-	 * @return ½ÚµãÁ¬½Ó¹ÜÀíÆ÷
+	 * è¿”å›IDå¯¹åº”çš„èŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨. å¦‚æœä¸å«è¯¥IDä¿¡æ¯, è¿”å›null.
+	 * @param pid è¦æŸ¥è¯¢çš„ID
+	 * @return èŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨
 	 */
 	public static PeerConnectionHandler getPeerConnectionHandler(PeerID pid){
 		if(pconnHdlerCache.containsKey(pid)){
@@ -150,10 +149,10 @@ public class NoxToolkit {
 		return null;
 	}
 	/**
-	 * ×¢²á½ÚµãÁ¬½Ó¹ÜÀíÆ÷. Èç¹û²ÎÊı¶¼²»Îª¿Õ, ÇÒ¹şÏ£±íÖĞÎŞ¸Ãid, Ôò×¢²áÖ®, ·µ»Øtrue; ·ñÔò·µ»Øfalse.
-	 * @param pid Òª×¢²áµÄID
-	 * @param handler ¸ÃID¶ÔÓ¦µÄ½ÚµãÁ¬½Ó¹ÜÀíÆ÷
-	 * @return ×¢²á³É¹¦·ñ. Èç¹ûº¬¿Õ²ÎÊı»òÕß¹şÏ£±íÖĞÒÑÓĞ¸Ã¹ÜÀíÆ÷Ôò·µ»Øfalse.
+	 * æ³¨å†ŒèŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨. å¦‚æœå‚æ•°éƒ½ä¸ä¸ºç©º, ä¸”å“ˆå¸Œè¡¨ä¸­æ— è¯¥id, åˆ™æ³¨å†Œä¹‹, è¿”å›true; å¦åˆ™è¿”å›false.
+	 * @param pid è¦æ³¨å†Œçš„ID
+	 * @param handler è¯¥IDå¯¹åº”çš„èŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨
+	 * @return æ³¨å†ŒæˆåŠŸå¦. å¦‚æœå«ç©ºå‚æ•°æˆ–è€…å“ˆå¸Œè¡¨ä¸­å·²æœ‰è¯¥ç®¡ç†å™¨åˆ™è¿”å›false.
 	 */
 	public static boolean registerPeerConnectionHandler(PeerID pid, PeerConnectionHandler handler){
 		if(pid != null && handler != null
@@ -164,27 +163,32 @@ public class NoxToolkit {
 		return false;
 	}
 	/**
-	 * Ç¿ĞĞ×¢²á½ÚµãÁ¬½Ó¹ÜÀíÆ÷. Èç¹û²ÎÊı¶¼²»Îª¿Õ, Ôò×¢²áÖ®, ·µ»Øtrue; ·ñÔò·µ»Øfalse.
-	 * Èç¹û±íÖĞÒÑº¬¸Ãkey, Ôò¾ÉµÄvalue»á±»¸²¸Ç.
+	 * å¼ºè¡Œæ³¨å†ŒèŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨. å¦‚æœå‚æ•°éƒ½ä¸ä¸ºç©º, åˆ™æ³¨å†Œä¹‹, è¿”å›true; å¦åˆ™è¿”å›false.
+	 * å¦‚æœè¡¨ä¸­å·²å«è¯¥key, åˆ™æ—§çš„valueä¼šè¢«è¦†ç›–.
 	 * 
-	 * @param pid Òª×¢²áµÄID
-	 * @param handler ¸ÃID¶ÔÓ¦µÄ½ÚµãÁ¬½Ó¹ÜÀíÆ÷
-	 * @return ×¢²á³É¹¦·ñ. Èç¹ûº¬¿Õ²ÎÊıÔò·µ»Øfalse.
+	 * @param pid è¦æ³¨å†Œçš„ID
+	 * @param handler è¯¥IDå¯¹åº”çš„èŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨
+	 * @return æ³¨å†ŒæˆåŠŸå¦. å¦‚æœå«ç©ºå‚æ•°åˆ™è¿”å›false.
 	 */
 	public static boolean forceRegisterPeerConnectionHandler(PeerID pid, PeerConnectionHandler handler){
 		if(pid != null && handler != null){
+			/*if(pconnHdlerCache.containsKey(pid)){
+				PeerChatroom room = pconnHdlerCache.get(pid).getRoom();
+				if(room != null && handler.getRoom() == null)
+					handler.setRoom(room);
+			}*/
 			pconnHdlerCache.put(pid, handler);
 			return true;
 		}
 		return false;
 	}
 	////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	////+++++                       ×é                                                               +++++++
+	////+++++                       ç»„                                                               +++++++
 	////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	/**
-	 * ·µ»ØID¶ÔÓ¦µÄ½ÚµãÁ¬½Ó¹ÜÀíÆ÷. Èç¹û²»º¬¸ÃIDĞÅÏ¢, ·µ»Ønull.
-	 * @param gid Òª²éÑ¯µÄID
-	 * @return ½ÚµãÁ¬½Ó¹ÜÀíÆ÷
+	 * è¿”å›IDå¯¹åº”çš„èŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨. å¦‚æœä¸å«è¯¥IDä¿¡æ¯, è¿”å›null.
+	 * @param gid è¦æŸ¥è¯¢çš„ID
+	 * @return èŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨
 	 */
 	public static GroupConnectionHandler getGroupConnectionHandler(PeerGroupID gid){
 		if(gconnHdlerCache.containsKey(gid)){
@@ -193,10 +197,10 @@ public class NoxToolkit {
 		return null;
 	}
 	/**
-	 * ×¢²á½ÚµãÁ¬½Ó¹ÜÀíÆ÷. Èç¹û²ÎÊı¶¼²»Îª¿Õ, ÇÒ¹şÏ£±íÖĞÎŞ¸Ãid, Ôò×¢²áÖ®, ·µ»Øtrue; ·ñÔò·µ»Øfalse.
-	 * @param gid Òª×¢²áµÄID
-	 * @param handler ¸ÃID¶ÔÓ¦µÄ½ÚµãÁ¬½Ó¹ÜÀíÆ÷
-	 * @return ×¢²á³É¹¦·ñ. Èç¹ûº¬¿Õ²ÎÊı»òÕß¹şÏ£±íÖĞÒÑÓĞ¸Ã¹ÜÀíÆ÷Ôò·µ»Øfalse.
+	 * æ³¨å†ŒèŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨. å¦‚æœå‚æ•°éƒ½ä¸ä¸ºç©º, ä¸”å“ˆå¸Œè¡¨ä¸­æ— è¯¥id, åˆ™æ³¨å†Œä¹‹, è¿”å›true; å¦åˆ™è¿”å›false.
+	 * @param gid è¦æ³¨å†Œçš„ID
+	 * @param handler è¯¥IDå¯¹åº”çš„èŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨
+	 * @return æ³¨å†ŒæˆåŠŸå¦. å¦‚æœå«ç©ºå‚æ•°æˆ–è€…å“ˆå¸Œè¡¨ä¸­å·²æœ‰è¯¥ç®¡ç†å™¨åˆ™è¿”å›false.
 	 */
 	public static boolean registerGroupConnectionHandler(PeerGroupID gid, GroupConnectionHandler handler){
 		if(gid != null && handler != null
@@ -207,12 +211,12 @@ public class NoxToolkit {
 		return false;
 	}
 	/**
-	 * Ç¿ĞĞ×¢²á½ÚµãÁ¬½Ó¹ÜÀíÆ÷. Èç¹û²ÎÊı¶¼²»Îª¿Õ, Ôò×¢²áÖ®, ·µ»Øtrue; ·ñÔò·µ»Øfalse.
-	 * Èç¹û±íÖĞÒÑº¬¸Ãkey, Ôò¾ÉµÄvalue»á±»¸²¸Ç.
+	 * å¼ºè¡Œæ³¨å†ŒèŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨. å¦‚æœå‚æ•°éƒ½ä¸ä¸ºç©º, åˆ™æ³¨å†Œä¹‹, è¿”å›true; å¦åˆ™è¿”å›false.
+	 * å¦‚æœè¡¨ä¸­å·²å«è¯¥key, åˆ™æ—§çš„valueä¼šè¢«è¦†ç›–.
 	 * 
-	 * @param gid Òª×¢²áµÄID
-	 * @param handler ¸ÃID¶ÔÓ¦µÄ½ÚµãÁ¬½Ó¹ÜÀíÆ÷
-	 * @return ×¢²á³É¹¦·ñ. Èç¹ûº¬¿Õ²ÎÊıÔò·µ»Øfalse.
+	 * @param gid è¦æ³¨å†Œçš„ID
+	 * @param handler è¯¥IDå¯¹åº”çš„èŠ‚ç‚¹è¿æ¥ç®¡ç†å™¨
+	 * @return æ³¨å†ŒæˆåŠŸå¦. å¦‚æœå«ç©ºå‚æ•°åˆ™è¿”å›false.
 	 */
 	public static boolean forceRegisterGroupConnectionHandler(PeerGroupID gid, GroupConnectionHandler handler){
 		if(gid != null && handler != null){
@@ -222,11 +226,11 @@ public class NoxToolkit {
 		return false;
 	}
 	/**
-	 * ´ÓcacheÖĞÒÆ³ıconnection handler<br>
-	 * Ò»°ã½«ºÃÓÑÌí¼Óµ½ºÚÃûµ¥»òÖ±½ÓÉ¾³ıÊ±ĞèÒªÊ¹ÓÃ´Ëº¯Êı
+	 * ä»cacheä¸­ç§»é™¤connection handler<br>
+	 * ä¸€èˆ¬å°†å¥½å‹æ·»åŠ åˆ°é»‘åå•æˆ–ç›´æ¥åˆ é™¤æ—¶éœ€è¦ä½¿ç”¨æ­¤å‡½æ•°
 	 * 
-	 * @param pid ºÃÓÑµÄID
-	 * @return Èç¹û¸ÃºÃÓÑIDÎª¿Õ»ò²»´æÔÚÓÚcacheÖĞ£¬·µ»Øfalse£»·ñÔò·µ»Øtrue
+	 * @param pid å¥½å‹çš„ID
+	 * @return å¦‚æœè¯¥å¥½å‹IDä¸ºç©ºæˆ–ä¸å­˜åœ¨äºcacheä¸­ï¼Œè¿”å›falseï¼›å¦åˆ™è¿”å›true
 	 */
 	public static boolean removePeer(PeerID pid){
 		if(pid != null && pconnHdlerCache.containsKey(pid)){
@@ -238,10 +242,10 @@ public class NoxToolkit {
 		return false;
 	}
 	/**
-	 * ÍË³ö×é
+	 * é€€å‡ºç»„
 	 * 
-	 * @param gid ÒªÍË³öµÄ×éµÄID
-	 * @return Èç¹û¸Ã×éÎª¿Õ»ò²»´æÔÚÓÚcacheÖĞ£¬·µ»Øfalse£»·ñÔò·µ»Øtrue
+	 * @param gid è¦é€€å‡ºçš„ç»„çš„ID
+	 * @return å¦‚æœè¯¥ç»„ä¸ºç©ºæˆ–ä¸å­˜åœ¨äºcacheä¸­ï¼Œè¿”å›falseï¼›å¦åˆ™è¿”å›true
 	 */
 	public static boolean resignGroup(PeerGroupID gid){
 		if(gid != null && gconnHdlerCache.containsKey(gid)){

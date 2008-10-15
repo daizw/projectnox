@@ -9,7 +9,7 @@ import java.security.PublicKey;
 
 import javax.swing.JOptionPane;
 
-//²úÉúRSA¹«Ô¿ºÍË½Ô¿µÄJAVA´úÂë
+//äº§ç”ŸRSAå…¬é’¥å’Œç§é’¥çš„JAVAä»£ç 
 public class Skey_RSA {
 
 	public static void main(String args[]) throws Exception {
@@ -25,7 +25,7 @@ public class Skey_RSA {
 		FileOutputStream f2 = new FileOutputStream("c:/Skey_RSA_priv.dat");
 		ObjectOutputStream b2 = new ObjectOutputStream(f2);
 		b2.writeObject(prkey);
-		JOptionPane.showMessageDialog(null, "ÃÜÔ¿ÒÑ±£´æÔÚCÅÌ¸ùÄ¿Â¼ÏÂ!", "ÌáÊ¾",
+		JOptionPane.showMessageDialog(null, "å¯†é’¥å·²ä¿å­˜åœ¨Cç›˜æ ¹ç›®å½•ä¸‹!", "æç¤º",
 				JOptionPane.OK_OPTION);
 
 		b1.close();

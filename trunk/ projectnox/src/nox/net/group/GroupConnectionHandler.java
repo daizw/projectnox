@@ -80,18 +80,18 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 	private SecretKey DESKey = null;
 
 	/**
-	 * ¹¹Ôìº¯Êı, ¸ù¾İµÚ¶ş¸ö²ÎÊı¾ö¶¨ÊÇ·ñÊµÀı»¯ÁÄÌì´°¿Ú<br>
+	 * æ„é€ å‡½æ•°, æ ¹æ®ç¬¬äºŒä¸ªå‚æ•°å†³å®šæ˜¯å¦å®ä¾‹åŒ–èŠå¤©çª—å£<br>
 	 * <ol>
-	 * <li>Èç¹ûÁ¢¿ÌÊµÀı»¯´°¿Ú, ÔòÁ¬½Ó¹ı³ÌÔÚµ¥¶ÀÒ»¸öÏß³ÌÖĞÔËĞĞ(Òì²½)</li>
-	 * <li>Èç¹û²»Á¢¿ÌÊµÀı»¯´°¿Ú, ÔòÁ¬½Ó¹ı³Ì×èÈûÔËĞĞ(Í¬²½)</li>
+	 * <li>å¦‚æœç«‹åˆ»å®ä¾‹åŒ–çª—å£, åˆ™è¿æ¥è¿‡ç¨‹åœ¨å•ç‹¬ä¸€ä¸ªçº¿ç¨‹ä¸­è¿è¡Œ(å¼‚æ­¥)</li>
+	 * <li>å¦‚æœä¸ç«‹åˆ»å®ä¾‹åŒ–çª—å£, åˆ™è¿æ¥è¿‡ç¨‹é˜»å¡è¿è¡Œ(åŒæ­¥)</li>
 	 * </ol>
-	 * @param groupItem ÁĞ±íÖĞ×éµÄGroupItem
-	 * @param showChatroom ÊÇ·ñÁ¢¿ÌÊµÀı»¯´°¿Ú
-	 * @throws Exception µÚÒ»¸ö²ÎÊıÎª¿ÕÒì³£
+	 * @param groupItem åˆ—è¡¨ä¸­ç»„çš„GroupItem
+	 * @param showChatroom æ˜¯å¦ç«‹åˆ»å®ä¾‹åŒ–çª—å£
+	 * @throws Exception ç¬¬ä¸€ä¸ªå‚æ•°ä¸ºç©ºå¼‚å¸¸
 	 */
 	public GroupConnectionHandler(final GroupItem groupItem, boolean showChatroom) throws Exception{
 		if(groupItem == null)
-			throw new Exception("GroupConnectionHandler ³õÊ¼»¯²ÎÊıÎª¿Õ.");
+			throw new Exception("GroupConnectionHandler åˆå§‹åŒ–å‚æ•°ä¸ºç©º.");
 		
 		PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
 		PeerGroupAdvertisement pga	= PeerGroupUtil.getLocalAdvByID(
@@ -101,9 +101,9 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 		this.groupItem = groupItem;
 		
 		if(showChatroom){
-			//ÏÔÊ¾ÁÄÌìÊÒ´°¿Ú, Á¬½Ó.
-			//³É¹¦: ×¢²á²¢¼àÌı
-			//³¬Ê±(²»³É¹¦):ÌáÊ¾ÓÃ»§Á¬½Ó³¬Ê±, ÊÇ·ñÖØÊÔ!
+			//æ˜¾ç¤ºèŠå¤©å®¤çª—å£, è¿æ¥.
+			//æˆåŠŸ: æ³¨å†Œå¹¶ç›‘å¬
+			//è¶…æ—¶(ä¸æˆåŠŸ):æç¤ºç”¨æˆ·è¿æ¥è¶…æ—¶, æ˜¯å¦é‡è¯•!
 			room = new GroupChatroom(groupItem, GroupConnectionHandler.this);
 			room.setVisible(true);
 			Thread connector = new Thread(new Runnable(){
@@ -115,8 +115,8 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 						if(outpipe == null){
 							retry = room.showTimeOutMsg();
 						} else {
-							System.out.println("Á¬½Ó³É¹¦!!");
-							//TryToConnect()ÒÑ×Ô¶¯×¢²áID-connectionHandler²¢¼àÌı
+							System.out.println("è¿æ¥æˆåŠŸ!!");
+							//TryToConnect()å·²è‡ªåŠ¨æ³¨å†ŒID-connectionHandlerå¹¶ç›‘å¬
 							room.removeMask();
 							break;
 						}
@@ -125,32 +125,32 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 			});
 			connector.start();
 		} else {
-			//²»ÏÔÊ¾ÁÄÌìÊÒ´°¿Ú, Ö»Á¬½Ó.
-			//³É¹¦: ×¢²á²¢¼àÌı
+			//ä¸æ˜¾ç¤ºèŠå¤©å®¤çª—å£, åªè¿æ¥.
+			//æˆåŠŸ: æ³¨å†Œå¹¶ç›‘å¬
 			TryToConnect(LANTimeLimit.UNIT_TIME * LANTimeLimit.CONNECT_MAXRETRIES);
 		}
 	}
 	/**
-	 * ¹¹Ôìº¯Êı, µ±ÓÃ»§Ë«»÷Ö÷½çÃæ×éÁĞ±íÊ±µ÷ÓÃ´Ë¹¹Ôìº¯Êı.<br>
-	 * Ö±½ÓÏÔÊ¾ÁÄÌì´°¿Ú, ²¢ÊÔÍ¼Á¬½Ó<br>
-	 * @param friend ÁĞ±íÖĞ×éµÄGroupItem
-	 * @throws Exception ²ÎÊıÎª¿ÕÒì³£
+	 * æ„é€ å‡½æ•°, å½“ç”¨æˆ·åŒå‡»ä¸»ç•Œé¢ç»„åˆ—è¡¨æ—¶è°ƒç”¨æ­¤æ„é€ å‡½æ•°.<br>
+	 * ç›´æ¥æ˜¾ç¤ºèŠå¤©çª—å£, å¹¶è¯•å›¾è¿æ¥<br>
+	 * @param friend åˆ—è¡¨ä¸­ç»„çš„GroupItem
+	 * @throws Exception å‚æ•°ä¸ºç©ºå¼‚å¸¸
 	 */
 	public GroupConnectionHandler(GroupItem groupItem) throws Exception{
 		this(groupItem, true);
 	}
 	/**
-	 * ³ıÁË±»Ä³Ğ©@@deprecatedµÄ·½·¨µ÷ÓÃÍâ,<br>
-	 * Ö÷ÒªµÄÓÃÍ¾ÊÇ¼ÓÈëĞÂ×éµÄÊ±ºòµ÷ÓÃ´Ë¹¹Ôìº¯Êı.<br>
-	 * ÒòÎª¼ÓÈëĞÂ×é»áÉú³ÉPeerGroup, µ÷ÓÃÕâ¸ö¹¹Ôìº¯Êı¿ÉÒÔ±ÜÃâÖØ¸´²Ù×÷.<br>
-	 * ´Ë´¦ÊÇÍ¬²½µÄ, µ«ÊÇÔÚ±»µ÷ÓÃÊ±ÊÇ×÷ÎªÒ»¸öÏß³ÌµÄrunnable, ÊÇÒì²½µÄ.<br>
+	 * é™¤äº†è¢«æŸäº›@@deprecatedçš„æ–¹æ³•è°ƒç”¨å¤–,<br>
+	 * ä¸»è¦çš„ç”¨é€”æ˜¯åŠ å…¥æ–°ç»„çš„æ—¶å€™è°ƒç”¨æ­¤æ„é€ å‡½æ•°.<br>
+	 * å› ä¸ºåŠ å…¥æ–°ç»„ä¼šç”ŸæˆPeerGroup, è°ƒç”¨è¿™ä¸ªæ„é€ å‡½æ•°å¯ä»¥é¿å…é‡å¤æ“ä½œ.<br>
+	 * æ­¤å¤„æ˜¯åŒæ­¥çš„, ä½†æ˜¯åœ¨è¢«è°ƒç”¨æ—¶æ˜¯ä½œä¸ºä¸€ä¸ªçº¿ç¨‹çš„runnable, æ˜¯å¼‚æ­¥çš„.<br>
 	 * @param pg
 	 * @param groupItem
 	 * @throws Exception
 	 */
 	public GroupConnectionHandler(PeerGroup pg, GroupItem groupItem) throws Exception{
 		if(pg == null || groupItem == null)
-			throw new Exception("GroupConnectionHandler ³õÊ¼»¯²ÎÊıÎª¿Õ.");
+			throw new Exception("GroupConnectionHandler åˆå§‹åŒ–å‚æ•°ä¸ºç©º.");
 		
 		this.peergroup = pg;
 		this.groupItem = groupItem;
@@ -171,10 +171,10 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 		return outpipe != null;
 	}
 	/**
-	 * ½¨Á¢Á¬½Ó:
+	 * å»ºç«‹è¿æ¥:
 	 */
 	private void TryToConnect(long waittime) {
-		// Èç¹ûÒÑ¾­ÓĞÁËoutbidipipe, Ôò²»ĞèÒªÖØĞÂÁ¬½Ó
+		// å¦‚æœå·²ç»æœ‰äº†outbidipipe, åˆ™ä¸éœ€è¦é‡æ–°è¿æ¥
 		if (outpipe != null && inpipe != null) {
 			System.out
 					.println("["
@@ -196,7 +196,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 				e.printStackTrace();
 			}
 			if(peergroup != null){
-				System.out.println("³É¹¦´´½¨×é, ÕıÔÚ²éÕÒ¸Ã×éËùÓÃ¹ÜµÀ¹ã¸æ...");
+				System.out.println("æˆåŠŸåˆ›å»ºç»„, æ­£åœ¨æŸ¥æ‰¾è¯¥ç»„æ‰€ç”¨ç®¡é“å¹¿å‘Š...");
 				PipeAdvertisement pia = null;
 				pia = PipeUtil.findNewestPipeAdv(peergroup, peergroup.getPeerGroupID().toString(), LANTimeLimit.UNIT_TIME*2);
 				if(pia == null){
@@ -216,12 +216,12 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 		        }
 			}
 		}
-		//×¢²á´¦ÀíÆ÷
+		//æ³¨å†Œå¤„ç†å™¨
 		if(inpipe != null)
 			NoxToolkit.forceRegisterGroupConnectionHandler((PeerGroupID) groupItem.getUUID(), this);
 		
 		if (outpipe != null) {
-			//Èº·¢ÏûÏ¢
+			//ç¾¤å‘æ¶ˆæ¯
 			System.out.println("[" + Thread.currentThread().getName()
 					+ "] Saying hello ...");
 			String hellomsg = "Hello [F:100] from "
@@ -255,14 +255,14 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 	@Override
 	public boolean SendMsg(BufferedImage bufImg, boolean encrypt) {
 		/**
-		 * ½«Í¼Æ¬»òÕßImageIcon×ªÎªbyte[]
-		 *  TODO imageio.write()µÄµÚ¶ş¸ö²ÎÊı.............
+		 * å°†å›¾ç‰‡æˆ–è€…ImageIconè½¬ä¸ºbyte[]
+		 *  TODO imageio.write()çš„ç¬¬äºŒä¸ªå‚æ•°.............
 		 */
 		ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
 		try {
 			javax.imageio.ImageIO.write(bufImg, "PNG", byteArrayOS);
 		} catch (IOException e) {
-			System.out.println("ImageIO.write(bufImg, \"PNG\", byteArrayOS)³ö´í!");
+			System.out.println("ImageIO.write(bufImg, \"PNG\", byteArrayOS)å‡ºé”™!");
 			e.printStackTrace();
 			return false;
 		}finally{
@@ -290,14 +290,14 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 	public boolean SendMsg(File file, boolean encrypt) {
 		long size = file.length();
 		/**
-		 * @Fixme msg³ß´çÉÏÏŞ
+		 * @Fixme msgå°ºå¯¸ä¸Šé™
 		 */
 		if(size >= 60000){
-			System.out.println("ÎÄ¼ş³ß´çÇëÏŞÖÆÔÚ60KÒÔÏÂ");
+			System.out.println("æ–‡ä»¶å°ºå¯¸è¯·é™åˆ¶åœ¨60Kä»¥ä¸‹");
 			return false;
 		}
 		/**
-		 * ½«ÎÄ¼ş×ªÎªbyte[]
+		 * å°†æ–‡ä»¶è½¬ä¸ºbyte[]
 		 */
 		byte[] fileBytes = null;
 		byte[] fileData = null;
@@ -361,9 +361,9 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 		Message msg = null;
 		
 		if(encrypt){
-			//TODO Éú³ÉDESÃÜÔ¿, ÓÃÆä¼ÓÃÜÊı¾İ(CBCÄ£Ê½), ²úÉúÏàÓ¦´ø²ÎÊıµÄÏûÏ¢
+			//TODO ç”ŸæˆDESå¯†é’¥, ç”¨å…¶åŠ å¯†æ•°æ®(CBCæ¨¡å¼), äº§ç”Ÿç›¸åº”å¸¦å‚æ•°çš„æ¶ˆæ¯
 			if(DESKey == null){
-				// ´ÓÎÄ¼şµ¼ÈëÃÜÔ¿DES
+				// ä»æ–‡ä»¶å¯¼å…¥å¯†é’¥DES
 				importDESKey();
 			}
 			if(DESKey != null){
@@ -398,11 +398,11 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 					e.printStackTrace();
 				}
 			} else {
-				System.out.println("µ¼ÈëDESÃÜÔ¿Ê§°Ü!");
+				System.out.println("å¯¼å…¥DESå¯†é’¥å¤±è´¥!");
 				return false;
 			}
 		} else {
-			//²»¼ÓÃÜ
+			//ä¸åŠ å¯†
 			msg = NoxMsgUtil.generateMsg(namespace,
 					NoxToolkit.getNetworkConfigurator().getName(),
 					NoxToolkit.getNetworkConfigurator().getPeerID().toString(),
@@ -427,24 +427,24 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 			return null;
 	}
 	/**
-	 * ÏûÏ¢´¦Àíº¯Êı, ÌáÊ¾ÊÕµ½ÏûÏ¢
+	 * æ¶ˆæ¯å¤„ç†å‡½æ•°, æç¤ºæ”¶åˆ°æ¶ˆæ¯
 	 * <ol>
-	 * <li>Èç¹ûÁÄÌìÊÒ¿É¼û, Ö±½ÓÏÔÊ¾</li>
-	 * <li>Èç¹û²»¿É¼û, ÔòÌáÊ¾ÓÃ»§ÓĞĞÂÏûÏ¢µ½´ï, ÓÉÓÃ»§¾ö¶¨ÊÇ·ñÏÔÊ¾</li>
+	 * <li>å¦‚æœèŠå¤©å®¤å¯è§, ç›´æ¥æ˜¾ç¤º</li>
+	 * <li>å¦‚æœä¸å¯è§, åˆ™æç¤ºç”¨æˆ·æœ‰æ–°æ¶ˆæ¯åˆ°è¾¾, ç”±ç”¨æˆ·å†³å®šæ˜¯å¦æ˜¾ç¤º</li>
 	 * </ol>
-	 * @param sender ·¢ËÍÕßêÇ³Æ
-	 * @param time Ê±¼ä´Á
-	 * @param msgdata ÊÕµ½µÄÏûÏ¢
+	 * @param sender å‘é€è€…æ˜µç§°
+	 * @param time æ—¶é—´æˆ³
+	 * @param msgdata æ”¶åˆ°çš„æ¶ˆæ¯
 	 */
 	private void promptIncomingMsg(final String sender, final String time, final Object msgdata) {
 		/**
-		 * ½«ÏûÏ¢Êä³öµ½ÁÄÌì´°¿Ú
+		 * å°†æ¶ˆæ¯è¾“å‡ºåˆ°èŠå¤©çª—å£
 		 */
 		System.out.println("Have put the message to the Chatroom window...");
 		System.out.println("Did you see the message?");
-		//Èç¹û´°¿Ú²»´æÔÚ»òÕß²»¿É¼û
+		//å¦‚æœçª—å£ä¸å­˜åœ¨æˆ–è€…ä¸å¯è§
 		if(room == null || !room.isVisible()){
-			//TODO Ó¦¸ÃÊÇÌáÊ¾ÓĞÏûÏ¢, ¶ø²»ÊÇÇ¿ĞĞÏÔÊ¾´°¿Ú
+			//TODO åº”è¯¥æ˜¯æç¤ºæœ‰æ¶ˆæ¯, è€Œä¸æ˜¯å¼ºè¡Œæ˜¾ç¤ºçª—å£
 			/*this.setVisible(true);*/
 			System.out.println("The window is null or not visible , I make it be!");
 			Icon infoIcon = UIManager.getIcon ("OptionPane.informationIcon");
@@ -477,7 +477,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 					playAudio();
 				}
 				/**
-				 * ½ÓÊÕÏûÏ¢Ê±²¥·ÅÌáÊ¾Òô
+				 * æ¥æ”¶æ¶ˆæ¯æ—¶æ’­æ”¾æç¤ºéŸ³
 				 */
 				private void playAudio() {
 					
@@ -501,7 +501,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 				@Override
 				public void actionPerformed(ActionEvent arg0){
 					if(room == null){
-						// ĞÂ½¨chatroom, ÏÔÊ¾ÏûÏ¢
+						// æ–°å»ºchatroom, æ˜¾ç¤ºæ¶ˆæ¯
 						room = new GroupChatroom(groupItem, GroupConnectionHandler.this);
 						room.removeMask();
 					}
@@ -526,8 +526,8 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 	/**
 	 * Process the incoming message
 	 * <ol>
-	 * <li>Èç¹ûÁÄÌìÊÒ¿É¼û, Ö±½ÓÏÔÊ¾</li>
-	 * <li>TODO Èç¹û²»¿É¼û, ÔòÌáÊ¾ÓÃ»§ÓĞĞÂÏûÏ¢µ½´ï</li>
+	 * <li>å¦‚æœèŠå¤©å®¤å¯è§, ç›´æ¥æ˜¾ç¤º</li>
+	 * <li>TODO å¦‚æœä¸å¯è§, åˆ™æç¤ºç”¨æˆ·æœ‰æ–°æ¶ˆæ¯åˆ°è¾¾</li>
 	 * 
 	 * @param msg
 	 *            the message
@@ -601,12 +601,12 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 				System.out.println("Incoming call: Msg: " + dataEle.toString());
 				
 				if(senderIDEle.toString().equals(NoxToolkit.getNetworkConfigurator().getPeerID().toString())){
-					//×Ô¼º·¢µÄÏûÏ¢, ºöÂÔÖ®
+					//è‡ªå·±å‘çš„æ¶ˆæ¯, å¿½ç•¥ä¹‹
 					System.out.println("It's a msg from myself, just omit it...");
 					return;
 				}
 				
-				//ÑéÖ¤ÏûÏ¢ÖĞÊÕ·¢ÕßIDÊÇ·ñ"Õı³£"
+				//éªŒè¯æ¶ˆæ¯ä¸­æ”¶å‘è€…IDæ˜¯å¦"æ­£å¸¸"
 				String receiverID = receiverIDEle.toString();
 				if(!groupItem.getUUID().toString().equals(receiverID)){
 					System.out.println("Receiver is not me but I still get it, that's funny.");
@@ -623,13 +623,13 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 				//String[] strArrayMsg = { "", roomname, timeEle.toString()};
 				
 				if(curNamespace.equals(XmlMsgFormat.MESSAGE_NAMESPACE_NAME)){
-					//TODO ´¦ÀístringÏûÏ¢
+					//TODO å¤„ç†stringæ¶ˆæ¯
 					String strmsg = null;
 					
 					if(paramEle != null){
-						//TODO ½âÃÜ
+						//TODO è§£å¯†
 						if(DESKey == null){
-							// ´ÓÎÄ¼şµ¼ÈëÃÜÔ¿DES
+							// ä»æ–‡ä»¶å¯¼å…¥å¯†é’¥DES
 							importDESKey();
 							if(DESKey == null){
 								System.out.println("You have no DES key to decrypt this message, " +
@@ -650,18 +650,18 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 				        byte[] recoveredData = aliceCipher.doFinal(dataEle.getBytes());
 				        strmsg = new String(recoveredData);
 					} else {
-						//ÎŞĞè½âÃÜ
+						//æ— éœ€è§£å¯†
 						strmsg = new String(dataEle.getBytes());
 					}
 					promptIncomingMsg(senderEle.toString(), timeEle.toString(), strmsg);
 				} else if(curNamespace.equals(XmlMsgFormat.PICTUREMSG_NAMESPACE_NAME)){
-					//TODO ´¦ÀíÍ¼Æ¬ÏûÏ¢
+					//TODO å¤„ç†å›¾ç‰‡æ¶ˆæ¯
 					ImageIcon incomingPic = null;
 					byte[] picBytes = null;
 					if(paramEle != null){
-						//TODO ½âÃÜ
+						//TODO è§£å¯†
 						if(DESKey == null){
-							// ´ÓÎÄ¼şµ¼ÈëÃÜÔ¿DES
+							// ä»æ–‡ä»¶å¯¼å…¥å¯†é’¥DES
 							importDESKey();
 							if(DESKey == null){
 								System.out.println("You have no DES key to decrypt this message, " +
@@ -681,10 +681,10 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 				        aliceCipher.init(Cipher.DECRYPT_MODE, DESKey, params);
 				        picBytes = aliceCipher.doFinal(dataEle.getBytes());
 					} else {
-						//ÎŞĞè½âÃÜ
+						//æ— éœ€è§£å¯†
 						picBytes = dataEle.getBytes();
 					}
-					// ½«byte[]×ª»¯ÎªÍ¼Æ¬ĞÎÊ½
+					// å°†byte[]è½¬åŒ–ä¸ºå›¾ç‰‡å½¢å¼
 					try {
 						ByteArrayInputStream byteArrayIS = new ByteArrayInputStream(picBytes);
 						BufferedImage bufImg = javax.imageio.ImageIO.read(byteArrayIS);
@@ -694,13 +694,13 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 					}
 					promptIncomingMsg(senderEle.toString(), timeEle.toString(), incomingPic);
 				} else if(curNamespace.equals(XmlMsgFormat.FILEMSG_NAMESPACE_NAME)){
-					//TODO ´¦ÀíÎÄ¼şÏûÏ¢
+					//TODO å¤„ç†æ–‡ä»¶æ¶ˆæ¯
 					NoxFileUnit incomingFile = null;
 					byte[] fileBytes = null;
 					if(paramEle != null){
-						//TODO ½âÃÜ
+						//TODO è§£å¯†
 						if(DESKey == null){
-							// ´ÓÎÄ¼şµ¼ÈëÃÜÔ¿DES
+							// ä»æ–‡ä»¶å¯¼å…¥å¯†é’¥DES
 							importDESKey();
 							if(DESKey == null){
 								System.out.println("You have no DES key to decrypt this message, " +
@@ -720,22 +720,22 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 				        aliceCipher.init(Cipher.DECRYPT_MODE, DESKey, params);
 				        fileBytes = aliceCipher.doFinal(dataEle.getBytes());
 					} else {
-						//ÎŞĞè½âÃÜ
+						//æ— éœ€è§£å¯†
 						fileBytes = dataEle.getBytes();
 					}
 					incomingFile = (NoxFileUnit)NoxMsgUtil.getObjectFromBytes(fileBytes);
 					promptIncomingMsg(senderEle.toString(), timeEle.toString(), incomingFile);
 				} else if(curNamespace.equals(XmlMsgFormat.PINGMSG_NAMESPACE_NAME)){
-					//TODO ´¦ÀípingÏûÏ¢
+					//TODO å¤„ç†pingæ¶ˆæ¯
 				} else if(curNamespace.equals(XmlMsgFormat.PONGMSG_NAMESPACE_NAME)){
-					//TODO ´¦ÀípongÏûÏ¢
+					//TODO å¤„ç†pongæ¶ˆæ¯
 					//how about doing nothing?
 				} else if(curNamespace.equals(XmlMsgFormat.PUBLICKEYENC_NAMESPACE_NAME)){
-					//TODO ´¦Àípublickey
+					//TODO å¤„ç†publickey
 				} else if(curNamespace.equals(XmlMsgFormat.PUBLICKEYENC2_NAMESPACE_NAME)){
-					//TODO ´¦Àípublickey2
+					//TODO å¤„ç†publickey2
 				} else {
-					System.out.println("¸ÃÏûÏ¢¸ñÊ½²»±»´Ë°æ±¾Ö§³Ö.");
+					System.out.println("è¯¥æ¶ˆæ¯æ ¼å¼ä¸è¢«æ­¤ç‰ˆæœ¬æ”¯æŒ.");
 					return;
 				}
 			}
@@ -758,7 +758,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 			}
 		};
 		chooser.setFileFilter(filter);
-		chooser.setDialogTitle("ÊÕµ½Ò»Ìõ¼ÓÃÜÏûÏ¢, ÇëÑ¡Ôñ¼Ó½âÃÜËùÓÃµÄDES KeyÎÄ¼ş, Ã»ÓĞÔòµã»÷È¡Ïû.");
+		chooser.setDialogTitle("æ”¶åˆ°ä¸€æ¡åŠ å¯†æ¶ˆæ¯, è¯·é€‰æ‹©åŠ è§£å¯†æ‰€ç”¨çš„DES Keyæ–‡ä»¶, æ²¡æœ‰åˆ™ç‚¹å‡»å–æ¶ˆ.");
 		int returnVal = chooser.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			// getJtf_pic().setText(chooser.getSelectedFile().getPath());
@@ -802,11 +802,11 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 		return groupItem.getName();
 	}
 	/**
-	 * ÏÔÊ¾ÁÄÌì´°¿Ú, Èç¹ûÉĞÎ´ÊµÀı»¯, ÔòÊµÀı»¯Ö®<br>
-	 * Èç¹ûĞèÒªÊµÀı»¯Ôò²»ÏÔÊ¾Á¬½ÓÄ£ºı½ø¶ÈÖ¸Ê¾Æ÷<br>
-	 * µ÷ÓÃ´Ëº¯ÊıµÄÇ°ÌáÊÇÔÚ¹şÏ£±íÖĞÕÒµ½PeerID¶ÔÓ¦µÄhandler,
-	 * È»ºóÍ¨¹ıhandlerÀ´ÏÔÊ¾chatroom. ËùÒÔ¶ÔÓ¦µÄpipe¿Ï¶¨´æÔÚ,
-	 * ²»È»²»»á×¢²áµ½¹şÏ£±íÖĞ.
+	 * æ˜¾ç¤ºèŠå¤©çª—å£, å¦‚æœå°šæœªå®ä¾‹åŒ–, åˆ™å®ä¾‹åŒ–ä¹‹<br>
+	 * å¦‚æœéœ€è¦å®ä¾‹åŒ–åˆ™ä¸æ˜¾ç¤ºè¿æ¥æ¨¡ç³Šè¿›åº¦æŒ‡ç¤ºå™¨<br>
+	 * è°ƒç”¨æ­¤å‡½æ•°çš„å‰ææ˜¯åœ¨å“ˆå¸Œè¡¨ä¸­æ‰¾åˆ°PeerIDå¯¹åº”çš„handler,
+	 * ç„¶åé€šè¿‡handleræ¥æ˜¾ç¤ºchatroom. æ‰€ä»¥å¯¹åº”çš„pipeè‚¯å®šå­˜åœ¨,
+	 * ä¸ç„¶ä¸ä¼šæ³¨å†Œåˆ°å“ˆå¸Œè¡¨ä¸­.
 	 */
 	public void showChatroom() {
 		if(room == null){
@@ -849,7 +849,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 		System.out.println("+++End Chatroom pipeMsgEvent()...+++");
 	}
 	/**
-	 * ÍË³ö¸Ã×é
+	 * é€€å‡ºè¯¥ç»„
 	 */
 	public void resign(){
 		stop();

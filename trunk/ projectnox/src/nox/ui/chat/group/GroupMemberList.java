@@ -25,7 +25,7 @@ import nox.ui.common.SystemPath;
 
 public class GroupMemberList extends JList {
 	/**
-	 * ºÃÓÑÁĞ±í
+	 * å¥½å‹åˆ—è¡¨
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -34,17 +34,17 @@ public class GroupMemberList extends JList {
 	private int DEFAULT_FIELD_WIDTH = 20;
 
 	/**
-	 * Èç¹û±äÁ¿ÎªrenderÀàÄÚ²¿±äÁ¿, Ôò»á³öÏÖÁĞ±íÔªËØ±»Ìí¼Óµ½Í¬Ò»ĞĞ, ²¢ÇÒ¸ÃĞĞÖØ¸´N´ÎµÄÇé¿ö
+	 * å¦‚æœå˜é‡ä¸ºrenderç±»å†…éƒ¨å˜é‡, åˆ™ä¼šå‡ºç°åˆ—è¡¨å…ƒç´ è¢«æ·»åŠ åˆ°åŒä¸€è¡Œ, å¹¶ä¸”è¯¥è¡Œé‡å¤Næ¬¡çš„æƒ…å†µ
 	 */
 	JLabel portrait;
 	JLabel nick;
 	JLabel sign;
 
 	/**
-	 * ¾ßÓĞ×Ô¶¨ÒåÁĞ±íÔªËØºÍ¹ıÂË¹¦ÄÜµÄÁĞ±í
+	 * å…·æœ‰è‡ªå®šä¹‰åˆ—è¡¨å…ƒç´ å’Œè¿‡æ»¤åŠŸèƒ½çš„åˆ—è¡¨
 	 * 
 	 * @param objs
-	 *            ÁĞ±íÔªËØ(FriendItemÀàĞÍ)Êı×é
+	 *            åˆ—è¡¨å…ƒç´ (FriendItemç±»å‹)æ•°ç»„
 	 */
 	GroupMemberList(Object[] objs) {
 		// super(objs);
@@ -73,7 +73,7 @@ public class GroupMemberList extends JList {
 			public void mouseClicked(MouseEvent me) {
 				if (me.getButton() == MouseEvent.BUTTON3) {
 					/*
-					 * ÊµÏÖÓÒ¼ü¿ÉÑ¡È¡JListItem
+					 * å®ç°å³é”®å¯é€‰å–JListItem
 					 */
 					int index = GroupMemberList.this.locationToIndex(me.getPoint());
 					GroupMemberList.this.setSelectedIndex(index);
@@ -82,7 +82,7 @@ public class GroupMemberList extends JList {
 
 			@Override
 			public void mouseEntered(MouseEvent menter) {
-				// TODO ×Ô¶¯¸Ä±ä±³¾°É«
+				// TODO è‡ªåŠ¨æ”¹å˜èƒŒæ™¯è‰²
 				// int index =
 				// ObjectList.this.locationToIndex(menter.getPoint());
 				// ObjectList.this.set
@@ -110,10 +110,10 @@ public class GroupMemberList extends JList {
 
 	public Object addItem(Object o) {
 		System.out.println("In GroupMemberList.addItems().");
-		//TODO ¼ÓÖ®Ç°Ó¦¸ÃÏÈÅĞ¶ÏÊÇ·ñÒÑÓĞ!!
+		//TODO åŠ ä¹‹å‰åº”è¯¥å…ˆåˆ¤æ–­æ˜¯å¦å·²æœ‰!!
 		int size =  ((FilterModel) getModel()).getSize();
 		for(int index = 0; index <  size; index++){
-			//Èç¹ûÒÑ¾­ÓĞÁË, Ôò·µ»Ø.
+			//å¦‚æœå·²ç»æœ‰äº†, åˆ™è¿”å›.
 			ID newID = ((NoxJListItem)o).getUUID();
 			ID curID = ((NoxJListItem)(((FilterModel) getModel()).getElementAt(index))).getUUID();
 			if(newID.equals(curID))
@@ -126,7 +126,7 @@ public class GroupMemberList extends JList {
 
 	public class GroupMemberListCellRender extends JPanel implements ListCellRenderer {
 		/**
-		 * JListµ¥Ôª¸ñäÖÈ¾Æ÷
+		 * JListå•å…ƒæ ¼æ¸²æŸ“å™¨
 		 */
 		private static final long serialVersionUID = 1L;
 
@@ -172,7 +172,7 @@ public class GroupMemberList extends JList {
 			 * .getForeground());
 			 */
 			/**
-			 * ÔİÊ±Ö»ÄÜÓÃ¾ø¶ÔÂ·¾¶, ²¢ÇÒĞèÒª°ÑÍ·Ïñ´æ´¢µ½±¾µØ
+			 * æš‚æ—¶åªèƒ½ç”¨ç»å¯¹è·¯å¾„, å¹¶ä¸”éœ€è¦æŠŠå¤´åƒå­˜å‚¨åˆ°æœ¬åœ°
 			 */
 			//System.out.println(item.getClass().toString().endsWith("PeerItem"));
 			if (item.getClass().toString().endsWith("PeerItem")) {
@@ -183,16 +183,16 @@ public class GroupMemberList extends JList {
 								+ System.getProperty("file.separator")
 								+ SystemPath.PORTRAIT_RESOURCE_PATH
 								+"chat.png\"><br>"
-								+ "<Font color=black>êÇ³Æ:</Font> <Font color=blue>"
+								+ "<Font color=black>æ˜µç§°:</Font> <Font color=blue>"
 								+ item.getName()
 								+ "<br></Font>"
-								+ "<Font color=black>Ç©Ãûµµ:</Font> <Font color=blue>"
+								+ "<Font color=black>ç­¾åæ¡£:</Font> <Font color=blue>"
 								+ item.getDesc()
 								+ "<br></Font>"
-								+ "<Font color=black>ÁªÏµ·½Ê½:</Font> <Font color=blue>"
+								+ "<Font color=black>è”ç³»æ–¹å¼:</Font> <Font color=blue>"
 								+ "110, 119, 120, 114, 117"
 								+ "<br></Font>"
-								+ "<Font color=black>¸öÈËËµÃ÷:</Font> <Font color=blue>"
+								+ "<Font color=black>ä¸ªäººè¯´æ˜:</Font> <Font color=blue>"
 								+ item.getName()
 								+ " owns me so much MONEY!! "
 								+ "<br></Font>"
@@ -206,13 +206,13 @@ public class GroupMemberList extends JList {
 								+ System.getProperty("file.separator")
 								+ SystemPath.PORTRAIT_RESOURCE_PATH
 								+ "chat.png\"><br>"
-								+ "<Font color=black>×éÃû:</Font> <Font color=blue>"
+								+ "<Font color=black>ç»„å:</Font> <Font color=blue>"
 								+ item.getName()
 								+ "<br></Font>"
-								+ "<Font color=black>¹«¸æ:</Font> <Font color=blue>"
+								+ "<Font color=black>å…¬å‘Š:</Font> <Font color=blue>"
 								+ item.getDesc()
 								+ "<br></Font>"
-								+ "<Font color=black>³ÉÔ±ÊıÁ¿:</Font> <Font color=blue>"
+								+ "<Font color=black>æˆå‘˜æ•°é‡:</Font> <Font color=blue>"
 								+ "110, 119, 120, 114, 117"
 								+ "<br></Font>"
 								+ "<Font color=black>UUID:</Font> <Font color=blue>"
@@ -287,7 +287,7 @@ public class GroupMemberList extends JList {
 
 		public FilterField(int width) {
 			super(width);
-			this.setToolTipText(getHtmlText("ÊäÈë¹Ø¼ü×ÖÒÔËÑË÷ÁĞ±í"));
+			this.setToolTipText(getHtmlText("è¾“å…¥å…³é”®å­—ä»¥æœç´¢åˆ—è¡¨"));
 			getDocument().addDocumentListener(this);
 		}
 

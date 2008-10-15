@@ -124,21 +124,21 @@ public class PeerGroupUtil {
 	}
 
 	/**
-	 * ´´½¨ĞÂµÄPGA
+	 * åˆ›å»ºæ–°çš„PGA
 	 * 
 	 * @param parentGroup
 	 *            parent group
 	 * @param name
-	 *            ¹ã¸æµÄÃû×Ö
+	 *            å¹¿å‘Šçš„åå­—
 	 * @param description
-	 *            ÃèÊö
+	 *            æè¿°
 	 * @param password
-	 *            ÃÜÂë, Îª¿Õ»òÎªnullÔò±íÃ÷ÎŞĞèÃÜÂëÈÏÖ¤
+	 *            å¯†ç , ä¸ºç©ºæˆ–ä¸ºnullåˆ™è¡¨æ˜æ— éœ€å¯†ç è®¤è¯
 	 * @param expiration
-	 *            ÉúÃüÆÚ(?)
+	 *            ç”Ÿå‘½æœŸ(?)
 	 * @param id
-	 *            ¸ø¶¨µÄID, Èç¹ûÎªnull, Ôò×Ô¶¯Éú³ÉĞÂID
-	 * @return ËùÉú³ÉµÄPGA
+	 *            ç»™å®šçš„ID, å¦‚æœä¸ºnull, åˆ™è‡ªåŠ¨ç”Ÿæˆæ–°ID
+	 * @return æ‰€ç”Ÿæˆçš„PGA
 	 * @throws Exception
 	 */
 	public static PeerGroupAdvertisement createPGA(PeerGroup parentGroup,
@@ -164,7 +164,7 @@ public class PeerGroupUtil {
 		mia = parentGroup.getAllPurposePeerGroupImplAdvertisement();
 
 		System.out.println("mia:\n" + mia.toString());
-		// Èç¹ûÓĞÃÜÂë, ÔòÔÚmiaÖĞÌí¼ÓÃÜÂëÈÏÖ¤moduleImpl
+		// å¦‚æœæœ‰å¯†ç , åˆ™åœ¨miaä¸­æ·»åŠ å¯†ç è®¤è¯moduleImpl
 		if (passProt) {
 			System.out.println("pasProt == true : Begin createPasswordModuleImpl()");
 			createPasswordModuleImpl(mia);
@@ -182,7 +182,7 @@ public class PeerGroupUtil {
 		pga.setDescription(description);
 		pga.setModuleSpecID(mia.getModuleSpecID());
 
-		//ÏòPGAÖĞÌí¼Ó(¼ÓÃÜºóµÄ)ÃÜÂë
+		//å‘PGAä¸­æ·»åŠ (åŠ å¯†åçš„)å¯†ç 
 		if (passProt) {
 			StructuredTextDocument login = (StructuredTextDocument) StructuredDocumentFactory
 					.newStructuredDocument(MimeMediaType.XMLUTF8, "Param");
@@ -199,7 +199,7 @@ public class PeerGroupUtil {
 
 		DiscoveryService ds = parentGroup.getDiscoveryService();
 
-		//·¢²¼×é¹ã¸æ
+		//å‘å¸ƒç»„å¹¿å‘Š
 		ds.publish(pga, expiration != 0 ? expiration
 				: 2 * MILLISECONDS_IN_A_WEEK, expiration != 0 ? expiration
 				: 2 * MILLISECONDS_IN_A_WEEK);
@@ -344,13 +344,13 @@ public class PeerGroupUtil {
 	}
 
 	/**
-	 * »ñÈ¡±¾µØ¹ã¸æ
+	 * è·å–æœ¬åœ°å¹¿å‘Š
 	 * 
 	 * @param pg
 	 *            (Parent?) PeerGroup
 	 * @param name
-	 *            ¹ã¸æµÄÃû×Ö
-	 * @return ·¢ÏÖµÄËùÓĞ·ûºÏ²éÑ¯Ìõ¼şµÄ¹ã¸æµÄList
+	 *            å¹¿å‘Šçš„åå­—
+	 * @return å‘ç°çš„æ‰€æœ‰ç¬¦åˆæŸ¥è¯¢æ¡ä»¶çš„å¹¿å‘Šçš„List
 	 */
 	public static List<PeerGroupAdvertisement> getLocalAdvs(PeerGroup pg,
 			String name) {
@@ -374,13 +374,13 @@ public class PeerGroupUtil {
 	}
 	
 	/**
-	 * »ñÈ¡±¾µØ¹ã¸æ
+	 * è·å–æœ¬åœ°å¹¿å‘Š
 	 * 
 	 * @param pg
 	 *            (Parent?) PeerGroup
 	 * @param name
-	 *            ¹ã¸æµÄÃû×Ö
-	 * @return ·¢ÏÖµÄËùÓĞ·ûºÏ²éÑ¯Ìõ¼şµÄ¹ã¸æµÄList
+	 *            å¹¿å‘Šçš„åå­—
+	 * @return å‘ç°çš„æ‰€æœ‰ç¬¦åˆæŸ¥è¯¢æ¡ä»¶çš„å¹¿å‘Šçš„List
 	 */
 	public static PeerGroupAdvertisement getLocalAdvByID(PeerGroup pg,
 			String id) {
@@ -399,7 +399,7 @@ public class PeerGroupUtil {
 					}else{
 						if(Long.parseLong(pga.getDescription())
 								<Long.parseLong(((PeerGroupAdvertisement)adv).getDescription())){
-							//Èç¹ûµ±Ç°Õı´¦ÀíµÄ¹ã¸æ±Èµ±Ç°¹ã¸æ¸üĞÂ, Ôò¸üĞÂ
+							//å¦‚æœå½“å‰æ­£å¤„ç†çš„å¹¿å‘Šæ¯”å½“å‰å¹¿å‘Šæ›´æ–°, åˆ™æ›´æ–°
 							pga = (PeerGroupAdvertisement) adv;
 						}
 					}*/
@@ -412,14 +412,14 @@ public class PeerGroupUtil {
 	}
 
 	/**
-	 * ·¢ÏÖÔ¶³Ì¹ã¸æ
+	 * å‘ç°è¿œç¨‹å¹¿å‘Š
 	 * 
 	 * @param pg
 	 *            (Parent?) PeerGroup
 	 * @param name
-	 *            ¹ã¸æµÄÃû×Ö
+	 *            å¹¿å‘Šçš„åå­—
 	 * @param listener
-	 *            ·¢ÏÖ¼àÌıÆ÷
+	 *            å‘ç°ç›‘å¬å™¨
 	 */
 	public static void discoverRemoteAdvs(PeerGroup pg, String name,
 			DiscoveryListener listener) {

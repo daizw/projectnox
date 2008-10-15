@@ -15,7 +15,7 @@ public class Main implements ActionListener {
 	String encrypt_Text;
 
 	public Main() {
-		f = new JFrame("RSA¼ÓÃÜ½âÃÜËã·¨ÑİÊ¾³ÌĞò");
+		f = new JFrame("RSAåŠ å¯†è§£å¯†ç®—æ³•æ¼”ç¤ºç¨‹åº");
 		Container containerPane = f.getContentPane();
 		containerPane.setLayout(new BorderLayout());
 
@@ -25,7 +25,7 @@ public class Main implements ActionListener {
 		F1 = new JTextArea(3, 15);
 		p1.add(F1);
 		p1.setBorder(BorderFactory.createTitledBorder(BorderFactory
-				.createLineBorder(Color.white, 0), "ÊäÈëÃ÷ÎÄ»òÕßÃÜÎÄÄÚÈİ:",
+				.createLineBorder(Color.white, 0), "è¾“å…¥æ˜æ–‡æˆ–è€…å¯†æ–‡å†…å®¹:",
 				TitledBorder.LEFT, TitledBorder.TOP));
 
 		p2 = new JPanel();
@@ -34,15 +34,15 @@ public class Main implements ActionListener {
 		area_T.setLineWrap(true);
 		p2.add(jsp);
 		p2.setBorder(BorderFactory.createTitledBorder(BorderFactory
-				.createLineBorder(Color.white, 0), "¼Ó/½âÃÜºóµÄÄÚÈİ:",
+				.createLineBorder(Color.white, 0), "åŠ /è§£å¯†åçš„å†…å®¹:",
 				TitledBorder.LEFT, TitledBorder.TOP));
 		p5.add(p1);
 		p5.add(p2);
 
 		p4 = new JPanel();
 		p4.setLayout(new FlowLayout());
-		encrypt_button = new JButton("¼ÓÃÜ");
-		decrypt_button = new JButton("½âÃÜ");
+		encrypt_button = new JButton("åŠ å¯†");
+		decrypt_button = new JButton("è§£å¯†");
 		p4.add(encrypt_button);
 		p4.add(decrypt_button);
 
@@ -65,20 +65,20 @@ public class Main implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
 		try {
-			if (cmd.equals("¼ÓÃÜ")) {
+			if (cmd.equals("åŠ å¯†")) {
 				String Plain_T = F1.getText();
 				encrypt en = new encrypt();
 				String text_E = en.en_code(Plain_T);
 				System.out.println(text_E);
-				JOptionPane.showMessageDialog(f, "¼ÓÃÜ³É¹¦!", "ÌáÊ¾",
+				JOptionPane.showMessageDialog(f, "åŠ å¯†æˆåŠŸ!", "æç¤º",
 						JOptionPane.INFORMATION_MESSAGE);
 				area_T.setText(text_E);
 			}// if
-			else if (cmd.equals("½âÃÜ")) {
+			else if (cmd.equals("è§£å¯†")) {
 				area_T.setText("");
 				decrypt de = new decrypt();
 				String text_D = de.de_code();
-				JOptionPane.showMessageDialog(f, "½âÃÜ³É¹¦!", "ÌáÊ¾",
+				JOptionPane.showMessageDialog(f, "è§£å¯†æˆåŠŸ!", "æç¤º",
 						JOptionPane.INFORMATION_MESSAGE);
 				area_T.setText(text_D);
 			}

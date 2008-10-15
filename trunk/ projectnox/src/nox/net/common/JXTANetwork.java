@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.exception.PeerGroupException;
-import net.jxta.peer.PeerID;
 import net.jxta.peergroup.PeerGroup;
 import net.jxta.pipe.PipeService;
 import net.jxta.platform.NetworkConfigurator;
@@ -38,15 +37,15 @@ import nox.ui.login.RegisterDialog;
  * </ol>
  * </ol>
  * 
- * <li>Peer ¹ã¸æ¸ñÊ½:</li>
+ * <li>Peer å¹¿å‘Šæ ¼å¼:</li>
  * <ol>
- * <li>name: ÓÃ»§×Ô¶¨ÒåÃû³Æ;</li>
- * <li>description: ÓÃ»§×Ô¶¨ÒåÇ©Ãû( + " - " + ¸ÃPeerËùÊ¹ÓÃµÄPipeID);</li> 
+ * <li>name: ç”¨æˆ·è‡ªå®šä¹‰åç§°;</li>
+ * <li>description: ç”¨æˆ·è‡ªå®šä¹‰ç­¾å( + " - " + è¯¥Peeræ‰€ä½¿ç”¨çš„PipeID);</li> 
  * </ol>
- * <li>¹ÜµÀ¹ã¸æ¸ñÊ½:</li>
+ * <li>ç®¡é“å¹¿å‘Šæ ¼å¼:</li>
  * <ol>
- * <li>name: ·¢²¼Õß(Peer)µÄPeerID;</li>
- * <li>description: ·¢²¼Ê±¼ä(Long);</li>
+ * <li>name: å‘å¸ƒè€…(Peer)çš„PeerID;</li>
+ * <li>description: å‘å¸ƒæ—¶é—´(Long);</li>
  * </ol>
  * 
  * 
@@ -60,7 +59,7 @@ public class JXTANetwork {
 
 	String locpeername = "";
 	char[] locpeerpassword;
-	//TODO ÕâÀïÉèÎªpublic static, ÔòNoxToolkitÖĞÄ³Ğ©º¯Êı¿ÉÒÔ¼ò»¯
+	//TODO è¿™é‡Œè®¾ä¸ºpublic static, åˆ™NoxToolkitä¸­æŸäº›å‡½æ•°å¯ä»¥ç®€åŒ–
 	static NetworkManager TheNetworkManager;
 	static NetworkConfigurator TheConfig;
 	static PeerGroup TheNetPeerGroup;
@@ -82,7 +81,7 @@ public class JXTANetwork {
 			try {
 				System.out.println("return value: " + retVal);
 				if(retVal.equals(LoginDialog.REGISTERCMD)){
-					//ÏÔÊ¾×¢²á´°¿Ú
+					//æ˜¾ç¤ºæ³¨å†Œçª—å£
 					RegisterDialog register = new RegisterDialog();
 					while(true){
 						String reg = (String) register.showDialog();
@@ -95,8 +94,8 @@ public class JXTANetwork {
 							}else{
 								locpeername = register.getUsername();
 								locpeerpassword = register.getPassword();
-								//TODO ´´½¨ĞÂÓÃ»§.............
-								System.out.println("´´½¨ĞÂÓÃ»§..."
+								//TODO åˆ›å»ºæ–°ç”¨æˆ·.............
+								System.out.println("åˆ›å»ºæ–°ç”¨æˆ·..."
 										+ locpeername+ ":" + new String(locpeerpassword));
 								break;
 							}
@@ -141,7 +140,7 @@ public class JXTANetwork {
 
 			// Does a local peer configuration exist?
 			if (TheConfig.exists()) {
-				//ÑéÖ¤ÃÜÂë!
+				//éªŒè¯å¯†ç !
 				System.out.println("Local configuration found, checking the password.......");
 				// We load it
 				File LocalConfig = new File(TheConfig.getHome(), "PlatformConfig");
@@ -213,7 +212,7 @@ public class JXTANetwork {
         System.out.println("system password: " + System.getProperty("net.jxta.tls.password"));
         
 		/**
-		 * ³õÊ¼»¯NoxToolkit
+		 * åˆå§‹åŒ–NoxToolkit
 		 */
 		hehandler = new NoxToolkit().new HuntingEventHandler(null);
 		cshandler = new NoxToolkit().new CheckStatusEventHandler(null);
@@ -271,7 +270,7 @@ public class JXTANetwork {
 	}
 
 	/**
-	 * ËÑË÷¹ã¸æ
+	 * æœç´¢å¹¿å‘Š
 	 * @param peerid
 	 * @param AdvType
 	 * @param attribute
@@ -309,7 +308,7 @@ public class JXTANetwork {
 	}
 
 	/**
-	 * Í£Ö¹ËÑË÷¹ã¸æ
+	 * åœæ­¢æœç´¢å¹¿å‘Š
 	 * @deprecated
 	 */
 	public void StopHunting() {
@@ -325,7 +324,7 @@ public class JXTANetwork {
 	public void Start() {
 		SeekRendezVousConnection();
 		/**
-		 * Ìí¼ÓÍâÀ´bidipipeÁ¬½Ó¼àÌıÆ÷
+		 * æ·»åŠ å¤–æ¥bidipipeè¿æ¥ç›‘å¬å™¨
 		 */
 		Thread inconn = new Thread(new Runnable() {
 			@Override
@@ -345,15 +344,15 @@ public class JXTANetwork {
 				//(BIDI_PIPEID == null)?null:BIDI_PIPEID.toString(),
 				true);
 		
-		//Èç¹ûÔÚÉÏÒ»¾äÖĞ´´½¨ÁËĞÂ¹ã¸æ, ÔòÏÂÃæÊôÓÚÖØĞÂ·¢²¼...
+		//å¦‚æœåœ¨ä¸Šä¸€å¥ä¸­åˆ›å»ºäº†æ–°å¹¿å‘Š, åˆ™ä¸‹é¢å±äºé‡æ–°å‘å¸ƒ...
 		try {
-			//µÃµ½×Ô¼ºĞèÒªÓÃµ½µÄpipeAdvºó, ´Ó±¾µØ»º´æÖĞÇå³ıËùÓĞDiscoveryService.ADVÀàĞÍµÄAdv,
-			//È»ºóÔÙ±¾µØ·¢²¼ºÍÔ¶³Ì·¢²¼ÕıÔÚÊ¹ÓÃµÄpipeAdv.
-			//ÕâÑù¿ÉÒÔÇå³ı×Ô¼º/±ğÈË¹ıÆÚ(²»ÔÙÊ¹ÓÃ)µÄpipeAdv.
-			//µ«ÊÇÓĞ¿ÉÄÜÔì³ÉÍøÂçÕûÌåĞÔÄÜµÄ½µµÍ, ÒòÎªÔö¼ÓÁËÔ¶³Ì·¢ÏÖµÄ¸ºµ£.
+			//å¾—åˆ°è‡ªå·±éœ€è¦ç”¨åˆ°çš„pipeAdvå, ä»æœ¬åœ°ç¼“å­˜ä¸­æ¸…é™¤æ‰€æœ‰DiscoveryService.ADVç±»å‹çš„Adv,
+			//ç„¶åå†æœ¬åœ°å‘å¸ƒå’Œè¿œç¨‹å‘å¸ƒæ­£åœ¨ä½¿ç”¨çš„pipeAdv.
+			//è¿™æ ·å¯ä»¥æ¸…é™¤è‡ªå·±/åˆ«äººè¿‡æœŸ(ä¸å†ä½¿ç”¨)çš„pipeAdv.
+			//ä½†æ˜¯æœ‰å¯èƒ½é€ æˆç½‘ç»œæ•´ä½“æ€§èƒ½çš„é™ä½, å› ä¸ºå¢åŠ äº†è¿œç¨‹å‘ç°çš„è´Ÿæ‹….
 			System.out.println("Flushing advs...");
-			/*//ËÆºõµÚÒ»¸ö²ÎÊıÈç¹ûÎªnull, ÔòÃ»ÓĞĞ§¹û. ÔõÃ´flush?
-			//Ö»ÄÜÊÖ¶¯?
+			/*//ä¼¼ä¹ç¬¬ä¸€ä¸ªå‚æ•°å¦‚æœä¸ºnull, åˆ™æ²¡æœ‰æ•ˆæœ. æ€ä¹ˆflush?
+			//åªèƒ½æ‰‹åŠ¨?
 			TheNetworkManager.getNetPeerGroup().getDiscoveryService()
 				.flushAdvertisements(null, DiscoveryService.ADV);*/
 			PipeUtil.flushOldPipeAdvs(TheNetworkManager.getNetPeerGroup(), TheConfig.getPeerID().toString());
@@ -374,13 +373,13 @@ public class JXTANetwork {
 					.println("Waiting for JxtaBidiPipe connections on JxtaServerPipe :\n\t"
 							+ serverPipeAdv.getPipeID());
 			while (true) {
-				JxtaBiDiPipe outbidipipe = serverPipe.accept();
+				final JxtaBiDiPipe outbidipipe = serverPipe.accept();
 				if (outbidipipe != null) {
 					System.out.println("JxtaBidiPipe accepted from: "
 							+ outbidipipe.getRemotePeerAdvertisement().getName());
-					PeerID pid = outbidipipe.getRemotePeerAdvertisement().getPeerID();
-					PeerConnectionHandler handler = NoxToolkit.getPeerConnectionHandler(pid);
-					if(handler == null){
+					//PeerID pid = outbidipipe.getRemotePeerAdvertisement().getPeerID();
+					//final PeerConnectionHandler handler = NoxToolkit.getPeerConnectionHandler(pid);
+					//if(handler == null){
 						Thread thread = null;
 						try {
 							thread = new Thread(	new PeerConnectionHandler(outbidipipe),
@@ -389,10 +388,21 @@ public class JXTANetwork {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-					}else{
-						//¸üĞÂbidipipe
-						handler.setBiDiPipe(outbidipipe);
-					}
+					/*}else{
+						//æ›´æ–°bidipipe
+						Thread thread = null;
+						try {
+							thread = new Thread(	new Runnable(){
+								@Override
+								public void run() {
+									handler.setBiDiPipe(outbidipipe);
+								}
+							},	"Incoming Connection Handler");
+							thread.start();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}*/
 				}
 			}
 		} catch (IOException e) {

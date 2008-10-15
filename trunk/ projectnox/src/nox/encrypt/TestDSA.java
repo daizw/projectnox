@@ -13,19 +13,19 @@ public class TestDSA {
 	}
 
 	public void run() {
-		// Êı×ÖÇ©ÃûÉú³ÉÃÜÔ¿
-		// µÚÒ»²½Éú³ÉÃÜÔ¿¶Ô,Èç¹ûÒÑ¾­Éú³É¹ı,±¾¹ı³Ì¾Í¿ÉÒÔÌø¹ı,¶ÔÓÃ»§À´½²myprikey.datÒª±£´æÔÚ±¾µØ
-		// ¶ømypubkey.dat¸ø·¢²¼¸øÆäËüÓÃ»§
+		// æ•°å­—ç­¾åç”Ÿæˆå¯†é’¥
+		// ç¬¬ä¸€æ­¥ç”Ÿæˆå¯†é’¥å¯¹,å¦‚æœå·²ç»ç”Ÿæˆè¿‡,æœ¬è¿‡ç¨‹å°±å¯ä»¥è·³è¿‡,å¯¹ç”¨æˆ·æ¥è®²myprikey.datè¦ä¿å­˜åœ¨æœ¬åœ°
+		// è€Œmypubkey.datç»™å‘å¸ƒç»™å…¶å®ƒç”¨æˆ·
 		if ((new java.io.File("myprikey.dat")).exists() == false) {
 			if (generatekey() == false) {
-				System.out.println("Éú³ÉÃÜÔ¿¶Ô°Ü");
+				System.out.println("ç”Ÿæˆå¯†é’¥å¯¹è´¥");
 				return;
 			}
 		}
-		// µÚ¶ş²½,´ËÓÃ»§
-		// ´ÓÎÄ¼şÖĞ¶ÁÈëË½Ô¿,¶ÔÒ»¸ö×Ö·û´®½øĞĞÇ©Ãûºó±£´æÔÚÒ»¸öÎÄ¼ş(myinfo.dat)ÖĞ
-		// ²¢ÇÒÔÙ°Ñmyinfo.dat·¢ËÍ³öÈ¥
-		// ÎªÁË·½±ãÊı×ÖÇ©ÃûÒ²·Å½øÁËmyifno.datÎÄ¼şÖĞ,µ±È»Ò²¿É·Ö±ğ·¢ËÍ
+		// ç¬¬äºŒæ­¥,æ­¤ç”¨æˆ·
+		// ä»æ–‡ä»¶ä¸­è¯»å…¥ç§é’¥,å¯¹ä¸€ä¸ªå­—ç¬¦ä¸²è¿›è¡Œç­¾ååä¿å­˜åœ¨ä¸€ä¸ªæ–‡ä»¶(myinfo.dat)ä¸­
+		// å¹¶ä¸”å†æŠŠmyinfo.datå‘é€å‡ºå»
+		// ä¸ºäº†æ–¹ä¾¿æ•°å­—ç­¾åä¹Ÿæ”¾è¿›äº†myifno.datæ–‡ä»¶ä¸­,å½“ç„¶ä¹Ÿå¯åˆ†åˆ«å‘é€
 		try {
 			java.io.ObjectInputStream in = new java.io.ObjectInputStream(
 					new java.io.FileInputStream("myprikey.dat"));
@@ -35,29 +35,29 @@ public class TestDSA {
 			// java.security.spec.X509EncodedKeySpec(bX509);
 			// java.security.spec.X509EncodedKeySpec
 			// pubkeyEncode=java.security.spec.X509EncodedKeySpec
-			String myinfo = "ÕâÊÇÎÒµÄĞÅÏ¢"; // ÒªÇ©ÃûµÄĞÅÏ¢
-			// ÓÃË½Ô¿¶ÔĞÅÏ¢Éú³ÉÊı×ÖÇ©Ãû
+			String myinfo = "è¿™æ˜¯æˆ‘çš„ä¿¡æ¯"; // è¦ç­¾åçš„ä¿¡æ¯
+			// ç”¨ç§é’¥å¯¹ä¿¡æ¯ç”Ÿæˆæ•°å­—ç­¾å
 			java.security.Signature signet = java.security.Signature
 					.getInstance("DSA");
 			signet.initSign(myprikey);
 			signet.update(myinfo.getBytes());
-			byte[] signed = signet.sign(); // ¶ÔĞÅÏ¢µÄÊı×ÖÇ©Ãû
-			System.out.println("signed(Ç©ÃûÄÚÈİ)=" + byte2hex(signed));
-			// °ÑĞÅÏ¢ºÍÊı×ÖÇ©Ãû±£´æÔÚÒ»¸öÎÄ¼şÖĞ
+			byte[] signed = signet.sign(); // å¯¹ä¿¡æ¯çš„æ•°å­—ç­¾å
+			System.out.println("signed(ç­¾åå†…å®¹)=" + byte2hex(signed));
+			// æŠŠä¿¡æ¯å’Œæ•°å­—ç­¾åä¿å­˜åœ¨ä¸€ä¸ªæ–‡ä»¶ä¸­
 			java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(
 					new java.io.FileOutputStream("myinfo.dat"));
 			out.writeObject(myinfo);
 			out.writeObject(signed);
 			out.close();
-			System.out.println("Ç©Ãû²¢Éú³ÉÎÄ¼ş³É¹¦");
+			System.out.println("ç­¾åå¹¶ç”Ÿæˆæ–‡ä»¶æˆåŠŸ");
 		} catch (java.lang.Exception e) {
 			e.printStackTrace();
-			System.out.println("Ç©Ãû²¢Éú³ÉÎÄ¼şÊ§°Ü");
+			System.out.println("ç­¾åå¹¶ç”Ÿæˆæ–‡ä»¶å¤±è´¥");
 		}
 		;
-		// µÚÈı²½
-		// ÆäËûÈËÍ¨¹ı¹«¹²·½Ê½µÃµ½´Ë»§µÄ¹«Ô¿ºÍÎÄ¼ş
-		// ÆäËûÈËÓÃ´Ë»§µÄ¹«Ô¿,¶ÔÎÄ¼ş½øĞĞ¼ì²é,Èç¹û³É¹¦ËµÃ÷ÊÇ´ËÓÃ»§·¢²¼µÄĞÅÏ¢.
+		// ç¬¬ä¸‰æ­¥
+		// å…¶ä»–äººé€šè¿‡å…¬å…±æ–¹å¼å¾—åˆ°æ­¤æˆ·çš„å…¬é’¥å’Œæ–‡ä»¶
+		// å…¶ä»–äººç”¨æ­¤æˆ·çš„å…¬é’¥,å¯¹æ–‡ä»¶è¿›è¡Œæ£€æŸ¥,å¦‚æœæˆåŠŸè¯´æ˜æ˜¯æ­¤ç”¨æˆ·å‘å¸ƒçš„ä¿¡æ¯.
 		//
 		try {
 			java.io.ObjectInputStream in = new java.io.ObjectInputStream(
@@ -75,43 +75,43 @@ public class TestDSA {
 			signetcheck.update(info.getBytes());
 			if (signetcheck.verify(signed)) {
 				System.out.println("info=" + info);
-				System.out.println("Ç©ÃûÕı³£");
+				System.out.println("ç­¾åæ­£å¸¸");
 			} else
-				System.out.println("·ÇÇ©ÃûÕı³£");
+				System.out.println("éç­¾åæ­£å¸¸");
 		} catch (java.lang.Exception e) {
 			e.printStackTrace();
 		}
 		;
 	}
 
-	// Éú³ÉÒ»¶ÔÎÄ¼şmyprikey.datºÍmypubkey.dat---Ë½Ô¿ºÍ¹«Ô¿,
-	// ¹«Ô¿ÒªÓÃ»§·¢ËÍ(ÎÄ¼ş,ÍøÂçµÈ·½·¨)¸øÆäËüÓÃ»§,Ë½Ô¿±£´æÔÚ±¾µØ
+	// ç”Ÿæˆä¸€å¯¹æ–‡ä»¶myprikey.datå’Œmypubkey.dat---ç§é’¥å’Œå…¬é’¥,
+	// å…¬é’¥è¦ç”¨æˆ·å‘é€(æ–‡ä»¶,ç½‘ç»œç­‰æ–¹æ³•)ç»™å…¶å®ƒç”¨æˆ·,ç§é’¥ä¿å­˜åœ¨æœ¬åœ°
 	public boolean generatekey() {
 		try {
 			KeyPairGenerator keygen = java.security.KeyPairGenerator.getInstance("DSA");
 			// SecureRandom secrand=new SecureRandom();
-			// secrand.setSeed("tttt".getBytes()); //³õÊ¼»¯Ëæ»ú²úÉúÆ÷
-			// keygen.initialize(576,secrand); //³õÊ¼»¯ÃÜÔ¿Éú³ÉÆ÷
+			// secrand.setSeed("tttt".getBytes()); //åˆå§‹åŒ–éšæœºäº§ç”Ÿå™¨
+			// keygen.initialize(576,secrand); //åˆå§‹åŒ–å¯†é’¥ç”Ÿæˆå™¨
 			keygen.initialize(512);
 			KeyPair keys = keygen.genKeyPair();
-			// KeyPair keys=keygen.generateKeyPair(); //Éú³ÉÃÜÔ¿×é
+			// KeyPair keys=keygen.generateKeyPair(); //ç”Ÿæˆå¯†é’¥ç»„
 			PublicKey pubkey = keys.getPublic();
 			PrivateKey prikey = keys.getPrivate();
 			ObjectOutputStream out = new ObjectOutputStream(
 					new  FileOutputStream("myprikey.dat"));
 			out.writeObject(prikey);
 			out.close();
-			System.out.println("Ğ´Èë¶ÔÏó prikeys ok");
+			System.out.println("å†™å…¥å¯¹è±¡ prikeys ok");
 			out = new ObjectOutputStream(new FileOutputStream(
 					"mypubkey.dat"));
 			out.writeObject(pubkey);
 			out.close();
-			System.out.println("Ğ´Èë¶ÔÏó pubkeys ok");
-			System.out.println("Éú³ÉÃÜÔ¿¶Ô³É¹¦");
+			System.out.println("å†™å…¥å¯¹è±¡ pubkeys ok");
+			System.out.println("ç”Ÿæˆå¯†é’¥å¯¹æˆåŠŸ");
 			return true;
 		} catch (java.lang.Exception e) {
 			e.printStackTrace();
-			System.out.println("Éú³ÉÃÜÔ¿¶ÔÊ§°Ü");
+			System.out.println("ç”Ÿæˆå¯†é’¥å¯¹å¤±è´¥");
 			return false;
 		}
 	}

@@ -160,9 +160,9 @@ public class GroupChatroomSidePane extends JSplitPane{
 			@Override
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() == 2){
-					//TODO ÅĞ¶ÏËùµã»÷µÄcellµÄÔÚÏß×´Ì¬½øĞĞ¶ÔÓ¦´¦Àí, ÔİÊ±Ö±½Óµ¯³öµ¯³öÁÄÌì´°¿Ú.
+					//TODO åˆ¤æ–­æ‰€ç‚¹å‡»çš„cellçš„åœ¨çº¿çŠ¶æ€è¿›è¡Œå¯¹åº”å¤„ç†, æš‚æ—¶ç›´æ¥å¼¹å‡ºå¼¹å‡ºèŠå¤©çª—å£.
 					/**
-					 * TODO Ó¦¸Ã¶ÔÃ¿Ò»¸ö¶ÔÏóÖ»¿ªÒ»¸ö´°¿Ú, ¿ÉÒÔÉè¶¨±ê¼Ç, Èç¹ûÒÑ¾­´ò¿ªÁËÒ»¸öÔòÏÔÊ¾Ö®, ·ñÔò¿ªĞÂ´°¿Ú
+					 * TODO åº”è¯¥å¯¹æ¯ä¸€ä¸ªå¯¹è±¡åªå¼€ä¸€ä¸ªçª—å£, å¯ä»¥è®¾å®šæ ‡è®°, å¦‚æœå·²ç»æ‰“å¼€äº†ä¸€ä¸ªåˆ™æ˜¾ç¤ºä¹‹, å¦åˆ™å¼€æ–°çª—å£
 					 */
 					listItem = (PeerItem)groupmemerlist.getSelectedValue();
 					GroupChatroomSidePane.this.showPeerChatroom((PeerItem)listItem);
@@ -186,16 +186,16 @@ public class GroupChatroomSidePane extends JSplitPane{
 									+ System.getProperty("file.separator")
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+ "chat.png\"><br>"
-									+"<Font color=black>êÇ³Æ:</Font> <Font color=blue>"
+									+"<Font color=black>æ˜µç§°:</Font> <Font color=blue>"
 									+ listItem.getName()
 									+"<br></Font>"
-									+"<Font color=black>Ç©Ãûµµ:</Font> <Font color=blue>"
+									+"<Font color=black>ç­¾åæ¡£:</Font> <Font color=blue>"
 									+ listItem.getDesc()
 									+"<br></Font>"
-									+"<Font color=black>ÁªÏµ·½Ê½:</Font> <Font color=blue>"
+									+"<Font color=black>è”ç³»æ–¹å¼:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font>"
-									+"<Font color=black>¸öÈËËµÃ÷:</Font> <Font color=blue>"
+									+"<Font color=black>ä¸ªäººè¯´æ˜:</Font> <Font color=blue>"
 									+ listItem.getName() + " owns me so much MONEY!! "
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
@@ -206,7 +206,7 @@ public class GroupChatroomSidePane extends JSplitPane{
 						els[i].getComponent().setBackground(Color.WHITE);
 					friendOprMenu.setLightWeightPopupEnabled(true);
 					friendOprMenu.pack();
-					// Î»ÖÃÓ¦¸ÃÊÇÏà¶ÔÓÚÔ´µÄÎ»ÖÃ
+					// ä½ç½®åº”è¯¥æ˜¯ç›¸å¯¹äºæºçš„ä½ç½®
 					friendOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
 				}
 			}
@@ -238,7 +238,7 @@ public class GroupChatroomSidePane extends JSplitPane{
 		}
 	}
 	/**
-	 * (ÔÚ×é³ÉÔ±ÁĞ±íË«»÷×éÔ±Ê±±»µ÷ÓÃ)µ¯³öÁÄÌì´°¿Ú.
+	 * (åœ¨ç»„æˆå‘˜åˆ—è¡¨åŒå‡»ç»„å‘˜æ—¶è¢«è°ƒç”¨)å¼¹å‡ºèŠå¤©çª—å£.
 	 * @param listItem
 	 */
 	private void showPeerChatroom(PeerItem listItem) {
@@ -247,7 +247,7 @@ public class GroupChatroomSidePane extends JSplitPane{
 		if(handler != null){
 			handler.showChatroom();
 		}else{
-			//²»´æÔÚ¶ÔÓ¦µÄhandler, ĞèÒªÁ¬½ÓÈ»ºó×¢²áhandler
+			//ä¸å­˜åœ¨å¯¹åº”çš„handler, éœ€è¦è¿æ¥ç„¶åæ³¨å†Œhandler
 			try {
 				handler = new PeerConnectionHandler(listItem, true);
 			} catch (Exception e) {

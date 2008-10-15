@@ -1,6 +1,6 @@
 /**
  *  ConfigCenterFrame.java
- *  ÉèÖÃÖĞĞÄ´°¿Ú.
+ *  è®¾ç½®ä¸­å¿ƒçª—å£.
  *  
  *  by DaiZW
  *  2008.04.24
@@ -40,9 +40,9 @@ import nox.ui.common.SystemPath;
 import nox.xml.NoxPeerStatusUnit;
 
 /**
- * ÉèÖÃÖĞĞÄ´°¿Ú. ÔÚÕâÀï¿ÉÒÔÉèÖÃ¸öÈË¼°ÏµÍ³µÄ¸÷Ïî²ÎÊı: ÀıÈç: ¸öÈËÉèÖÃ: êÇ³Æ; Ç©Ãûµµ; ¸öÈË×ÊÁÏ; Í·Ïñ; Éí·İÑéÖ¤; ÆäËü. ÏµÍ³ÉèÖÃ:
- * ´úÀí·şÎñÆ÷; Êı¾İ±£´æÎÄ¼ş¼Ğ; ĞŞ¸ÄÃÜÂë; ×Ô¶¯µÇÂ¼; ÒşÉíµÇÂ¼; ÆäËü. (ÓĞĞ©Ï¸½Ú¿ÉÒÔÒÔºóÊµÏÖ)
- * Æô¶¯ºóÒş²Ø½çÃæ,±£³ÖÔÚ×î¶¥¶Ë.
+ * è®¾ç½®ä¸­å¿ƒçª—å£. åœ¨è¿™é‡Œå¯ä»¥è®¾ç½®ä¸ªäººåŠç³»ç»Ÿçš„å„é¡¹å‚æ•°: ä¾‹å¦‚: ä¸ªäººè®¾ç½®: æ˜µç§°; ç­¾åæ¡£; ä¸ªäººèµ„æ–™; å¤´åƒ; èº«ä»½éªŒè¯; å…¶å®ƒ. ç³»ç»Ÿè®¾ç½®:
+ * ä»£ç†æœåŠ¡å™¨; æ•°æ®ä¿å­˜æ–‡ä»¶å¤¹; ä¿®æ”¹å¯†ç ; è‡ªåŠ¨ç™»å½•; éšèº«ç™»å½•; å…¶å®ƒ. (æœ‰äº›ç»†èŠ‚å¯ä»¥ä»¥åå®ç°)
+ * å¯åŠ¨åéšè—ç•Œé¢,ä¿æŒåœ¨æœ€é¡¶ç«¯.
  * 
  * @author shinysky
  */
@@ -58,10 +58,10 @@ public class ConfigCenterFrame extends NoxFrame {
 	public static int MenuItemHeight = 20;
 
 	JPanel menuPane;
-	JButton personalConfigSideBtn = new JButton("¸öÈËÉèÖÃ");
+	JButton personalConfigSideBtn = new JButton("ä¸ªäººè®¾ç½®");
 	JPanel perConfigSidePane = new JPanel();
 	JScrollPane perConfigSideScrPane;
-	JButton systemConfigSideBtn = new JButton("ÏµÍ³ÉèÖÃ");
+	JButton systemConfigSideBtn = new JButton("ç³»ç»Ÿè®¾ç½®");
 	JPanel sysConfigSidePane = new JPanel();
 	JScrollPane sysConfigSideScrPane;
 
@@ -77,7 +77,7 @@ public class ConfigCenterFrame extends NoxFrame {
 				SystemPath.ICONS_RESOURCE_PATH + "config_20.png",
 				SystemPath.ICONS_RESOURCE_PATH + "config_48.png", "NoX Configuration Center", false);
 		/**
-		 * TODO: ¾¡¹ÜsuperÉèÎªfalse, ¹Ø±Õ°´Å¥»¹ÊÇ¿ÉÒÔexit, ÈÃÎÒºÜ²ïÒì, ÏÈ²»¹ÜÕâ¸ö
+		 * TODO: å°½ç®¡superè®¾ä¸ºfalse, å…³é—­æŒ‰é’®è¿˜æ˜¯å¯ä»¥exit, è®©æˆ‘å¾ˆè¯§å¼‚, å…ˆä¸ç®¡è¿™ä¸ª
 		 */
 		parent = prt;
 
@@ -92,18 +92,18 @@ public class ConfigCenterFrame extends NoxFrame {
 		systemConfigSideBtn.setMinimumSize(btnsize);
 
 		/**
-		 * ¸öÈËÉèÖÃÁĞ±í
+		 * ä¸ªäººè®¾ç½®åˆ—è¡¨
 		 */
-		String[] pclistItems = { "  ¸öÈË×ÊÁÏ", "  ÁªÏµ·½Ê½", "  Éí·İÑéÖ¤", "  What!",
+		String[] pclistItems = { "  ä¸ªäººèµ„æ–™", "  è”ç³»æ–¹å¼", "  èº«ä»½éªŒè¯", "  What!",
 				"  dfa", "  fdas" };
 
 		JList pclist = new JList(pclistItems);
 
 		/**
-		 * ÏµÍ³ÉèÖÃÁĞ±í
+		 * ç³»ç»Ÿè®¾ç½®åˆ—è¡¨
 		 */
-		String[] sclistItems = { "  »ù±¾ÉèÖÃ", "  µÇÂ¼ÉèÖÃ", "  ´úÀíÉèÖÃ", "  °²È«ÉèÖÃ",
-				"  Íâ¹ÛÉèÖÃ", "  fda" };
+		String[] sclistItems = { "  åŸºæœ¬è®¾ç½®", "  ç™»å½•è®¾ç½®", "  ä»£ç†è®¾ç½®", "  å®‰å…¨è®¾ç½®",
+				"  å¤–è§‚è®¾ç½®", "  fda" };
 
 		JList sclist = new JList(sclistItems);
 
@@ -114,7 +114,7 @@ public class ConfigCenterFrame extends NoxFrame {
 		sclist.setFixedCellHeight(MenuItemHeight);
 
 		/**
-		 * µ¥Ñ¡Ä£Ê½
+		 * å•é€‰æ¨¡å¼
 		 */
 		pclist.getSelectionModel().setSelectionMode(
 				ListSelectionModel.SINGLE_SELECTION);
@@ -180,7 +180,7 @@ public class ConfigCenterFrame extends NoxFrame {
 		menuPane.add(sysConfigSidePane);
 		menuPane.add(Box.createVerticalGlue());
 		menuPane.setBackground(Color.WHITE);
-		sysConfigSidePane.setVisible(false);// Ä¬ÈÏ³õÊ¼Ö»ÓĞperConfigPane¿É¼û
+		sysConfigSidePane.setVisible(false);// é»˜è®¤åˆå§‹åªæœ‰perConfigPaneå¯è§
 
 		Dimension size = new Dimension(WIDTH, HEIGHT);
 
@@ -249,14 +249,14 @@ public class ConfigCenterFrame extends NoxFrame {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		//System.setProperty("sun.java2d.noddraw", "true");// Îª°ëÍ¸Ã÷×ö×¼±¸
+		//System.setProperty("sun.java2d.noddraw", "true");// ä¸ºåŠé€æ˜åšå‡†å¤‡
 		ConfigCenterFrame ccf = new ConfigCenterFrame(null);
 		ccf.setVisible(true);
 	}
 }
 
 /**
- * ¸öÈË»ù±¾ÉèÖÃJPanel
+ * ä¸ªäººåŸºæœ¬è®¾ç½®JPanel
  * @author shinysky
  * @Fixme
  */
@@ -313,7 +313,7 @@ class PersonalBasicConfigPane extends JPanel implements ActionListener {
 					}
 				};
 				chooser.setFileFilter(filter);
-				chooser.setDialogTitle("ÇëÑ¡ÔñÍ·ÏñÍ¼Æ¬(½¨Òé³ß´ç´óĞ¡Îª40x40)");
+				chooser.setDialogTitle("è¯·é€‰æ‹©å¤´åƒå›¾ç‰‡(å»ºè®®å°ºå¯¸å¤§å°ä¸º40x40)");
 				int returnVal = chooser.showOpenDialog(null);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					// getJtf_pic().setText(chooser.getSelectedFile().getPath());
@@ -373,7 +373,7 @@ class PersonalBasicConfigPane extends JPanel implements ActionListener {
 }
 
 /**
- * ÏµÍ³»ù±¾ÉèÖÃJPanel
+ * ç³»ç»ŸåŸºæœ¬è®¾ç½®JPanel
  * @author shinysky
  *
  */
@@ -382,13 +382,13 @@ class SysBasicConfigPane extends JPanel implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JRadioButton java, system;// JAVA½çÃæ,ÏµÍ³½çÃæ
+	private JRadioButton java, system;// JAVAç•Œé¢,ç³»ç»Ÿç•Œé¢
 	Cheyenne parent;
 	SysBasicConfigPane(Cheyenne prt) {
 		parent = prt;
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		this.add(java = new JRadioButton("javaÖ÷Ìâ", true));
-		this.add(system = new JRadioButton("ÏµÍ³Ö÷Ìâ"));
+		this.add(java = new JRadioButton("javaä¸»é¢˜", true));
+		this.add(system = new JRadioButton("ç³»ç»Ÿä¸»é¢˜"));
 		ButtonGroup bg=new ButtonGroup();
         bg.add(java);
         bg.add(system);

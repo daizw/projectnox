@@ -1,8 +1,8 @@
 package nox.xml;
 
 /**
- * ��Ϣ��ǩ����</p>
- * ��Ϣ��һ���ʽΪ:<br>
+ * 消息标签常量</p>
+ * 消息的一般格式为:<br>
  * <code>
  * &ltnamespace><br>
  * &ltsender/><br>
@@ -14,11 +14,11 @@ package nox.xml;
  * &ltparam/><br>
  * &lt/namespace><br>
  * </code></p>
- * ����:<br>
+ * 其中:<br>
  * <ol>
- * <li>��Ϣ���岿����<b>&ltdata/></b>, ��������ȡ����&ltnamespace>��ֵ.</li>
- * <li>&ltparam/>�ǿ�ѡ��, �����ݵ��Ǽ���(DES/CBC)��Ϣʱ���Ǳ�Ҫ��.
- * �����Ϣ�в�����Ԫ��, ����֮Ϊδ������Ϣ.</li>
+ * <li>消息主体部分是<b>&ltdata/></b>, 数据类型取决于&ltnamespace>的值.</li>
+ * <li>&ltparam/>是可选的, 当传递的是加密(DES/CBC)消息时才是必要的.
+ * 如果消息中不含此元素, 则视之为未加密消息.</li>
  * </ol><br>
  * @author shinysky
  *

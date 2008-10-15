@@ -99,7 +99,7 @@ public class ListsPane extends JTabbedPane {
 		frdlistpane.add(blkListScrPane);
 		
 		/**
-		 * ³õÊ¼²»¿É¼û
+		 * åˆå§‹ä¸å¯è§
 		 */
 		blist.getFilterField().setVisible(false);
 		blkListScrPane.setVisible(false);
@@ -149,9 +149,9 @@ public class ListsPane extends JTabbedPane {
 			@Override
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() == 2){
-					//TODO ÅĞ¶ÏËùµã»÷µÄcellµÄÔÚÏß×´Ì¬½øĞĞ¶ÔÓ¦´¦Àí, ÔİÊ±Ö±½Óµ¯³öµ¯³öÁÄÌì´°¿Ú.
+					//TODO åˆ¤æ–­æ‰€ç‚¹å‡»çš„cellçš„åœ¨çº¿çŠ¶æ€è¿›è¡Œå¯¹åº”å¤„ç†, æš‚æ—¶ç›´æ¥å¼¹å‡ºå¼¹å‡ºèŠå¤©çª—å£.
 					/**
-					 * TODO Ó¦¸Ã¶ÔÃ¿Ò»¸ö¶ÔÏóÖ»¿ªÒ»¸ö´°¿Ú, ¿ÉÒÔÉè¶¨±ê¼Ç, Èç¹ûÒÑ¾­´ò¿ªÁËÒ»¸öÔòÏÔÊ¾Ö®, ·ñÔò¿ªĞÂ´°¿Ú
+					 * TODO åº”è¯¥å¯¹æ¯ä¸€ä¸ªå¯¹è±¡åªå¼€ä¸€ä¸ªçª—å£, å¯ä»¥è®¾å®šæ ‡è®°, å¦‚æœå·²ç»æ‰“å¼€äº†ä¸€ä¸ªåˆ™æ˜¾ç¤ºä¹‹, å¦åˆ™å¼€æ–°çª—å£
 					 */
 					listItem = (PeerItem)flist.getSelectedValue();
 					ListsPane.this.showPeerChatroom((PeerItem)listItem);
@@ -175,16 +175,16 @@ public class ListsPane extends JTabbedPane {
 									+ System.getProperty("file.separator")
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+ "chat.png\"><br>"
-									+"<Font color=black>êÇ³Æ:</Font> <Font color=blue>"
+									+"<Font color=black>æ˜µç§°:</Font> <Font color=blue>"
 									+ listItem.getName()
 									+"<br></Font>"
-									+"<Font color=black>Ç©Ãûµµ:</Font> <Font color=blue>"
+									+"<Font color=black>ç­¾åæ¡£:</Font> <Font color=blue>"
 									+ listItem.getDesc()
 									+"<br></Font>"
-									+"<Font color=black>ÁªÏµ·½Ê½:</Font> <Font color=blue>"
+									+"<Font color=black>è”ç³»æ–¹å¼:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font>"
-									+"<Font color=black>¸öÈËËµÃ÷:</Font> <Font color=blue>"
+									+"<Font color=black>ä¸ªäººè¯´æ˜:</Font> <Font color=blue>"
 									+ listItem.getName() + " owns me so much MONEY!! "
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
@@ -222,7 +222,7 @@ public class ListsPane extends JTabbedPane {
 						els[i].getComponent().setBackground(Color.WHITE);
 					friendOprMenu.setLightWeightPopupEnabled(true);
 					friendOprMenu.pack();
-					// Î»ÖÃÓ¦¸ÃÊÇÏà¶ÔÓÚÔ´µÄÎ»ÖÃ
+					// ä½ç½®åº”è¯¥æ˜¯ç›¸å¯¹äºæºçš„ä½ç½®
 					friendOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
 				}
 			}
@@ -253,16 +253,16 @@ public class ListsPane extends JTabbedPane {
 							+ System.getProperty("file.separator")
 							+ SystemPath.PORTRAIT_RESOURCE_PATH
 							+ "chat.png\"><br>"
-							+"<Font color=black>êÇ³Æ:</Font> <Font color=blue>"
+							+"<Font color=black>æ˜µç§°:</Font> <Font color=blue>"
 							+ listItem.getName()
 							+"<br></Font>"
-							+"<Font color=black>Ç©Ãûµµ:</Font> <Font color=blue>"
+							+"<Font color=black>ç­¾åæ¡£:</Font> <Font color=blue>"
 							+ listItem.getDesc()
 							+"<br></Font>"
-							+"<Font color=black>ÁªÏµ·½Ê½:</Font> <Font color=blue>"
+							+"<Font color=black>è”ç³»æ–¹å¼:</Font> <Font color=blue>"
 							+ "110, 119, 120, 114, 117"
 							+"<br></Font>"
-							+"<Font color=black>¸öÈËËµÃ÷:</Font> <Font color=blue>"
+							+"<Font color=black>ä¸ªäººè¯´æ˜:</Font> <Font color=blue>"
 							+ listItem.getName() + " owns me so much MONEY!! "
 							+"<br></Font></BODY></html>",
 							"User Information", JOptionPane.INFORMATION_MESSAGE);
@@ -280,16 +280,16 @@ public class ListsPane extends JTabbedPane {
 									+ System.getProperty("file.separator")
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+ "chat.png\"><br>"
-									+"<Font color=black>êÇ³Æ:</Font> <Font color=blue>"
+									+"<Font color=black>æ˜µç§°:</Font> <Font color=blue>"
 									+ listItem.getName()
 									+"<br></Font>"
-									+"<Font color=black>Ç©Ãûµµ:</Font> <Font color=blue>"
+									+"<Font color=black>ç­¾åæ¡£:</Font> <Font color=blue>"
 									+ listItem.getDesc()
 									+"<br></Font>"
-									+"<Font color=black>ÁªÏµ·½Ê½:</Font> <Font color=blue>"
+									+"<Font color=black>è”ç³»æ–¹å¼:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font>"
-									+"<Font color=black>¸öÈËËµÃ÷:</Font> <Font color=blue>"
+									+"<Font color=black>ä¸ªäººè¯´æ˜:</Font> <Font color=blue>"
 									+ listItem.getName() + " owns me so much MONEY!! "
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
@@ -324,7 +324,7 @@ public class ListsPane extends JTabbedPane {
 						els[i].getComponent().setBackground(Color.WHITE);
 					blacklistOprMenu.setLightWeightPopupEnabled(true);
 					blacklistOprMenu.pack();
-					// Î»ÖÃÓ¦¸ÃÊÇÏà¶ÔÓÚÔ´µÄÎ»ÖÃ
+					// ä½ç½®åº”è¯¥æ˜¯ç›¸å¯¹äºæºçš„ä½ç½®
 					blacklistOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
 				}
 			}
@@ -351,13 +351,13 @@ public class ListsPane extends JTabbedPane {
 			@Override
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() == 2){
-					//TODO ÅĞ¶ÏËùµã»÷µÄcellµÄÔÚÏß×´Ì¬½øĞĞ¶ÔÓ¦´¦Àí, ÔİÊ±Ö±½Óµ¯³öµ¯³öÁÄÌì´°¿Ú.
+					//TODO åˆ¤æ–­æ‰€ç‚¹å‡»çš„cellçš„åœ¨çº¿çŠ¶æ€è¿›è¡Œå¯¹åº”å¤„ç†, æš‚æ—¶ç›´æ¥å¼¹å‡ºå¼¹å‡ºèŠå¤©çª—å£.
 					listItem = (GroupItem)(glist.getSelectedValue());
 					ListsPane.this.showGroupChatroom((GroupItem)listItem);
 				}else if(me.getButton() == MouseEvent.BUTTON3){
 					final JPopupMenu groupOprMenu = new JPopupMenu();
 					/*
-					 * ÔõÃ´ÊµÏÖÓÒ¼ü¿ÉÑ¡È¡JListItem?
+					 * æ€ä¹ˆå®ç°å³é”®å¯é€‰å–JListItem?
 					 */
 					listItem = (GroupItem)glist.getSelectedValue();
 					//System.out.println(flist.getComponentAt(me.getPoint()).toString());
@@ -379,13 +379,13 @@ public class ListsPane extends JTabbedPane {
 									+ System.getProperty("file.separator")
 									+ SystemPath.PORTRAIT_RESOURCE_PATH
 									+"chat.png\"><br>"
-									+"<Font color=black>×éÃû:</Font> <Font color=blue>"
+									+"<Font color=black>ç»„å:</Font> <Font color=blue>"
 									+ listItem.getName()
 									+"<br></Font>"
-									+"<Font color=black>¹«¸æ:</Font> <Font color=blue>"
+									+"<Font color=black>å…¬å‘Š:</Font> <Font color=blue>"
 									+ listItem.getDesc()
 									+"<br></Font>"
-									+"<Font color=black>³ÉÔ±ÊıÁ¿:</Font> <Font color=blue>"
+									+"<Font color=black>æˆå‘˜æ•°é‡:</Font> <Font color=blue>"
 									+ "110, 119, 120, 114, 117"
 									+"<br></Font></BODY></html>",
 									"User Information", JOptionPane.INFORMATION_MESSAGE);
@@ -396,7 +396,7 @@ public class ListsPane extends JTabbedPane {
 							int index = glist.getSelectedIndex();
 							GroupItem group = (GroupItem)glist.deleteItem(index);
 							ListsPane.this.repaint();
-							//É¾³ıÈÏÖ¤Êé, É¾³ıChatroom, É¾³ı¹ÜµÀ¼àÌıÆ÷.
+							//åˆ é™¤è®¤è¯ä¹¦, åˆ é™¤Chatroom, åˆ é™¤ç®¡é“ç›‘å¬å™¨.
 							NoxToolkit.resignGroup((PeerGroupID) group.getUUID());
 						}
 					});
@@ -405,7 +405,7 @@ public class ListsPane extends JTabbedPane {
 						els[i].getComponent().setBackground(Color.WHITE);
 					groupOprMenu.setLightWeightPopupEnabled(true);
 					groupOprMenu.pack();
-					// Î»ÖÃÓ¦¸ÃÊÇÏà¶ÔÓÚÔ´µÄÎ»ÖÃ
+					// ä½ç½®åº”è¯¥æ˜¯ç›¸å¯¹äºæºçš„ä½ç½®
 					groupOprMenu.show((Component) me.getSource(), me.getPoint().x, me.getPoint().y);
 				}
 			}
@@ -425,8 +425,8 @@ public class ListsPane extends JTabbedPane {
 		blklistpane.add(blist.getFilterField(), BorderLayout.NORTH);*/
 
 		this.setTabPlacement(JTabbedPane.LEFT);
-		this.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);// ¹ö¶¯±êÇ©(Ò»ĞĞ)
-		// tabs.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);//¶àĞĞ±êÇ©
+		this.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);// æ»šåŠ¨æ ‡ç­¾(ä¸€è¡Œ)
+		// tabs.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);//å¤šè¡Œæ ‡ç­¾
 		this.setBackground(Color.BLACK);
 		this.setForeground(Color.WHITE);
 
@@ -439,7 +439,7 @@ public class ListsPane extends JTabbedPane {
 			@Override
 			public void stateChanged(ChangeEvent ce) {
 				int temp = ListsPane.this.getSelectedIndex();
-				//Èç¹ûÑ¡ÔñµÄ±êÇ©ÊÇºÃÓÑÁĞ±í»ò×éÁĞ±í£¬Ôò¸üĞÂÑ¡ÖĞ±êÇ©Ë÷Òı¡£
+				//å¦‚æœé€‰æ‹©çš„æ ‡ç­¾æ˜¯å¥½å‹åˆ—è¡¨æˆ–ç»„åˆ—è¡¨ï¼Œåˆ™æ›´æ–°é€‰ä¸­æ ‡ç­¾ç´¢å¼•ã€‚
 				if(temp < 2)
 					selectedIndex = temp;
 				//System.out.println("selectedIndex" + selectedIndex);
@@ -510,7 +510,7 @@ public class ListsPane extends JTabbedPane {
 		this.setOpaque(false);
 	}
 	/**
-	 * ·µ»ØTooltipTxtµÄhtmlĞÎÊ½
+	 * è¿”å›TooltipTxtçš„htmlå½¢å¼
 	 * @param text
 	 * @return
 	 */
@@ -518,7 +518,7 @@ public class ListsPane extends JTabbedPane {
 		return ("<html><BODY bgColor=#ffffff><Font color=black>" + text + "</Font></BODY></html>");
 	}
 	/**
-	 * (ÔÚÖ÷½çÃæË«»÷ºÃÓÑ»òÕß×éÊ±±»µ÷ÓÃ)µ¯³öÁÄÌì´°¿Ú.
+	 * (åœ¨ä¸»ç•Œé¢åŒå‡»å¥½å‹æˆ–è€…ç»„æ—¶è¢«è°ƒç”¨)å¼¹å‡ºèŠå¤©çª—å£.
 	 * @param listItem
 	 */
 	private void showPeerChatroom(PeerItem listItem) {
@@ -527,7 +527,7 @@ public class ListsPane extends JTabbedPane {
 		if(handler != null){
 			handler.showChatroom();
 		}else{
-			//²»´æÔÚ¶ÔÓ¦µÄhandler, ĞèÒªÁ¬½ÓÈ»ºó×¢²áhandler
+			//ä¸å­˜åœ¨å¯¹åº”çš„handler, éœ€è¦è¿æ¥ç„¶åæ³¨å†Œhandler
 			try {
 				handler = new PeerConnectionHandler(listItem, true);
 			} catch (Exception e) {
@@ -536,7 +536,7 @@ public class ListsPane extends JTabbedPane {
 		}
 	}
 	/**
-	 * ÒòÎª×éÁÄÌìÊÒµÄ¹ÜµÀÊµ¼ÊÉÏ¶¼ÊÇ×¢²á¹ıµÄ, ËùÒÔ´¦Àí·½·¨Ó¦¸Ã¸úË½ÁÄÓĞËù²»Í¬!
+	 * å› ä¸ºç»„èŠå¤©å®¤çš„ç®¡é“å®é™…ä¸Šéƒ½æ˜¯æ³¨å†Œè¿‡çš„, æ‰€ä»¥å¤„ç†æ–¹æ³•åº”è¯¥è·Ÿç§èŠæœ‰æ‰€ä¸åŒ!
 	 * 
 	 * @param listItem
 	 */
@@ -554,8 +554,8 @@ public class ListsPane extends JTabbedPane {
 		handler.showChatroom();
 	}
 	/**
-	 * ÇĞ»»ÁĞ±íÊ±²¥·ÅÌáÊ¾Òô
-	 * ....Ä³Ğ©ÒôÆµÎÄ¼ş»á½µµÍËÙ¶È
+	 * åˆ‡æ¢åˆ—è¡¨æ—¶æ’­æ”¾æç¤ºéŸ³
+	 * ....æŸäº›éŸ³é¢‘æ–‡ä»¶ä¼šé™ä½é€Ÿåº¦
 	 */
 	public void playAudio() {
 		AudioClip playsound;

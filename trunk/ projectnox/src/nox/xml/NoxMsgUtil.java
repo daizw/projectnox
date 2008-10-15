@@ -20,16 +20,16 @@ import net.jxta.endpoint.StringMessageElement;
 
 public class NoxMsgUtil {
 	/**
-	 * ¸ù¾İËù¸ø²ÎÊıÉú³ÉÏûÏ¢
-	 * @param namespace ÏûÏ¢namespace, ±íÃ÷ÏûÏ¢ÀàĞÍ
+	 * æ ¹æ®æ‰€ç»™å‚æ•°ç”Ÿæˆæ¶ˆæ¯
+	 * @param namespace æ¶ˆæ¯namespace, è¡¨æ˜æ¶ˆæ¯ç±»å‹
 	 * @param sender
 	 * @param senderID
 	 * @param receiver
 	 * @param receiverID
-	 * @param dataEleName ÏûÏ¢Ö÷ÌåÔªËØÃû
-	 * @param data ÏûÏ¢Ö÷ÌåÊı¾İ
-	 * @param param ¼ÓÃÜËùÓÃ²ÎÊı
-	 * @return Éú³ÉµÄÏûÏ¢
+	 * @param dataEleName æ¶ˆæ¯ä¸»ä½“å…ƒç´ å
+	 * @param data æ¶ˆæ¯ä¸»ä½“æ•°æ®
+	 * @param param åŠ å¯†æ‰€ç”¨å‚æ•°
+	 * @return ç”Ÿæˆçš„æ¶ˆæ¯
 	 */
 	public static Message generateMsg(String namespace,
 			String sender, String senderID,
@@ -76,16 +76,16 @@ public class NoxMsgUtil {
 		return msg;
 	}
 	/**
-	 * ¸ù¾İËù¸ø²ÎÊıÉú³ÉÏûÏ¢
-	 * @param namespace ÏûÏ¢namespace, ±íÃ÷ÏûÏ¢ÀàĞÍ
+	 * æ ¹æ®æ‰€ç»™å‚æ•°ç”Ÿæˆæ¶ˆæ¯
+	 * @param namespace æ¶ˆæ¯namespace, è¡¨æ˜æ¶ˆæ¯ç±»å‹
 	 * @param sender
 	 * @param senderID
 	 * @param receiver
 	 * @param receiverID
 	 * @param time
-	 * @param dataEleName ÏûÏ¢Ö÷ÌåÔªËØÃû
-	 * @param data ÏûÏ¢Ö÷ÌåÊı¾İ
-	 * @return Éú³ÉµÄÏûÏ¢
+	 * @param dataEleName æ¶ˆæ¯ä¸»ä½“å…ƒç´ å
+	 * @param data æ¶ˆæ¯ä¸»ä½“æ•°æ®
+	 * @return ç”Ÿæˆçš„æ¶ˆæ¯
 	 */
 	public static Message generateMsg(String namespace,
 			String sender, String senderID,
@@ -112,7 +112,7 @@ public class NoxMsgUtil {
         // to ensure that file is not larger than Integer.MAX_VALUE.
         if (length > Integer.MAX_VALUE) {
             // File is too large
-        	System.out.println("ÎÄ¼ş³ß´ç¹ı´ó, È¡Ïû...");
+        	System.out.println("æ–‡ä»¶å°ºå¯¸è¿‡å¤§, å–æ¶ˆ...");
         	return null;
         }
         // Create the byte array to hold the data
@@ -134,9 +134,9 @@ public class NoxMsgUtil {
     }
 
     /**
-     * °Ñ×Ö½ÚÊı×é±£´æÎªÒ»¸öÎÄ¼ş
+     * æŠŠå­—èŠ‚æ•°ç»„ä¿å­˜ä¸ºä¸€ä¸ªæ–‡ä»¶
      * @Author Sean.guo
-     * @EditTime 2007-8-13 ÉÏÎç11:45:56
+     * @EditTime 2007-8-13 ä¸Šåˆ11:45:56
      * @ReEditBy shinysky
      */
     public static File getFileFromBytes(byte[] bytes, String outputFile) {
@@ -161,9 +161,9 @@ public class NoxMsgUtil {
         return file;
     }
     /**
-     * ´Ó×Ö½ÚÊı×é»ñÈ¡¶ÔÏó
+     * ä»å­—èŠ‚æ•°ç»„è·å–å¯¹è±¡
      * @Author Sean.guo
-     * @EditTime 2007-8-13 ÉÏÎç11:46:34
+     * @EditTime 2007-8-13 ä¸Šåˆ11:46:34
      * @ReEditBy shinysky
      */
     public static Object getObjectFromBytes(byte[] objBytes) throws Exception {
@@ -176,9 +176,9 @@ public class NoxMsgUtil {
     }
 
     /**
-     * ´Ó¶ÔÏó»ñÈ¡Ò»¸ö×Ö½ÚÊı×é
+     * ä»å¯¹è±¡è·å–ä¸€ä¸ªå­—èŠ‚æ•°ç»„
      * @Author Sean.guo
-     * @EditTime 2007-8-13 ÉÏÎç11:46:56
+     * @EditTime 2007-8-13 ä¸Šåˆ11:46:56
      * @ReEditBy shinysky
      */
     public static byte[] getBytesFromObject(Serializable obj) throws Exception {

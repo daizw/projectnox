@@ -70,7 +70,7 @@ public class Cheyenne extends NoxFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
-	 * Ä¬ÈÏ³ß´ç³£Á¿
+	 * é»˜è®¤å°ºå¯¸å¸¸é‡
 	 */
 	public static final int WIDTH_DEFLT = 300;
 	public static final int WIDTH_PREF = 300;
@@ -83,28 +83,28 @@ public class Cheyenne extends NoxFrame {
 	
 	public static final int InterStatusCheckingsSleepTime = 10 * 1000;
 	/**
-	 * ¸÷JPanel
+	 * å„JPanel
 	 */
 	private MiniProfilePane profile;
 	private ListsPane tabs;
 	
 	Connection sqlconn;
 	/**
-	 * ºÃÓÑÁĞ±í/×éÁĞ±í/ºÚÃûµ¥
+	 * å¥½å‹åˆ—è¡¨/ç»„åˆ—è¡¨/é»‘åå•
 	 */
 	ObjectList friendlist, grouplist, blacklist;
 
 	
 	/**
-	 * ¸öÈË/ÏµÍ³ÉèÖÃ´°¿Ú
+	 * ä¸ªäºº/ç³»ç»Ÿè®¾ç½®çª—å£
 	 */
 	ConfigCenterFrame ccf;
 	/**
-	 * ËÑË÷´°¿Ú
+	 * æœç´¢çª—å£
 	 */
 	SearchingFrame sfrm = new SearchingFrame(Cheyenne.this);
 	/**
-	 * ÂÖÁ÷pingËùÓĞºÃÓÑ»ñÈ¡Æä×´Ì¬ĞÅÏ¢
+	 * è½®æµpingæ‰€æœ‰å¥½å‹è·å–å…¶çŠ¶æ€ä¿¡æ¯
 	 */
 	Thread peersStatusChecker;
 	/**
@@ -163,7 +163,7 @@ public class Cheyenne extends NoxFrame {
 		addGroupListenerThread.start();
 	}
 	/**
-	 * ³õÊ¼»¯¸öÈËÉèÖÃ
+	 * åˆå§‹åŒ–ä¸ªäººè®¾ç½®
 	 * @param conn
 	 * @param meSqltableName
 	 */
@@ -208,7 +208,7 @@ public class Cheyenne extends NoxFrame {
 			e.printStackTrace();
 		}
 		/**
-		 * mini profile ×é¼ş º¬: Í·Ïñ, êÇ³Æ, ×´Ì¬, Ç©Ãû
+		 * mini profile ç»„ä»¶ å«: å¤´åƒ, æ˜µç§°, çŠ¶æ€, ç­¾å
 		 */
 		profile = new MiniProfilePane(this, portrait, nick, sign);
 		// profile.setBackground(new Color(0, 255, 0));
@@ -230,7 +230,7 @@ public class Cheyenne extends NoxFrame {
 			Statement stmt = sqlconn.createStatement();
 			stmt.execute("delete from "+
 					DBTableName.ME_SQLTABLE_NAME + " where Tag = '" + DBTableName.MYPORTRAIT_TAG_NAME + "'");
-			//Ìí¼Óµ½Êı¾İ¿â
+			//æ·»åŠ åˆ°æ•°æ®åº“
 			PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
 					DBTableName.ME_SQLTABLE_NAME + " values (?, ?)");
 			pstmt.setString(1, DBTableName.MYPORTRAIT_TAG_NAME);
@@ -255,7 +255,7 @@ public class Cheyenne extends NoxFrame {
 			Statement stmt = sqlconn.createStatement();
 			stmt.execute("delete from "+
 					DBTableName.ME_SQLTABLE_NAME + " where Tag = '" + DBTableName.MYNICKNAME_TAG_NAME + "'");
-			//Ìí¼Óµ½Êı¾İ¿â
+			//æ·»åŠ åˆ°æ•°æ®åº“
 			PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
 					DBTableName.ME_SQLTABLE_NAME + " values (?, ?)");
 			pstmt.setString(1, DBTableName.MYNICKNAME_TAG_NAME);
@@ -279,7 +279,7 @@ public class Cheyenne extends NoxFrame {
 			Statement stmt = sqlconn.createStatement();
 			stmt.execute("delete from "+
 					DBTableName.ME_SQLTABLE_NAME + " where Tag = '" + DBTableName.MYSIGN_TAG_NAME + "'");
-			//Ìí¼Óµ½Êı¾İ¿â
+			//æ·»åŠ åˆ°æ•°æ®åº“
 			PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
 					DBTableName.ME_SQLTABLE_NAME + " values (?, ?)");
 			pstmt.setString(1, DBTableName.MYSIGN_TAG_NAME);
@@ -323,8 +323,8 @@ public class Cheyenne extends NoxFrame {
 					peer = (PeerItem) fmod.getRealElementAt(index);
 					long curTime = new Date().getTime();
 					if(curTime - peer.getTimeStamp() > LANTimeLimit.OFFLINE_TIMELIMIT){
-						//ÒÑ¾­Ò»·ÖÖÓÃ»ÓĞÊÕµ½¶Ô·½µÄ×´Ì¬ÏûÏ¢ÁË, ÊÓÎªÀëÏß
-						//ÊÊÓÃÓÚ¶Ô·½ÏÈÉÏÏßºóÏÂÏßÕâÖÖÇé¿ö
+						//å·²ç»ä¸€åˆ†é’Ÿæ²¡æœ‰æ”¶åˆ°å¯¹æ–¹çš„çŠ¶æ€æ¶ˆæ¯äº†, è§†ä¸ºç¦»çº¿
+						//é€‚ç”¨äºå¯¹æ–¹å…ˆä¸Šçº¿åä¸‹çº¿è¿™ç§æƒ…å†µ
 						peer.setOnlineStatus(ItemStatus.OFFLINE);
 					}
 					System.out.println("Pinging: " + peer.getName());
@@ -332,8 +332,8 @@ public class Cheyenne extends NoxFrame {
 					if(handler != null){
 						handler.sendPingMsg();
 					}else{
-						//²»´æÔÚ¶ÔÓ¦µÄhandler, ĞèÒªÁ¬½ÓÈ»ºó×¢²áhandler
-						//!!!Í¬²½·½Ê½!!!!!!!!!!!!!!!!!!
+						//ä¸å­˜åœ¨å¯¹åº”çš„handler, éœ€è¦è¿æ¥ç„¶åæ³¨å†Œhandler
+						//!!!åŒæ­¥æ–¹å¼!!!!!!!!!!!!!!!!!!
 						try {
 							handler = new PeerConnectionHandler(peer, false);
 							if(handler.isConnected())
@@ -343,7 +343,7 @@ public class Cheyenne extends NoxFrame {
 						}
 					}
 				}
-				//Ò»ÂÖÂÖÑ¯Ö®ºóĞİÏ¢Ò»¶ÎÊ±¼ä(InterStatusCheckingsSleepTime)
+				//ä¸€è½®è½®è¯¢ä¹‹åä¼‘æ¯ä¸€æ®µæ—¶é—´(InterStatusCheckingsSleepTime)
 				try {
 					Thread.sleep(Cheyenne.InterStatusCheckingsSleepTime);
 				} catch (InterruptedException e) {
@@ -354,8 +354,8 @@ public class Cheyenne extends NoxFrame {
 		}
 	}
 	/**
-	 * ÎªËùÓĞ×éÌí¼Ó¹ÜµÀ¼àÌıÆ÷, ¶ø²»½øĞĞÖØĞÂÈÏÖ¤.
-	 * Ò»ÂÖÌí¼Óºó
+	 * ä¸ºæ‰€æœ‰ç»„æ·»åŠ ç®¡é“ç›‘å¬å™¨, è€Œä¸è¿›è¡Œé‡æ–°è®¤è¯.
+	 * ä¸€è½®æ·»åŠ å
 	 */
 	private void initGroupListenerWithoutReauthenticating(){
 		System.out.println("Begining initGroupListenerWithoutReauthenticating()");
@@ -364,13 +364,13 @@ public class Cheyenne extends NoxFrame {
 		
 		GroupItem group;
 		GroupConnectionHandler handler;
-		//ÊÇ·ñÈ«²¿Ìí¼Ó³É¹¦
+		//æ˜¯å¦å…¨éƒ¨æ·»åŠ æˆåŠŸ
 		boolean finished = false;
 		
 		while(!finished){
-			//±êÖ¾Î», Èç¹ûÓĞ¸ö×é²»´æÔÚ¼àÌıÆ÷, ÔòÉèÎªfalse, ÒÔ½øĞĞÏÂÒ»ÂÖÑ­»·.
-			//Èç¹û¾­¹ıÒ»ÂÖÑ­»·, ·¢ÏÖËùÓĞ×é¶¼ÓĞ¼àÌıÆ÷, Ôò¸ÃÖµ²»»á±»ĞŞ¸Ä.
-			//´Ó¶øÌø³öÑ­»·
+			//æ ‡å¿—ä½, å¦‚æœæœ‰ä¸ªç»„ä¸å­˜åœ¨ç›‘å¬å™¨, åˆ™è®¾ä¸ºfalse, ä»¥è¿›è¡Œä¸‹ä¸€è½®å¾ªç¯.
+			//å¦‚æœç»è¿‡ä¸€è½®å¾ªç¯, å‘ç°æ‰€æœ‰ç»„éƒ½æœ‰ç›‘å¬å™¨, åˆ™è¯¥å€¼ä¸ä¼šè¢«ä¿®æ”¹.
+			//ä»è€Œè·³å‡ºå¾ªç¯
 			finished = true;
 			
 			for(int index = 0; index < fmod.getRealSize(); index++){					
@@ -381,12 +381,12 @@ public class Cheyenne extends NoxFrame {
 					//do nothing
 					//handler.sendPingMsg();
 				}else{
-					//²»´æÔÚ¶ÔÓ¦µÄhandler, ĞèÒªÁ¬½ÓÈ»ºó×¢²áhandler
+					//ä¸å­˜åœ¨å¯¹åº”çš„handler, éœ€è¦è¿æ¥ç„¶åæ³¨å†Œhandler
 					/*PeerGroupAdvertisement pga	= PeerGroupUtil.getLocalAdvByID(
 								NoxToolkit.getNetworkManager().getNetPeerGroup(), group.getUUID().toString());
 					addGroupPipeListener(pga, group);*/
 					finished = false;
-					//!!!Í¬²½·½Ê½!!
+					//!!!åŒæ­¥æ–¹å¼!!
 					try {
 						handler = new GroupConnectionHandler(group, false);
 						if(handler.isConnected())
@@ -396,7 +396,7 @@ public class Cheyenne extends NoxFrame {
 					}
 				}
 			}
-			//Ò»ÂÖÌí¼ÓÖ®ºóĞİÏ¢Ò»¶ÎÊ±¼ä(InterStatusCheckingsSleepTime)
+			//ä¸€è½®æ·»åŠ ä¹‹åä¼‘æ¯ä¸€æ®µæ—¶é—´(InterStatusCheckingsSleepTime)
 			try {
 				Thread.sleep(Cheyenne.InterStatusCheckingsSleepTime);
 			} catch (InterruptedException e) {
@@ -408,7 +408,7 @@ public class Cheyenne extends NoxFrame {
 		System.out.println("Ending initGroupListenerWithoutReauthenticating()");
 	}
 	/**
-	 * ¸ù¾İ¹ã¸æ½¨Á¢×é, È»ºóÆô¶¯ĞÂÏß³Ì³õÊ¼»¯GroupConnectionHandler
+	 * æ ¹æ®å¹¿å‘Šå»ºç«‹ç»„, ç„¶åå¯åŠ¨æ–°çº¿ç¨‹åˆå§‹åŒ–GroupConnectionHandler
 	 * @param adv
 	 * @param item
 	 * @return
@@ -440,7 +440,7 @@ public class Cheyenne extends NoxFrame {
         return false;
 	}
 	/**
-	 * ÎªËùÓĞ×éÌí¼Ó¹ÜµÀ¼àÌıÆ÷, ²¢½øĞĞÖØĞÂÈÏÖ¤
+	 * ä¸ºæ‰€æœ‰ç»„æ·»åŠ ç®¡é“ç›‘å¬å™¨, å¹¶è¿›è¡Œé‡æ–°è®¤è¯
 	 * @deprecated
 	 */
 	private void initGroupListenerWithReauthenticating(){
@@ -453,7 +453,7 @@ public class Cheyenne extends NoxFrame {
 		Iterator<Entry<ID, String>> it=idpwds.entrySet().iterator();
 
 		int count = 0;
-		//Ê¹ÓÃentrySet·½·¨½«hashMap×ª»¯ÎªSetÊÓÍ¼,·µ»ØµÄSetÖĞµÄÃ¿¸öÔªËØ¶¼ÊÇÒ»¸öMap.Entry
+		//ä½¿ç”¨entrySetæ–¹æ³•å°†hashMapè½¬åŒ–ä¸ºSetè§†å›¾,è¿”å›çš„Setä¸­çš„æ¯ä¸ªå…ƒç´ éƒ½æ˜¯ä¸€ä¸ªMap.Entry
 		while(it.hasNext()){
 		    Map.Entry<ID, String> entry=(Map.Entry<ID, String>)it.next();
 			PeerGroupID curID = (PeerGroupID)entry.getKey();
@@ -463,16 +463,16 @@ public class Cheyenne extends NoxFrame {
 			count++;
 			/*boolean auth = authenticateThisGroup(pga, (String)entry.getValue());
 			System.out.println("Authenticating result: " + auth);*/
-			//ÎªÃ¿¸ö×é½¨Á¢inputPipe²¢Ìí¼Ó¼àÌıÆ÷,
+			//ä¸ºæ¯ä¸ªç»„å»ºç«‹inputPipeå¹¶æ·»åŠ ç›‘å¬å™¨,
 			/**
-			 * @Fixme µÃµ½GroupItemÓÃÀ´³õÊ¼»¯¼àÌıÆ÷(GroupConnectiongListener)
+			 * @Fixme å¾—åˆ°GroupItemç”¨æ¥åˆå§‹åŒ–ç›‘å¬å™¨(GroupConnectiongListener)
 			 */
 			boolean isListening = addGroupPipeListener(pga, null);
 			System.out.println("addGroupPipeListener result: " + isListening);
 		}
 	}
 	/**
-	 * ÎªËùÓĞ×éÖØĞÂÈÏÖ¤, ²¢Ìí¼Ó¼àÌıÆ÷, ÔİÊ±ÓÃ²»µ½...
+	 * ä¸ºæ‰€æœ‰ç»„é‡æ–°è®¤è¯, å¹¶æ·»åŠ ç›‘å¬å™¨, æš‚æ—¶ç”¨ä¸åˆ°...
 	 * @param adv
 	 * @param password
 	 * @return
@@ -491,7 +491,7 @@ public class Cheyenne extends NoxFrame {
         // if the group was successfully created join it
         if (pg != null) {
         	if(AuthenticationUtil.isAuthenticated(pg)){
-        		//ÎŞÃÜÂë×é
+        		//æ— å¯†ç ç»„
 				try {
 					Thread groupPipeListener;
 					groupPipeListener = new Thread(new GroupConnectionHandler(pg, item),
@@ -508,9 +508,9 @@ public class Cheyenne extends NoxFrame {
         		boolean joined = PeerGroupUtil.joinPeerGroup(pg, PeerGroupUtil.MEMBERSHIP_ID, password);
         		
         		if(joined){
-            		System.out.println("ÄúÒÑ³É¹¦¼ÓÈë¸Ã×é. ¿ÉÔÚ×éÁĞ±íÖĞ²é¿´.");
+            		System.out.println("æ‚¨å·²æˆåŠŸåŠ å…¥è¯¥ç»„. å¯åœ¨ç»„åˆ—è¡¨ä¸­æŸ¥çœ‹.");
             		//InputPipe inpipe = pg.getPipeService().createInputPipe(adv,);
-            		//Îª×é½¨Á¢¹ÜµÀ, ²¢Ìí¼Ó¼àÌıÆ÷
+            		//ä¸ºç»„å»ºç«‹ç®¡é“, å¹¶æ·»åŠ ç›‘å¬å™¨
             		try {
     					Thread groupPipeListener;
     					groupPipeListener = new Thread(new GroupConnectionHandler(pg, item),
@@ -524,12 +524,12 @@ public class Cheyenne extends NoxFrame {
     				}
             	}
             	else{
-            		System.out.println("Î´ÄÜ³É¹¦¼ÓÈë¸Ã×é, ÃÜÂë´íÎó?");
+            		System.out.println("æœªèƒ½æˆåŠŸåŠ å…¥è¯¥ç»„, å¯†ç é”™è¯¯?");
             		return false;
             	}
         	}
         } else {
-            System.out.println("Ê¹ÓÃ×é¹ã¸æ´´½¨×éÊ§°Ü");
+            System.out.println("ä½¿ç”¨ç»„å¹¿å‘Šåˆ›å»ºç»„å¤±è´¥");
 			return false;
         }
 	}
@@ -537,17 +537,17 @@ public class Cheyenne extends NoxFrame {
 		return sqlconn;
 	}
 	/**
-	 * ½«¹ã¸æËù´ú±íµÄpeerÌí¼Óµ½ºÃÓÑÁĞ±í»òºÚÃûµ¥ÖĞ
-	 * @param adv ÒªÌí¼ÓµÄpeerµÄ¹ã¸æ
-	 * @param good  ºÃÓÑ»¹ÊÇºÚÃûµ¥
-	 * @return ºÃÓÑµÄÁĞ±íÔªËØ
+	 * å°†å¹¿å‘Šæ‰€ä»£è¡¨çš„peeræ·»åŠ åˆ°å¥½å‹åˆ—è¡¨æˆ–é»‘åå•ä¸­
+	 * @param adv è¦æ·»åŠ çš„peerçš„å¹¿å‘Š
+	 * @param good  å¥½å‹è¿˜æ˜¯é»‘åå•
+	 * @return å¥½å‹çš„åˆ—è¡¨å…ƒç´ 
 	 */
 	public PeerItem add2PeerList(PeerAdvertisement adv, boolean good){
 		PeerItem newFriend = new PeerItem(new ImageIcon(
 				SystemPath.PORTRAIT_RESOURCE_PATH + "user.png"), adv);
 		
-		//ÕâÑùµÄ¸³ÖµÄ¿Ç°Ã»ÓĞ±ØÒª,
-		//²»¹ıÔÚÒÑ¾­´æÔÚºÃÓÑ, ÇÒÍ·ÏñÓĞ±ä»¯µÄÊ±ºòÓĞÓÃ;
+		//è¿™æ ·çš„èµ‹å€¼ç›®å‰æ²¡æœ‰å¿…è¦,
+		//ä¸è¿‡åœ¨å·²ç»å­˜åœ¨å¥½å‹, ä¸”å¤´åƒæœ‰å˜åŒ–çš„æ—¶å€™æœ‰ç”¨;
 		try {
 			if(good)
 				newFriend = (PeerItem) friendlist.addItem(newFriend);
@@ -562,16 +562,16 @@ public class Cheyenne extends NoxFrame {
 		return newFriend;
 	}
 	/**
-	 * ½«¹ã¸æËù´ú±íµÄpeerÌí¼Óµ½ºÃÓÑÁĞ±íÖĞ, ²¢Ìí¼Ó¼àÌıÆ÷.
-	 * TODO Õâ²¿·Ö¿ÉÒÔ²Î¿¼JXTA Prog Guide2.5µÄMembership Service Ò»ÕÂÖĞ¶ÔInteractiveAuthenticatorµÄ½éÉÜ.
+	 * å°†å¹¿å‘Šæ‰€ä»£è¡¨çš„peeræ·»åŠ åˆ°å¥½å‹åˆ—è¡¨ä¸­, å¹¶æ·»åŠ ç›‘å¬å™¨.
+	 * TODO è¿™éƒ¨åˆ†å¯ä»¥å‚è€ƒJXTA Prog Guide2.5çš„Membership Service ä¸€ç« ä¸­å¯¹InteractiveAuthenticatorçš„ä»‹ç».
 	 * 
-	 * @param adv ÒªÌí¼ÓµÄpeerµÄ¹ã¸æ 
-	 * @return ³É¹¦:·µ»Øfalse; Èç¹ûÒÑ¾­´¦ÓÚ¸Ã×éÖĞ: ·µ»Øtrue.
+	 * @param adv è¦æ·»åŠ çš„peerçš„å¹¿å‘Š 
+	 * @return æˆåŠŸ:è¿”å›false; å¦‚æœå·²ç»å¤„äºè¯¥ç»„ä¸­: è¿”å›true.
 	 */
 	public boolean joinThisGroup(PeerGroupAdvertisement adv){
 		System.out.println("In joinThisGroup(): \n" + adv);
 		
-		//TODO ¼ÓÈëµ½advËù´ú±íµÄ×éÖĞ
+		//TODO åŠ å…¥åˆ°advæ‰€ä»£è¡¨çš„ç»„ä¸­
 		PeerGroup ppg = NoxToolkit.getNetworkManager().getNetPeerGroup();
 		PeerGroup pg = null;
 		
@@ -587,21 +587,21 @@ public class Cheyenne extends NoxFrame {
         if (pg != null) {
         	if(AuthenticationUtil.isAuthenticated(pg)){
         		if(grouplist.isExist(pg.getPeerGroupID())){
-        			//Èç¹ûÁĞ±íÀïÒÑ¾­ÓĞ¸Ã×éÔò:"ÄãÒÑ¼ÓÈë¸Ã×é, ²»ĞèÒªÖØĞÂ¼ÓÈë"
-        			System.out.println("ÄãÒÑ¼ÓÈë¸Ã×é, ²»ĞèÒªÖØĞÂ¼ÓÈë. If you're surpried, it may because this group need no password.");
+        			//å¦‚æœåˆ—è¡¨é‡Œå·²ç»æœ‰è¯¥ç»„åˆ™:"ä½ å·²åŠ å…¥è¯¥ç»„, ä¸éœ€è¦é‡æ–°åŠ å…¥"
+        			System.out.println("ä½ å·²åŠ å…¥è¯¥ç»„, ä¸éœ€è¦é‡æ–°åŠ å…¥. If you're surpried, it may because this group need no password.");
         			JOptionPane.showMessageDialog((Component) null,
-        					"ÄãÒÑ¼ÓÈë¸Ã×é, ²»ĞèÒªÖØĞÂ¼ÓÈë. If you're surpried, it may because this group need no password.",
+        					"ä½ å·²åŠ å…¥è¯¥ç»„, ä¸éœ€è¦é‡æ–°åŠ å…¥. If you're surpried, it may because this group need no password.",
         					"Succeed!",
         					JOptionPane.INFORMATION_MESSAGE);
         		}else{
-        			//Èç¹ûÁĞ±íÖĞÃ»ÓĞ, ËµÃ÷¸Ã×é²»ĞèÒªÃÜÂë, Õı³£ÌáÊ¾¼ÓÈë³É¹¦.
-        			//½«¸Ã×é¼ÓÈëÁĞ±íÖĞ
+        			//å¦‚æœåˆ—è¡¨ä¸­æ²¡æœ‰, è¯´æ˜è¯¥ç»„ä¸éœ€è¦å¯†ç , æ­£å¸¸æç¤ºåŠ å…¥æˆåŠŸ.
+        			//å°†è¯¥ç»„åŠ å…¥åˆ—è¡¨ä¸­
         			GroupItem item = add2GroupList(adv, "");
-	        		System.out.println("ÄúÒÑ³É¹¦¼ÓÈë¸Ã×é. ¿ÉÔÚ×éÁĞ±íÖĞ²é¿´.");
+	        		System.out.println("æ‚¨å·²æˆåŠŸåŠ å…¥è¯¥ç»„. å¯åœ¨ç»„åˆ—è¡¨ä¸­æŸ¥çœ‹.");
 	        		JOptionPane.showMessageDialog((Component) null,
-	    					"ÄúÒÑ³É¹¦¼ÓÈë¸Ã×é. ¿ÉÔÚ×éÁĞ±íÖĞ²é¿´.", "Succeed!",
+	    					"æ‚¨å·²æˆåŠŸåŠ å…¥è¯¥ç»„. å¯åœ¨ç»„åˆ—è¡¨ä¸­æŸ¥çœ‹.", "Succeed!",
 	    					JOptionPane.INFORMATION_MESSAGE);
-	        		//Ìí¼Ó¼àÌıÆ÷
+	        		//æ·»åŠ ç›‘å¬å™¨
 					try {
 						Thread groupPipeListener;
 						groupPipeListener = new Thread(new GroupConnectionHandler(pg, item),
@@ -616,13 +616,13 @@ public class Cheyenne extends NoxFrame {
         		return true;
     		}
         	
-        	System.out.println("³¢ÊÔ¼ÓÈë×é");
+        	System.out.println("å°è¯•åŠ å…¥ç»„");
         	String password = getJoiningGroupPassword();
         	if(password == null || password.trim().equals("")){
-        		//TODO ¿ÉÒÔ»ñÈ¡¸ü¶àĞÅÏ¢µÄÃÜÂëÊäÈë´°¿Ú:
-        		//1. ÓÃ»§µã»÷ÁËOK;--ÃÜÂë´íÎó
-        		//2. ÓÃ»§µã»÷Cancel;--ºöÂÔ
-        		//3. ÓÃ»§Ö±½Ó¹Ø±Õ´°¿Ú.--ºöÂÔ
+        		//TODO å¯ä»¥è·å–æ›´å¤šä¿¡æ¯çš„å¯†ç è¾“å…¥çª—å£:
+        		//1. ç”¨æˆ·ç‚¹å‡»äº†OK;--å¯†ç é”™è¯¯
+        		//2. ç”¨æˆ·ç‚¹å‡»Cancel;--å¿½ç•¥
+        		//3. ç”¨æˆ·ç›´æ¥å…³é—­çª—å£.--å¿½ç•¥
         		System.out.println("Password inputted is empty/null");
         		return false;
         	}
@@ -632,9 +632,9 @@ public class Cheyenne extends NoxFrame {
         	if(joined){
         		GroupItem item = add2GroupList(adv, password);
         		JOptionPane.showMessageDialog((Component) null,
-    					"ÄúÒÑ³É¹¦¼ÓÈë¸Ã×é. ¿ÉÔÚ×éÁĞ±íÖĞ²é¿´.", "Succeed!",
+    					"æ‚¨å·²æˆåŠŸåŠ å…¥è¯¥ç»„. å¯åœ¨ç»„åˆ—è¡¨ä¸­æŸ¥çœ‹.", "Succeed!",
     					JOptionPane.INFORMATION_MESSAGE);
-        		//Ìí¼Ó¼àÌıÆ÷
+        		//æ·»åŠ ç›‘å¬å™¨
         		try {
 					Thread groupPipeListener;
 					groupPipeListener = new Thread(new GroupConnectionHandler(pg, item),
@@ -649,27 +649,27 @@ public class Cheyenne extends NoxFrame {
         	}
         	else{
         		JOptionPane.showMessageDialog((Component) null,
-    					"Î´ÄÜ³É¹¦¼ÓÈë¸Ã×é, ÃÜÂë´íÎó?", "Failure!",
+    					"æœªèƒ½æˆåŠŸåŠ å…¥è¯¥ç»„, å¯†ç é”™è¯¯?", "Failure!",
     					JOptionPane.ERROR_MESSAGE);
         		return false;
         	}
         } else {
             System.out.println("Error: failed to create new group");
-            System.out.println("Ê¹ÓÃ×é¹ã¸æ´´½¨×éÊ§°Ü");
+            System.out.println("ä½¿ç”¨ç»„å¹¿å‘Šåˆ›å»ºç»„å¤±è´¥");
 			JOptionPane.showMessageDialog((Component) null,
-					"Ê¹ÓÃ×é¹ã¸æ´´½¨×éÊ§°Ü", "Phew~",
+					"ä½¿ç”¨ç»„å¹¿å‘Šåˆ›å»ºç»„å¤±è´¥", "Phew~",
 					JOptionPane.ERROR_MESSAGE);
 			return false;
         }
 	}
 	/**
-	 * ÓÉµ÷ÓÃÕßÎªĞÂ×éÌí¼Ó¼àÌıÆ÷, ±¾º¯Êı²»Ö±½ÓÌí¼Ó.
+	 * ç”±è°ƒç”¨è€…ä¸ºæ–°ç»„æ·»åŠ ç›‘å¬å™¨, æœ¬å‡½æ•°ä¸ç›´æ¥æ·»åŠ .
 	 * @param adv
 	 * @param password
 	 * @return
 	 */
 	public GroupItem add2GroupList(PeerGroupAdvertisement adv, String password){
-		//½«¸Ã×é¼ÓÈëÁĞ±íÖĞ
+		//å°†è¯¥ç»„åŠ å…¥åˆ—è¡¨ä¸­
 		GroupItem newGroupItem = new GroupItem(new ImageIcon(
 				SystemPath.PORTRAIT_RESOURCE_PATH + "group.png"), adv, password);
 		try {
@@ -689,14 +689,14 @@ public class Cheyenne extends NoxFrame {
 				"Password Needed", JOptionPane.QUESTION_MESSAGE, null, null, "");
 	}
 	/**
-	 * ÔÚ²»´æÔÚ¶ÔÓ¦ID-Pipe¶Ô, ¸ü²»´æÔÚ¶ÔÓ¦ÁÄÌìÊÒµÄÇé¿öÏÂµ÷ÓÃ
-	 * @param connhandler ÓÃÓÚ¹ÜÀíÁ¬½ÓµÄConnectionHandler
-	 * @return ĞÂ½¨Á¢µÄchatroom, ÓÃÓÚ×¢²áµ½NoxToolkit
+	 * åœ¨ä¸å­˜åœ¨å¯¹åº”ID-Pipeå¯¹, æ›´ä¸å­˜åœ¨å¯¹åº”èŠå¤©å®¤çš„æƒ…å†µä¸‹è°ƒç”¨
+	 * @param connhandler ç”¨äºç®¡ç†è¿æ¥çš„ConnectionHandler
+	 * @return æ–°å»ºç«‹çš„chatroom, ç”¨äºæ³¨å†Œåˆ°NoxToolkit
 	 */
 	/*public GroupChatroom setupNewChatroomOver(GroupItem group){
-		//´ò¿ªÁÄÌìÊÒ
+		//æ‰“å¼€èŠå¤©å®¤
 		GroupChatroom chatroom = new GroupChatroom(group);
-		//×¢²áÖ®
+		//æ³¨å†Œä¹‹
 		NoxToolkit.registerChatroom(group.getUUID(), chatroom);
 		//TODO comment this
 		chatroom.setVisible(true);
@@ -704,19 +704,19 @@ public class Cheyenne extends NoxFrame {
 		return chatroom;
 	}*/
 	/**
-	 * ´ó¶àÊıÇé¿öÏÂ(ÏµÍ³³õÊ¼»¯Ê±³É¹¦½¨Á¢¹ÜµÀ²¢¼àÌıÖ®), µ÷ÓÃ´Ëº¯Êı½¨Á¢×éÁÄÌìÊÒ.</p>
-	 * ÔÚ´æÔÚ¶ÔÓ¦ID-Pipe¶Ô, ¶ø²»´æÔÚ¶ÔÓ¦ÁÄÌìÊÒµÄÇé¿öÏÂ:
-	 * <li>Èç¹ûÊÇºÃÓÑµÄÏûÏ¢, Ôò(ÔİÊ±)½¨Á¢ÁÄÌìÊÒÏÔÊ¾Ö®.
-	 * (Ó¦µ±)ÌáÊ¾ÓĞĞÂÏûÏ¢</li>
-	 * <li>Èç¹û²»ÊÇºÃÓÑµÄÏûÏ¢, Ôò(ÔİÊ±)½«Ö®Ìí¼ÓÎªºÃÓÑ½¨Á¢ÁÄÌìÊÒ²¢ÏÔÊ¾Ö®.
-	 * (Ó¦µ±)ÌáÊ¾ÓĞÀ´×ÔÄ°ÉúÈËµÄĞÂÏûÏ¢</li>
-	 * @param connhandler ÓÃÓÚ¹ÜÀíÁ¬½ÓµÄConnectionHandler
-	 * @return ĞÂ½¨Á¢µÄchatroom, ÓÃÓÚ×¢²áµ½NoxToolkit
+	 * å¤§å¤šæ•°æƒ…å†µä¸‹(ç³»ç»Ÿåˆå§‹åŒ–æ—¶æˆåŠŸå»ºç«‹ç®¡é“å¹¶ç›‘å¬ä¹‹), è°ƒç”¨æ­¤å‡½æ•°å»ºç«‹ç»„èŠå¤©å®¤.</p>
+	 * åœ¨å­˜åœ¨å¯¹åº”ID-Pipeå¯¹, è€Œä¸å­˜åœ¨å¯¹åº”èŠå¤©å®¤çš„æƒ…å†µä¸‹:
+	 * <li>å¦‚æœæ˜¯å¥½å‹çš„æ¶ˆæ¯, åˆ™(æš‚æ—¶)å»ºç«‹èŠå¤©å®¤æ˜¾ç¤ºä¹‹.
+	 * (åº”å½“)æç¤ºæœ‰æ–°æ¶ˆæ¯</li>
+	 * <li>å¦‚æœä¸æ˜¯å¥½å‹çš„æ¶ˆæ¯, åˆ™(æš‚æ—¶)å°†ä¹‹æ·»åŠ ä¸ºå¥½å‹å»ºç«‹èŠå¤©å®¤å¹¶æ˜¾ç¤ºä¹‹.
+	 * (åº”å½“)æç¤ºæœ‰æ¥è‡ªé™Œç”Ÿäººçš„æ–°æ¶ˆæ¯</li>
+	 * @param connhandler ç”¨äºç®¡ç†è¿æ¥çš„ConnectionHandler
+	 * @return æ–°å»ºç«‹çš„chatroom, ç”¨äºæ³¨å†Œåˆ°NoxToolkit
 	 */
 	/*public GroupChatroom setupNewChatroomOver(PeerGroupAdvertisement pga, InputPipe ipipe, OutputPipe opipe){
-		//´ò¿ªÁÄÌìÊÒ
+		//æ‰“å¼€èŠå¤©å®¤
 		GroupChatroom chatroom = new GroupChatroom(pga, ipipe, opipe);
-		//×¢²áÖ®
+		//æ³¨å†Œä¹‹
 		NoxToolkit.registerChatroom(pga.getPeerGroupID(), chatroom);
 		//TODO comment this
 		chatroom.setVisible(true);
@@ -725,7 +725,7 @@ public class Cheyenne extends NoxFrame {
 	}*/
 	
 	/*public boolean setupGroupChatroom(PeerGroupAdvertisement adv){
-		//´ò¿ªÈºÁÄ´°¿Ú
+		//æ‰“å¼€ç¾¤èŠçª—å£
 		//do something
 		return true;
 	}*/
@@ -733,7 +733,7 @@ public class Cheyenne extends NoxFrame {
 		sfrm.setVisible(true);
 	}
 	/**
-	 * ÉèÖÃÍĞÅÌ
+	 * è®¾ç½®æ‰˜ç›˜
 	 */
 	private void initTrayIcon(){
         try{
@@ -743,7 +743,7 @@ public class Cheyenne extends NoxFrame {
             traymenu.add(new MenuItem("Configure")).addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
                 	/**
-                	 * ¸öÈË/ÏµÍ³ÉèÖÃ´°¿Ú
+                	 * ä¸ªäºº/ç³»ç»Ÿè®¾ç½®çª—å£
                 	 */
                 	ccf = new ConfigCenterFrame(Cheyenne.this);
                 	ccf.setVisible(true);
@@ -782,7 +782,7 @@ public class Cheyenne extends NoxFrame {
                 		Statement stmt = sqlconn.createStatement();
                 		stmt.execute("SHUTDOWN");
 						sqlconn.close();
-						//FIXME ¹Ø±ÕÆäËü, Èç¹ÜµÀ, ×é, JXTAÍøÂç, µÈµÈµÈµÈÇåÀí¹¤×÷.
+						//FIXME å…³é—­å…¶å®ƒ, å¦‚ç®¡é“, ç»„, JXTAç½‘ç»œ, ç­‰ç­‰ç­‰ç­‰æ¸…ç†å·¥ä½œ.
 						/*
 						 * pipe.close();
 						 * 
@@ -803,7 +803,7 @@ public class Cheyenne extends NoxFrame {
                     System.exit(0);
                 }
             });
-            //TODO Õû¸öºÃ¿´µãµÄ²Ëµ¥?
+            //TODO æ•´ä¸ªå¥½çœ‹ç‚¹çš„èœå•?
             /*MenuElement els[] = traymenu.getSubElements();
 			for(int i = 0; i < els.length; i++)
 				els[i].getComponent().setBackground(Color.WHITE);*/
@@ -820,7 +820,7 @@ public class Cheyenne extends NoxFrame {
         }
     }
 	/**
-	 * ÉèÖÃ´°¿ÚÇ°¾°ÑÕÉ«
+	 * è®¾ç½®çª—å£å‰æ™¯é¢œè‰²
 	 */
 	public void setForegroundColor()
 	{
@@ -829,7 +829,7 @@ public class Cheyenne extends NoxFrame {
 		profile.setForegroundColor(color);
 	}
 	/**
-	 * ÉèÖÃ´°¿Ú±³¾°ÑÕÉ«
+	 * è®¾ç½®çª—å£èƒŒæ™¯é¢œè‰²
 	 */
 	public void setBackgroundColor(Color color)
 	{
@@ -840,14 +840,14 @@ public class Cheyenne extends NoxFrame {
 			tabs.setBackground(color);
 	}
 	/**
-	 * ÏÔÊ¾¸öÈË/ÏµÍ³ÉèÖÃ´°¿Ú
+	 * æ˜¾ç¤ºä¸ªäºº/ç³»ç»Ÿè®¾ç½®çª—å£
 	 */
 	public void ShowConfigCenter(){
 		ccf = new ConfigCenterFrame(Cheyenne.this);
 		ccf.setVisible(true);
 	}
 	/**
-	 * ÏÔÊ¾´´½¨×é´°¿Ú
+	 * æ˜¾ç¤ºåˆ›å»ºç»„çª—å£
 	 */
 	public void ShowCreateNewGroupDialog(){
 		CreateNewGroupDialog cngD = new CreateNewGroupDialog(this);

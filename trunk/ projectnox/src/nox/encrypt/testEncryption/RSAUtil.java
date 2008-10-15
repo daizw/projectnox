@@ -11,8 +11,8 @@ import java.io.*;
 import java.math.BigInteger;
 
 /**
- * RSA ¹¤¾ßÀà¡£Ìá¹©¼ÓÃÜ£¬½âÃÜ£¬Éú³ÉÃÜÔ¿¶ÔµÈ·½·¨¡£
- * ĞèÒªµ½http://www.bouncycastle.orgÏÂÔØbcprov-jdk14-123.jar¡£
+ * RSA å·¥å…·ç±»ã€‚æä¾›åŠ å¯†ï¼Œè§£å¯†ï¼Œç”Ÿæˆå¯†é’¥å¯¹ç­‰æ–¹æ³•ã€‚
+ * éœ€è¦åˆ°http://www.bouncycastle.orgä¸‹è½½bcprov-jdk14-123.jarã€‚
  * 
 * @author xiaoyusong
 *           mail: xiaoyusong@etang.com
@@ -22,7 +22,7 @@ import java.math.BigInteger;
 public class RSAUtil {
 
 	/**
-	 * Éú³ÉÃÜÔ¿¶Ô
+	 * ç”Ÿæˆå¯†é’¥å¯¹
 	 * 
 	 * @return KeyPair
 	 * @throws GeneralSecurityException
@@ -31,7 +31,7 @@ public class RSAUtil {
 		try {
 			KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA",
 					new org.bouncycastle.jce.provider.BouncyCastleProvider());
-			final int KEY_SIZE = 1024;// Ã»Ê²Ã´ºÃËµµÄÁË£¬Õâ¸öÖµ¹ØÏµµ½¿é¼ÓÃÜµÄ´óĞ¡£¬¿ÉÒÔ¸ü¸Ä£¬µ«ÊÇ²»ÒªÌ«´ó£¬·ñÔòĞ§ÂÊ»áµÍ
+			final int KEY_SIZE = 1024;// æ²¡ä»€ä¹ˆå¥½è¯´çš„äº†ï¼Œè¿™ä¸ªå€¼å…³ç³»åˆ°å—åŠ å¯†çš„å¤§å°ï¼Œå¯ä»¥æ›´æ”¹ï¼Œä½†æ˜¯ä¸è¦å¤ªå¤§ï¼Œå¦åˆ™æ•ˆç‡ä¼šä½
 			keyPairGen.initialize(KEY_SIZE, new SecureRandom());
 			KeyPair keyPair = keyPairGen.genKeyPair();
 			return keyPair;
@@ -41,7 +41,7 @@ public class RSAUtil {
 	}
 
 	/**
-	 * Éú³É¹«Ô¿
+	 * ç”Ÿæˆå…¬é’¥
 	 * 
 	 * @param modulus
 	 * @param publicExponent
@@ -68,7 +68,7 @@ public class RSAUtil {
 	}
 
 	/**
-	 * Éú³ÉË½Ô¿
+	 * ç”Ÿæˆç§é’¥
 	 * 
 	 * @param modulus
 	 * @param privateExponent
@@ -95,13 +95,13 @@ public class RSAUtil {
 	}
 
 	/**
-	 * ¼ÓÃÜ
+	 * åŠ å¯†
 	 * 
 	 * @param key
-	 *            ¼ÓÃÜµÄÃÜÔ¿
+	 *            åŠ å¯†çš„å¯†é’¥
 	 * @param data
-	 *            ´ı¼ÓÃÜµÄÃ÷ÎÄÊı¾İ
-	 * @return ¼ÓÃÜºóµÄÊı¾İ
+	 *            å¾…åŠ å¯†çš„æ˜æ–‡æ•°æ®
+	 * @return åŠ å¯†åçš„æ•°æ®
 	 * @throws GeneralSecurityException
 	 */
 	public static byte[] encrypt(Key key, byte[] data) throws GeneralSecurityException {
@@ -109,11 +109,11 @@ public class RSAUtil {
 			Cipher cipher = Cipher.getInstance("RSA",
 					new org.bouncycastle.jce.provider.BouncyCastleProvider());
 			cipher.init(Cipher.ENCRYPT_MODE, key);
-			int blockSize = cipher.getBlockSize();// »ñµÃ¼ÓÃÜ¿é´óĞ¡£¬Èç£º¼ÓÃÜÇ°Êı¾İÎª128¸öbyte£¬¶økey_size=1024
-													// ¼ÓÃÜ¿é´óĞ¡Îª127
-													// byte,¼ÓÃÜºóÎª128¸öbyte;Òò´Ë¹²ÓĞ2¸ö¼ÓÃÜ¿é£¬µÚÒ»¸ö127
-													// byteµÚ¶ş¸öÎª1¸öbyte
-			int outputSize = cipher.getOutputSize(data.length);// »ñµÃ¼ÓÃÜ¿é¼ÓÃÜºó¿é´óĞ¡
+			int blockSize = cipher.getBlockSize();// è·å¾—åŠ å¯†å—å¤§å°ï¼Œå¦‚ï¼šåŠ å¯†å‰æ•°æ®ä¸º128ä¸ªbyteï¼Œè€Œkey_size=1024
+													// åŠ å¯†å—å¤§å°ä¸º127
+													// byte,åŠ å¯†åä¸º128ä¸ªbyte;å› æ­¤å…±æœ‰2ä¸ªåŠ å¯†å—ï¼Œç¬¬ä¸€ä¸ª127
+													// byteç¬¬äºŒä¸ªä¸º1ä¸ªbyte
+			int outputSize = cipher.getOutputSize(data.length);// è·å¾—åŠ å¯†å—åŠ å¯†åå—å¤§å°
 			int leavedSize = data.length % blockSize;
 			int blocksSize = leavedSize != 0 ? data.length / blockSize + 1
 					: data.length / blockSize;
@@ -126,9 +126,9 @@ public class RSAUtil {
 				else
 					cipher.doFinal(data, i * blockSize, data.length - i
 							* blockSize, raw, i * outputSize);
-				// ÕâÀïÃædoUpdate·½·¨²»¿ÉÓÃ£¬²é¿´Ô´´úÂëºó·¢ÏÖÃ¿´ÎdoUpdateºó²¢Ã»ÓĞÊ²Ã´Êµ¼Ê¶¯×÷³ıÁË°Ñbyte[]·Åµ½
-				// ByteArrayOutputStreamÖĞ£¬¶ø×îºódoFinalµÄÊ±ºò²Å½«ËùÓĞµÄbyte[]½øĞĞ¼ÓÃÜ£¬¿ÉÊÇµ½ÁË´ËÊ±¼ÓÃÜ¿é´óĞ¡ºÜ¿ÉÄÜÒÑ¾­³¬³öÁË
-				// OutputSizeËùÒÔÖ»ºÃÓÃdofinal·½·¨¡£
+				// è¿™é‡Œé¢doUpdateæ–¹æ³•ä¸å¯ç”¨ï¼ŒæŸ¥çœ‹æºä»£ç åå‘ç°æ¯æ¬¡doUpdateåå¹¶æ²¡æœ‰ä»€ä¹ˆå®é™…åŠ¨ä½œé™¤äº†æŠŠbyte[]æ”¾åˆ°
+				// ByteArrayOutputStreamä¸­ï¼Œè€Œæœ€ådoFinalçš„æ—¶å€™æ‰å°†æ‰€æœ‰çš„byte[]è¿›è¡ŒåŠ å¯†ï¼Œå¯æ˜¯åˆ°äº†æ­¤æ—¶åŠ å¯†å—å¤§å°å¾ˆå¯èƒ½å·²ç»è¶…å‡ºäº†
+				// OutputSizeæ‰€ä»¥åªå¥½ç”¨dofinalæ–¹æ³•ã€‚
 
 				i++;
 			}
@@ -139,13 +139,13 @@ public class RSAUtil {
 	}
 
 	/**
-	 * ½âÃÜ
+	 * è§£å¯†
 	 * 
 	 * @param key
-	 *            ½âÃÜµÄÃÜÔ¿
+	 *            è§£å¯†çš„å¯†é’¥
 	 * @param raw
-	 *            ÒÑ¾­¼ÓÃÜµÄÊı¾İ
-	 * @return ½âÃÜºóµÄÃ÷ÎÄ
+	 *            å·²ç»åŠ å¯†çš„æ•°æ®
+	 * @return è§£å¯†åçš„æ˜æ–‡
 	 * @throws GeneralSecurityException
 	 */
 	public static byte[] decrypt(Key key, byte[] raw) throws GeneralSecurityException {

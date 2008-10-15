@@ -9,12 +9,12 @@ public class LANTimeLimit {
 	
 	public static long CREATE_OUTPUT_PIPE_WAITTIME = 5 * 1000;
 	/**
-	 * Èç¹ûÔÚÕâ¸öÊ±¼äÄÚÃ»ÓÐÊÕµ½¶Ô·½µÄ×´Ì¬ÏûÏ¢, ÊÓÎªÀëÏß
+	 * å¦‚æžœåœ¨è¿™ä¸ªæ—¶é—´å†…æ²¡æœ‰æ”¶åˆ°å¯¹æ–¹çš„çŠ¶æ€æ¶ˆæ¯, è§†ä¸ºç¦»çº¿
 	 */
 	public static long OFFLINE_TIMELIMIT = 60 * 1000;
 	/**
-	 * ×î´óÖØÊÔ´ÎÊý......ºÍ×î´óÖØÊÔÊ±¼ä¹¦ÄÜÓÐÖØ¸´, »¹ÊÇÊ¹ÓÃ×î´óÖØÊÔ´ÎÊý°É!
-	 *  ÒòÎª¿ÉÒÔ×÷Îª¼ÆÊýÆ÷(eg. counter--), ¶øÊ¹ÓÃÊ±¼äÀ´µ¹¼ÆÊ±²»·½±ã.
+	 * æœ€å¤§é‡è¯•æ¬¡æ•°......å’Œæœ€å¤§é‡è¯•æ—¶é—´åŠŸèƒ½æœ‰é‡å¤, è¿˜æ˜¯ä½¿ç”¨æœ€å¤§é‡è¯•æ¬¡æ•°å§!
+	 *  å› ä¸ºå¯ä»¥ä½œä¸ºè®¡æ•°å™¨(eg. counter--), è€Œä½¿ç”¨æ—¶é—´æ¥å€’è®¡æ—¶ä¸æ–¹ä¾¿.
 	 */
 	public static final int CONNECT_MAXRETRIES = 10;
 	public static final int FETCH_PEERADV_MAXRETRIES = 10;
