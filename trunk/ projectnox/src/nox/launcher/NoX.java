@@ -118,8 +118,6 @@ public class NoX {
 	 * @param meSqltableName
 	 */
 	private static void initMyStatus(Connection conn, String meSqltableName) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/**

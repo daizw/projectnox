@@ -15,30 +15,23 @@ import net.jxta.peergroup.PeerGroup;
 public class AuthenticationPanel extends JPanel {
 
 	public AuthenticationPanel(JFrame parent, PeerGroup pg) {
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public boolean isCanceled() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public boolean isReadyForJoin() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public void join() throws PeerGroupException{
-		// TODO Auto-generated method stub
-		
 	}
 
 }

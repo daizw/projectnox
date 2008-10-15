@@ -142,7 +142,6 @@ public class ListsPane extends JTabbedPane {
 		/*flist.addListSelectionListener(new ListSelectionListener(){
 			@Override
 			public void valueChanged(ListSelectionEvent se) {
-				// TODO Auto-generated method stub
 			}
 		});*/
 		flist.addMouseListener(new MouseListener(){

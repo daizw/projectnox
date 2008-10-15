@@ -332,11 +332,9 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 			}
 
 			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
 			}
 
 			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
 			}
 		});
 		sp_input = new JScrollPane(tp_input);
@@ -451,11 +449,9 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 						}
 
 						public void keyTyped(KeyEvent e) {
-							// TODO Auto-generated method stub
 						}
 
 						public void keyReleased(KeyEvent e) {
-							// TODO Auto-generated method stub
 						}
 					});
 					ScreenCapturer temp = new ScreenCapturer(fakeWin, buffImg,

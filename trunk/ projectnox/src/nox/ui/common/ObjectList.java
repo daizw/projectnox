@@ -319,7 +319,6 @@ public class ObjectList extends JList {
 	 * @param stat 含状态信息的数据结构, stat为null则表示离线...
 	 */
 	public void setStatus(ID id, NoxPeerStatusUnit stat) throws SQLException, IOException{
-		// TODO Auto-generated method stub
 		//注意!!!!!!!!因为好友之间才会互ping, 所以如果出现在好友列表中找不到id是不正常的.
 		//同时, 最好能更新数据库中昵称和签名档信息
 		int size =  fmod.getRealSize();

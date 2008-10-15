@@ -351,7 +351,6 @@ class FaceDialog extends JDialog implements ActionListener, MouseListener {
 	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
 	 */
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
 		// this.setVisible(false);
 	}
 }
