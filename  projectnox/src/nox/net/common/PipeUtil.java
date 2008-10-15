@@ -18,20 +18,20 @@ import net.jxta.protocol.PipeAdvertisement;
 public class PipeUtil {
 	private static final Logger LOG = Logger.getLogger(PipeUtil.class.getName());
 	
-	private static final long WaitTime = LANTimeLimit.UNIT_TIME;		// Ô¶³Ì·¢ÏÖµÄµÈ´ıÊ±¼ä£¬Ğè¸ù¾İÍøÂçÇé¿öµ÷Õû
-	private static final int MAXRETRIES = LANTimeLimit.FETCH_PIPEADV_MAXRETRIES;		// Ô¶³Ì·¢ÏÖÊ±µÄÖØÊÔ´ÎÊı£¬Ğè¸ù¾İÍøÂçÇé¿öµ÷Õû
+	private static final long WaitTime = LANTimeLimit.UNIT_TIME;		// è¿œç¨‹å‘ç°çš„ç­‰å¾…æ—¶é—´ï¼Œéœ€æ ¹æ®ç½‘ç»œæƒ…å†µè°ƒæ•´
+	private static final int MAXRETRIES = LANTimeLimit.FETCH_PIPEADV_MAXRETRIES;		// è¿œç¨‹å‘ç°æ—¶çš„é‡è¯•æ¬¡æ•°ï¼Œéœ€æ ¹æ®ç½‘ç»œæƒ…å†µè°ƒæ•´
 	
 	/**
-	 * »ñÈ¡¹ÜµÀ¹ã¸æ£¬Ê×ÏÈ´Ó±¾µØ»º´æÖĞ·¢ÏÖ¹ÜµÀ¹ã¸æ£¬Èç¹ûÃ»ÓĞ·¢ÏÖ£¬ÔÙ´ÓÔ¶³Ì·¢ÏÖ¹ÜµÀ¹ã¸æ£¬Èç¹ûÃ»ÓĞ·¢ÏÖ£¬ÄÇÃ´´´½¨¹ÜµÀ¹ã¸æ¡£
-	 * @param pg		ÓÃÓÚ·¢ÏÖ»ò´´½¨¹ÜµÀ¹ã¸æµÄ½Úµã×é
-	 * @param name		ÓÃÓÚ·¢ÏÖ»ò´´½¨¹ÜµÀ¹ã¸æµÄÃû³Æ£¬Èç¹û±¾µØ»òÔ¶³Ì¶¼Ã»ÓĞ·¢ÏÖ¹ÜµÀ¹ã¸æ£¬ÄÇÃ´½«Ê¹ÓÃ¸ÃÃû³Æ´´½¨¹ÜµÀ¹ã¸æ£¬Òò´Ë¸ÃÃû³Æ²»ÒªÊ¹ÓÃÍ¨Åä·û
-	 * @param type		´´½¨¹ÜµÀ¹ã¸æµÄÀàĞÍ£¬Ä¿Ç°Ö§³Ö3ÖÖ»ù±¾ÀàĞÍ
-	 * 						JxtaUnicast			µ¥Ïò¡¢²»°²È«ºÍ²»¿É¿¿
-	 * 						JxtaUnicastSecure	µ¥Ïò¡¢°²È«£¨Ê¹ÓÃTLS£©
-	 * 						JxtaPropagate		´«²¥¹ã¸æ 
-	 * @param pipeId	Ö¸¶¨Éú³É¹ÜµÀ¹ã¸æµÄPipeId,Èç¹û¸ÃÖµÎª¿Õ»ònull£¬ÄÇÃ´Ê¹ÓÃÏµÍ³Éú³ÉµÄId
-	 * @param remotePublish	Èç¹û´´½¨¹ÜµÀ¹ã¸æ£¬ÄÇÃ´ÊÇ·ñÔ¶³Ì·¢²¼
-	 * @return			ÔÚ½Úµã×éÄÚ·¢ÏÖ»ò´´½¨µÄ¹ã¸æ¶ÔÏó
+	 * è·å–ç®¡é“å¹¿å‘Šï¼Œé¦–å…ˆä»æœ¬åœ°ç¼“å­˜ä¸­å‘ç°ç®¡é“å¹¿å‘Šï¼Œå¦‚æœæ²¡æœ‰å‘ç°ï¼Œå†ä»è¿œç¨‹å‘ç°ç®¡é“å¹¿å‘Šï¼Œå¦‚æœæ²¡æœ‰å‘ç°ï¼Œé‚£ä¹ˆåˆ›å»ºç®¡é“å¹¿å‘Šã€‚
+	 * @param pg		ç”¨äºå‘ç°æˆ–åˆ›å»ºç®¡é“å¹¿å‘Šçš„èŠ‚ç‚¹ç»„
+	 * @param name		ç”¨äºå‘ç°æˆ–åˆ›å»ºç®¡é“å¹¿å‘Šçš„åç§°ï¼Œå¦‚æœæœ¬åœ°æˆ–è¿œç¨‹éƒ½æ²¡æœ‰å‘ç°ç®¡é“å¹¿å‘Šï¼Œé‚£ä¹ˆå°†ä½¿ç”¨è¯¥åç§°åˆ›å»ºç®¡é“å¹¿å‘Šï¼Œå› æ­¤è¯¥åç§°ä¸è¦ä½¿ç”¨é€šé…ç¬¦
+	 * @param type		åˆ›å»ºç®¡é“å¹¿å‘Šçš„ç±»å‹ï¼Œç›®å‰æ”¯æŒ3ç§åŸºæœ¬ç±»å‹
+	 * 						JxtaUnicast			å•å‘ã€ä¸å®‰å…¨å’Œä¸å¯é 
+	 * 						JxtaUnicastSecure	å•å‘ã€å®‰å…¨ï¼ˆä½¿ç”¨TLSï¼‰
+	 * 						JxtaPropagate		ä¼ æ’­å¹¿å‘Š 
+	 * @param pipeId	æŒ‡å®šç”Ÿæˆç®¡é“å¹¿å‘Šçš„PipeId,å¦‚æœè¯¥å€¼ä¸ºç©ºæˆ–nullï¼Œé‚£ä¹ˆä½¿ç”¨ç³»ç»Ÿç”Ÿæˆçš„Id
+	 * @param remotePublish	å¦‚æœåˆ›å»ºç®¡é“å¹¿å‘Šï¼Œé‚£ä¹ˆæ˜¯å¦è¿œç¨‹å‘å¸ƒ
+	 * @return			åœ¨èŠ‚ç‚¹ç»„å†…å‘ç°æˆ–åˆ›å»ºçš„å¹¿å‘Šå¯¹è±¡
 	 */
 	public static PipeAdvertisement getPipeAdv(PeerGroup pg, String name, String type, String pipeId, boolean remotePublish) {
 		PipeAdvertisement myAdv = null;
@@ -60,31 +60,31 @@ public class PipeUtil {
 	}
 	
 	/**
-	 * »ñÈ¡¹ÜµÀ¹ã¸æ£¬Ê×ÏÈ´Ó±¾µØ»º´æÖĞ·¢ÏÖ¹ÜµÀ¹ã¸æ£¬Èç¹ûÃ»ÓĞ·¢ÏÖ£¬ÔÙ´ÓÔ¶³Ì·¢ÏÖ¹ÜµÀ¹ã¸æ£¬Èç¹ûÃ»ÓĞ·¢ÏÖ£¬ÄÇÃ´Ê¹ÓÃÏµÍ³Éú³ÉµÄId´´½¨¹ÜµÀ¹ã¸æ¡£
-	 * @param pg		ÓÃÓÚ·¢ÏÖ»ò´´½¨¹ÜµÀ¹ã¸æµÄ½Úµã×é
-	 * @param name		ÓÃÓÚ·¢ÏÖ»ò´´½¨¹ÜµÀ¹ã¸æµÄÃû³Æ£¬Èç¹û±¾µØ»òÔ¶³Ì¶¼Ã»ÓĞ·¢ÏÖ¹ÜµÀ¹ã¸æ£¬ÄÇÃ´½«Ê¹ÓÃ¸ÃÃû³Æ´´½¨¹ÜµÀ¹ã¸æ£¬Òò´Ë¸ÃÃû³Æ²»ÒªÊ¹ÓÃÍ¨Åä·û
-	 * @param type		´´½¨¹ÜµÀ¹ã¸æµÄÀàĞÍ£¬Ä¿Ç°Ö§³Ö3ÖÖ»ù±¾ÀàĞÍ
-	 * 						JxtaUnicast			µ¥Ïò¡¢²»°²È«ºÍ²»¿É¿¿
-	 * 						JxtaUnicastSecure	µ¥Ïò¡¢°²È«£¨Ê¹ÓÃTLS£©
-	 * 						JxtaPropagate		´«²¥¹ã¸æ 
-	 * @param remotePublish	Èç¹û´´½¨¹ÜµÀ¹ã¸æ£¬ÄÇÃ´ÊÇ·ñÔ¶³Ì·¢²¼
-	 * @return			ÔÚ½Úµã×éÄÚ·¢ÏÖ»ò´´½¨µÄ¹ã¸æ¶ÔÏó
+	 * è·å–ç®¡é“å¹¿å‘Šï¼Œé¦–å…ˆä»æœ¬åœ°ç¼“å­˜ä¸­å‘ç°ç®¡é“å¹¿å‘Šï¼Œå¦‚æœæ²¡æœ‰å‘ç°ï¼Œå†ä»è¿œç¨‹å‘ç°ç®¡é“å¹¿å‘Šï¼Œå¦‚æœæ²¡æœ‰å‘ç°ï¼Œé‚£ä¹ˆä½¿ç”¨ç³»ç»Ÿç”Ÿæˆçš„Idåˆ›å»ºç®¡é“å¹¿å‘Šã€‚
+	 * @param pg		ç”¨äºå‘ç°æˆ–åˆ›å»ºç®¡é“å¹¿å‘Šçš„èŠ‚ç‚¹ç»„
+	 * @param name		ç”¨äºå‘ç°æˆ–åˆ›å»ºç®¡é“å¹¿å‘Šçš„åç§°ï¼Œå¦‚æœæœ¬åœ°æˆ–è¿œç¨‹éƒ½æ²¡æœ‰å‘ç°ç®¡é“å¹¿å‘Šï¼Œé‚£ä¹ˆå°†ä½¿ç”¨è¯¥åç§°åˆ›å»ºç®¡é“å¹¿å‘Šï¼Œå› æ­¤è¯¥åç§°ä¸è¦ä½¿ç”¨é€šé…ç¬¦
+	 * @param type		åˆ›å»ºç®¡é“å¹¿å‘Šçš„ç±»å‹ï¼Œç›®å‰æ”¯æŒ3ç§åŸºæœ¬ç±»å‹
+	 * 						JxtaUnicast			å•å‘ã€ä¸å®‰å…¨å’Œä¸å¯é 
+	 * 						JxtaUnicastSecure	å•å‘ã€å®‰å…¨ï¼ˆä½¿ç”¨TLSï¼‰
+	 * 						JxtaPropagate		ä¼ æ’­å¹¿å‘Š 
+	 * @param remotePublish	å¦‚æœåˆ›å»ºç®¡é“å¹¿å‘Šï¼Œé‚£ä¹ˆæ˜¯å¦è¿œç¨‹å‘å¸ƒ
+	 * @return			åœ¨èŠ‚ç‚¹ç»„å†…å‘ç°æˆ–åˆ›å»ºçš„å¹¿å‘Šå¯¹è±¡
 	 */
 	public static PipeAdvertisement getPipeAdv(PeerGroup pg, String name, String type, boolean remotePublish) {
 		return getPipeAdv(pg, name, type, null, remotePublish);
 	}
 	
 	/**
-	 * »ñÈ¡¹ÜµÀ¹ã¸æ£¬Ê×ÏÈ´Ó±¾µØ»º´æÖĞ·¢ÏÖ¹ÜµÀ¹ã¸æ£¬Èç¹ûÃ»ÓĞ·¢ÏÖ£¬ÄÇÃ´´´½¨¹ÜµÀ¹ã¸æ¡£
-	 * @param pg		ÓÃÓÚ·¢ÏÖ»ò´´½¨¹ÜµÀ¹ã¸æµÄ½Úµã×é
-	 * @param name		ÓÃÓÚ·¢ÏÖ»ò´´½¨¹ÜµÀ¹ã¸æµÄÃû³Æ£¬Èç¹û±¾µØ»òÔ¶³Ì¶¼Ã»ÓĞ·¢ÏÖ¹ÜµÀ¹ã¸æ£¬ÄÇÃ´½«Ê¹ÓÃ¸ÃÃû³Æ´´½¨¹ÜµÀ¹ã¸æ£¬Òò´Ë¸ÃÃû³Æ²»ÒªÊ¹ÓÃÍ¨Åä·û
-	 * @param type		´´½¨¹ÜµÀ¹ã¸æµÄÀàĞÍ£¬Ä¿Ç°Ö§³Ö3ÖÖ»ù±¾ÀàĞÍ
-	 * 						JxtaUnicast			µ¥Ïò¡¢²»°²È«ºÍ²»¿É¿¿
-	 * 						JxtaUnicastSecure	µ¥Ïò¡¢°²È«£¨Ê¹ÓÃTLS£©
-	 * 						JxtaPropagate		´«²¥¹ã¸æ 
-	 * @param pipeId	Ö¸¶¨Éú³É¹ÜµÀ¹ã¸æµÄPipeId,Èç¹û¸ÃÖµÎª¿Õ»ònull£¬ÄÇÃ´Ê¹ÓÃÏµÍ³Éú³ÉµÄId
-	 * @param remotePublish	Èç¹û´´½¨¹ÜµÀ¹ã¸æ£¬ÄÇÃ´ÊÇ·ñÔ¶³Ì·¢²¼
-	 * @return			ÔÚ½Úµã×éÄÚ·¢ÏÖ»ò´´½¨µÄ¹ã¸æ¶ÔÏó
+	 * è·å–ç®¡é“å¹¿å‘Šï¼Œé¦–å…ˆä»æœ¬åœ°ç¼“å­˜ä¸­å‘ç°ç®¡é“å¹¿å‘Šï¼Œå¦‚æœæ²¡æœ‰å‘ç°ï¼Œé‚£ä¹ˆåˆ›å»ºç®¡é“å¹¿å‘Šã€‚
+	 * @param pg		ç”¨äºå‘ç°æˆ–åˆ›å»ºç®¡é“å¹¿å‘Šçš„èŠ‚ç‚¹ç»„
+	 * @param name		ç”¨äºå‘ç°æˆ–åˆ›å»ºç®¡é“å¹¿å‘Šçš„åç§°ï¼Œå¦‚æœæœ¬åœ°æˆ–è¿œç¨‹éƒ½æ²¡æœ‰å‘ç°ç®¡é“å¹¿å‘Šï¼Œé‚£ä¹ˆå°†ä½¿ç”¨è¯¥åç§°åˆ›å»ºç®¡é“å¹¿å‘Šï¼Œå› æ­¤è¯¥åç§°ä¸è¦ä½¿ç”¨é€šé…ç¬¦
+	 * @param type		åˆ›å»ºç®¡é“å¹¿å‘Šçš„ç±»å‹ï¼Œç›®å‰æ”¯æŒ3ç§åŸºæœ¬ç±»å‹
+	 * 						JxtaUnicast			å•å‘ã€ä¸å®‰å…¨å’Œä¸å¯é 
+	 * 						JxtaUnicastSecure	å•å‘ã€å®‰å…¨ï¼ˆä½¿ç”¨TLSï¼‰
+	 * 						JxtaPropagate		ä¼ æ’­å¹¿å‘Š 
+	 * @param pipeId	æŒ‡å®šç”Ÿæˆç®¡é“å¹¿å‘Šçš„PipeId,å¦‚æœè¯¥å€¼ä¸ºç©ºæˆ–nullï¼Œé‚£ä¹ˆä½¿ç”¨ç³»ç»Ÿç”Ÿæˆçš„Id
+	 * @param remotePublish	å¦‚æœåˆ›å»ºç®¡é“å¹¿å‘Šï¼Œé‚£ä¹ˆæ˜¯å¦è¿œç¨‹å‘å¸ƒ
+	 * @return			åœ¨èŠ‚ç‚¹ç»„å†…å‘ç°æˆ–åˆ›å»ºçš„å¹¿å‘Šå¯¹è±¡
 	 */
 	public static PipeAdvertisement getPipeAdvWithoutRemoteDiscovery(PeerGroup pg, String name, String type, String pipeId, boolean remotePublish) {
         PipeAdvertisement pa = searchLocal(pg, name);
@@ -100,26 +100,26 @@ public class PipeUtil {
 	}
 	
 	/**
-	 * »ñÈ¡¹ÜµÀ¹ã¸æ£¬Ê×ÏÈ´Ó±¾µØ»º´æÖĞ·¢ÏÖ¹ÜµÀ¹ã¸æ£¬Èç¹ûÃ»ÓĞ·¢ÏÖ£¬ÄÇÃ´Ê¹ÓÃÏµÍ³Éú³ÉµÄId´´½¨¹ÜµÀ¹ã¸æ¡£
-	 * @param pg		ÓÃÓÚ·¢ÏÖ»ò´´½¨¹ÜµÀ¹ã¸æµÄ½Úµã×é
-	 * @param name		ÓÃÓÚ·¢ÏÖ»ò´´½¨¹ÜµÀ¹ã¸æµÄÃû³Æ£¬Èç¹û±¾µØ»òÔ¶³Ì¶¼Ã»ÓĞ·¢ÏÖ¹ÜµÀ¹ã¸æ£¬ÄÇÃ´½«Ê¹ÓÃ¸ÃÃû³Æ´´½¨¹ÜµÀ¹ã¸æ£¬Òò´Ë¸ÃÃû³Æ²»ÒªÊ¹ÓÃÍ¨Åä·û
-	 * @param type		´´½¨¹ÜµÀ¹ã¸æµÄÀàĞÍ£¬Ä¿Ç°Ö§³Ö3ÖÖ»ù±¾ÀàĞÍ
-	 * 						JxtaUnicast			µ¥Ïò¡¢²»°²È«ºÍ²»¿É¿¿
-	 * 						JxtaUnicastSecure	µ¥Ïò¡¢°²È«£¨Ê¹ÓÃTLS£©
-	 * 						JxtaPropagate		´«²¥¹ã¸æ 
-	 * @param remotePublish	Èç¹û´´½¨¹ÜµÀ¹ã¸æ£¬ÄÇÃ´ÊÇ·ñÔ¶³Ì·¢²¼
-	 * @return			ÔÚ½Úµã×éÄÚ·¢ÏÖ»ò´´½¨µÄ¹ã¸æ¶ÔÏó
+	 * è·å–ç®¡é“å¹¿å‘Šï¼Œé¦–å…ˆä»æœ¬åœ°ç¼“å­˜ä¸­å‘ç°ç®¡é“å¹¿å‘Šï¼Œå¦‚æœæ²¡æœ‰å‘ç°ï¼Œé‚£ä¹ˆä½¿ç”¨ç³»ç»Ÿç”Ÿæˆçš„Idåˆ›å»ºç®¡é“å¹¿å‘Šã€‚
+	 * @param pg		ç”¨äºå‘ç°æˆ–åˆ›å»ºç®¡é“å¹¿å‘Šçš„èŠ‚ç‚¹ç»„
+	 * @param name		ç”¨äºå‘ç°æˆ–åˆ›å»ºç®¡é“å¹¿å‘Šçš„åç§°ï¼Œå¦‚æœæœ¬åœ°æˆ–è¿œç¨‹éƒ½æ²¡æœ‰å‘ç°ç®¡é“å¹¿å‘Šï¼Œé‚£ä¹ˆå°†ä½¿ç”¨è¯¥åç§°åˆ›å»ºç®¡é“å¹¿å‘Šï¼Œå› æ­¤è¯¥åç§°ä¸è¦ä½¿ç”¨é€šé…ç¬¦
+	 * @param type		åˆ›å»ºç®¡é“å¹¿å‘Šçš„ç±»å‹ï¼Œç›®å‰æ”¯æŒ3ç§åŸºæœ¬ç±»å‹
+	 * 						JxtaUnicast			å•å‘ã€ä¸å®‰å…¨å’Œä¸å¯é 
+	 * 						JxtaUnicastSecure	å•å‘ã€å®‰å…¨ï¼ˆä½¿ç”¨TLSï¼‰
+	 * 						JxtaPropagate		ä¼ æ’­å¹¿å‘Š 
+	 * @param remotePublish	å¦‚æœåˆ›å»ºç®¡é“å¹¿å‘Šï¼Œé‚£ä¹ˆæ˜¯å¦è¿œç¨‹å‘å¸ƒ
+	 * @return			åœ¨èŠ‚ç‚¹ç»„å†…å‘ç°æˆ–åˆ›å»ºçš„å¹¿å‘Šå¯¹è±¡
 	 */
 	public static PipeAdvertisement getPipeAdvWithoutRemoteDiscovery(PeerGroup pg, String name, String type, boolean remotePublish) {
 		return getPipeAdvWithoutRemoteDiscovery(pg, name, type, null, remotePublish);
 	}
 	
 	/**
-	 * Í¬²½·½Ê½·¢ÏÖÒ»¶¨Ê±¼äÄÚµÃµ½µÄ×îĞÂ¹ÜµÀ¹ã¸æ
-	 * @param pg	½Úµã×é£¬ÔÚ¸Ã½Úµã×éÄÚ·¢ÏÖ¹ÜµÀ¹ã¸æ
-	 * @param name	¹ÜµÀ¹ã¸æÃû³Æ£¬¿ÉÊ¹ÓÃÍ¨Åä·û
-	 * @param time Ê±¼äÉÏÏŞ
-	 * @return		×îĞÂµÄ¹ÜµÀ¹ã¸æ¶ÔÏó£¬Èç¹ûÃ»ÓĞÕÒµ½»ò·¢ÏÖ¹ı³Ì·¢ÉúÒì³££¬ÄÇÃ´·µ»Ønull
+	 * åŒæ­¥æ–¹å¼å‘ç°ä¸€å®šæ—¶é—´å†…å¾—åˆ°çš„æœ€æ–°ç®¡é“å¹¿å‘Š
+	 * @param pg	èŠ‚ç‚¹ç»„ï¼Œåœ¨è¯¥èŠ‚ç‚¹ç»„å†…å‘ç°ç®¡é“å¹¿å‘Š
+	 * @param name	ç®¡é“å¹¿å‘Šåç§°ï¼Œå¯ä½¿ç”¨é€šé…ç¬¦
+	 * @param time æ—¶é—´ä¸Šé™
+	 * @return		æœ€æ–°çš„ç®¡é“å¹¿å‘Šå¯¹è±¡ï¼Œå¦‚æœæ²¡æœ‰æ‰¾åˆ°æˆ–å‘ç°è¿‡ç¨‹å‘ç”Ÿå¼‚å¸¸ï¼Œé‚£ä¹ˆè¿”å›null
 	 */
 	public static PipeAdvertisement findNewestPipeAdv(PeerGroup pg, String name, long time) {
 		DiscoveryService discovery = pg.getDiscoveryService();
@@ -146,7 +146,7 @@ public class PipeUtil {
 				}
 			}
 			
-			//·¢ËÍÁËN¸öÔ¶³ÌËÑË÷ÇëÇóºó, ¼ì²é±¾µØ×îĞÂµÄ¹ÜµÀ¹ã¸æ.
+			//å‘é€äº†Nä¸ªè¿œç¨‹æœç´¢è¯·æ±‚å, æ£€æŸ¥æœ¬åœ°æœ€æ–°çš„ç®¡é“å¹¿å‘Š.
 			myAdv = searchLocal(pg, name);
 			
 		} catch(Exception e) {
@@ -164,10 +164,10 @@ public class PipeUtil {
 	}
 	
 	/**
-	 * Í¬²½·½Ê½·¢ÏÖÒ»¶¨Ê±¼äÄÚ×îÏÈµÃµ½µÄ¹ÜµÀ¹ã¸æ
-	 * @param pg	½Úµã×é£¬ÔÚ¸Ã½Úµã×éÄÚ·¢ÏÖ¹ÜµÀ¹ã¸æ
-	 * @param name	¹ÜµÀ¹ã¸æÃû³Æ£¬¿ÉÊ¹ÓÃÍ¨Åä·û
-	 * @return		¹ÜµÀ¹ã¸æ¶ÔÏó£¬Èç¹ûÃ»ÓĞÕÒµ½»ò·¢ÏÖ¹ı³Ì·¢ÉúÒì³££¬ÄÇÃ´·µ»Ønull
+	 * åŒæ­¥æ–¹å¼å‘ç°ä¸€å®šæ—¶é—´å†…æœ€å…ˆå¾—åˆ°çš„ç®¡é“å¹¿å‘Š
+	 * @param pg	èŠ‚ç‚¹ç»„ï¼Œåœ¨è¯¥èŠ‚ç‚¹ç»„å†…å‘ç°ç®¡é“å¹¿å‘Š
+	 * @param name	ç®¡é“å¹¿å‘Šåç§°ï¼Œå¯ä½¿ç”¨é€šé…ç¬¦
+	 * @return		ç®¡é“å¹¿å‘Šå¯¹è±¡ï¼Œå¦‚æœæ²¡æœ‰æ‰¾åˆ°æˆ–å‘ç°è¿‡ç¨‹å‘ç”Ÿå¼‚å¸¸ï¼Œé‚£ä¹ˆè¿”å›null
 	 * @deprecated
 	 */
 	public static PipeAdvertisement findPipeAdv(PeerGroup pg, String name) {
@@ -216,10 +216,10 @@ public class PipeUtil {
 	}
 	
 	/**
-	 * °´¸ø¶¨µÄpipeIDÍ¬²½·½Ê½·¢ÏÖ¹ÜµÀ¹ã¸æ
-	 * @param pg ½Úµã×é£¬ÔÚ¸Ã½Úµã×éÄÚ·¢ÏÖ¹ÜµÀ¹ã¸æ
-	 * @param pipeID Òª²éÕÒµÄ¹ÜµÀ¹ã¸æµÄ¹ÜµÀID
-	 * @return ¹ÜµÀ¹ã¸æ¶ÔÏó£¬Èç¹ûÃ»ÓĞÕÒµ½»ò·¢ÏÖ¹ı³Ì·¢ÉúÒì³££¬ÄÇÃ´·µ»Ønull
+	 * æŒ‰ç»™å®šçš„pipeIDåŒæ­¥æ–¹å¼å‘ç°ç®¡é“å¹¿å‘Š
+	 * @param pg èŠ‚ç‚¹ç»„ï¼Œåœ¨è¯¥èŠ‚ç‚¹ç»„å†…å‘ç°ç®¡é“å¹¿å‘Š
+	 * @param pipeID è¦æŸ¥æ‰¾çš„ç®¡é“å¹¿å‘Šçš„ç®¡é“ID
+	 * @return ç®¡é“å¹¿å‘Šå¯¹è±¡ï¼Œå¦‚æœæ²¡æœ‰æ‰¾åˆ°æˆ–å‘ç°è¿‡ç¨‹å‘ç”Ÿå¼‚å¸¸ï¼Œé‚£ä¹ˆè¿”å›null
 	 */
 	public static PipeAdvertisement findPipeAdvByPipeID(PeerGroup pg, String pipeID) {
 		DiscoveryService discovery = pg.getDiscoveryService();
@@ -267,15 +267,15 @@ public class PipeUtil {
 	}
 	
 	/**
-	 * ´´½¨¹ÜµÀ¹ã¸æ
-	 * @param pg		ÓÃÓÚ´´½¨¹ÜµÀ¹ã¸æµÄ½Úµã×é
-	 * @param name		Ê¹ÓÃ¸ÃÃû³Æ´´½¨¹ÜµÀ¹ã¸æ
-	 * @param type		´´½¨¹ÜµÀ¹ã¸æµÄÀàĞÍ£¬Ä¿Ç°Ö§³Ö3ÖÖ»ù±¾ÀàĞÍ
-	 * 						JxtaUnicast			µ¥Ïò¡¢²»°²È«ºÍ²»¿É¿¿
-	 * 						JxtaUnicastSecure	µ¥Ïò¡¢°²È«£¨Ê¹ÓÃTLS£©
-	 * 						JxtaPropagate		´«²¥¹ã¸æ 
-	 * @param pipeId	Ö¸¶¨Éú³É¹ÜµÀ¹ã¸æµÄPipeId,Èç¹û¸ÃÖµÎª¿Õ»ònull£¬ÄÇÃ´Ê¹ÓÃÏµÍ³Éú³ÉµÄId
-	 * @return			ÔÚ½Úµã×éÄÚ´´½¨µÄ¹ã¸æ¶ÔÏó
+	 * åˆ›å»ºç®¡é“å¹¿å‘Š
+	 * @param pg		ç”¨äºåˆ›å»ºç®¡é“å¹¿å‘Šçš„èŠ‚ç‚¹ç»„
+	 * @param name		ä½¿ç”¨è¯¥åç§°åˆ›å»ºç®¡é“å¹¿å‘Š
+	 * @param type		åˆ›å»ºç®¡é“å¹¿å‘Šçš„ç±»å‹ï¼Œç›®å‰æ”¯æŒ3ç§åŸºæœ¬ç±»å‹
+	 * 						JxtaUnicast			å•å‘ã€ä¸å®‰å…¨å’Œä¸å¯é 
+	 * 						JxtaUnicastSecure	å•å‘ã€å®‰å…¨ï¼ˆä½¿ç”¨TLSï¼‰
+	 * 						JxtaPropagate		ä¼ æ’­å¹¿å‘Š 
+	 * @param pipeId	æŒ‡å®šç”Ÿæˆç®¡é“å¹¿å‘Šçš„PipeId,å¦‚æœè¯¥å€¼ä¸ºç©ºæˆ–nullï¼Œé‚£ä¹ˆä½¿ç”¨ç³»ç»Ÿç”Ÿæˆçš„Id
+	 * @return			åœ¨èŠ‚ç‚¹ç»„å†…åˆ›å»ºçš„å¹¿å‘Šå¯¹è±¡
 	 */
     public static PipeAdvertisement createAdv(PeerGroup pg, String name, String type, String pipeId) {
     	PipeAdvertisement pa = (PipeAdvertisement) AdvertisementFactory.newAdvertisement(PipeAdvertisement.getAdvertisementType());
@@ -296,10 +296,10 @@ public class PipeUtil {
     }
 	
     /**
-     * ±¾µØËÑË÷¹ã¸æ¶ÔÏó, ·µ»ØµÃµ½µÄ×îĞÂµÄ¹ã¸æ
-     * @param pg		ÓÃÓÚËÑË÷¹ÜµÀ¹ã¸æµÄ½Úµã×é
-     * @param name		ÓÃÓÚËÑË÷¹ÜµÀ¹ã¸æµÄÃû³Æ£¬¿ÉÊ¹ÓÃÍ¨Åä·û
-     * @return			ÔÚ½Úµã×éÄÚ´´½¨µÄ¹ã¸æ¶ÔÏó£¨·µ»Ø·¢ÏÖµÄ×îĞÂµÄ¹ÜµÀ¹ã¸æ£©
+     * æœ¬åœ°æœç´¢å¹¿å‘Šå¯¹è±¡, è¿”å›å¾—åˆ°çš„æœ€æ–°çš„å¹¿å‘Š
+     * @param pg		ç”¨äºæœç´¢ç®¡é“å¹¿å‘Šçš„èŠ‚ç‚¹ç»„
+     * @param name		ç”¨äºæœç´¢ç®¡é“å¹¿å‘Šçš„åç§°ï¼Œå¯ä½¿ç”¨é€šé…ç¬¦
+     * @return			åœ¨èŠ‚ç‚¹ç»„å†…åˆ›å»ºçš„å¹¿å‘Šå¯¹è±¡ï¼ˆè¿”å›å‘ç°çš„æœ€æ–°çš„ç®¡é“å¹¿å‘Šï¼‰
      */
     public static PipeAdvertisement searchLocal(PeerGroup pg, String name) {
         DiscoveryService discoveryService = pg.getDiscoveryService();
@@ -331,10 +331,10 @@ public class PipeUtil {
     }
     
     /**
-     * °´¸ø¶¨µÄpipeID±¾µØËÑË÷¹ã¸æ¶ÔÏó
-     * @param pg		ÓÃÓÚËÑË÷¹ÜµÀ¹ã¸æµÄ½Úµã×é
-     * @param pipeID Òª²éÕÒµÄ¹ÜµÀ¹ã¸æµÄ¹ÜµÀID
-     * @return			ÔÚ½Úµã×éÄÚ´´½¨µÄ¹ã¸æ¶ÔÏó£¨·µ»Ø·¢ÏÖµÄ×îĞÂµÄ¹ÜµÀ¹ã¸æ£©
+     * æŒ‰ç»™å®šçš„pipeIDæœ¬åœ°æœç´¢å¹¿å‘Šå¯¹è±¡
+     * @param pg		ç”¨äºæœç´¢ç®¡é“å¹¿å‘Šçš„èŠ‚ç‚¹ç»„
+     * @param pipeID è¦æŸ¥æ‰¾çš„ç®¡é“å¹¿å‘Šçš„ç®¡é“ID
+     * @return			åœ¨èŠ‚ç‚¹ç»„å†…åˆ›å»ºçš„å¹¿å‘Šå¯¹è±¡ï¼ˆè¿”å›å‘ç°çš„æœ€æ–°çš„ç®¡é“å¹¿å‘Šï¼‰
      */
     public static PipeAdvertisement searchLocalByPipeID(PeerGroup pg, String pipeID) {
         DiscoveryService discoveryService = pg.getDiscoveryService();
@@ -366,19 +366,19 @@ public class PipeUtil {
     }
     
 	/**
-	 * ±¾µØ·¢²¼¹ã¸æ
-	 * @param pg ×é
-	 * @param pa ¹ÜµÀ¹ã¸æ
+	 * æœ¬åœ°å‘å¸ƒå¹¿å‘Š
+	 * @param pg ç»„
+	 * @param pa ç®¡é“å¹¿å‘Š
 	 */
     public static void publish(PeerGroup pg, PipeAdvertisement pa) {
         publish(pg, pa, false);
     }
 
     /**
-     * ±¾µØ·¢²¼¹ã¸æ, Èç¹ûremoteÎªÕæÔòÔ¶³Ì·¢²¼
-     * @param pg ×é
-     * @param pa ¹ÜµÀ¹ã¸æ
-     * @param remote ÊÇ·ñÔ¶³Ì·¢²¼ 
+     * æœ¬åœ°å‘å¸ƒå¹¿å‘Š, å¦‚æœremoteä¸ºçœŸåˆ™è¿œç¨‹å‘å¸ƒ
+     * @param pg ç»„
+     * @param pa ç®¡é“å¹¿å‘Š
+     * @param remote æ˜¯å¦è¿œç¨‹å‘å¸ƒ 
      */
     public static void publish(PeerGroup pg, PipeAdvertisement pa, boolean remote) {
         DiscoveryService ds = pg.getDiscoveryService();

@@ -24,20 +24,20 @@ public class GroupAdvTable extends AdvTable{
 	}
 
 	/**
-	 * ÏòËÑË÷½á¹ûÁĞ±íÖĞÌí¼ÓÒ»ĞĞ. Ìí¼ÓÖ®Ç°ÅĞ¶Ï±íÖĞÊÇ·ñÒÑÓĞ¸ÃÔªËØ, Ã»ÓĞ²ÅĞèÒªÌí¼Ó. TODO ÒÔºó¸ù¾İ¾ßÌåÇé¿ö»¹ĞèÒª¸Ä
+	 * å‘æœç´¢ç»“æœåˆ—è¡¨ä¸­æ·»åŠ ä¸€è¡Œ. æ·»åŠ ä¹‹å‰åˆ¤æ–­è¡¨ä¸­æ˜¯å¦å·²æœ‰è¯¥å…ƒç´ , æ²¡æœ‰æ‰éœ€è¦æ·»åŠ . TODO ä»¥åæ ¹æ®å…·ä½“æƒ…å†µè¿˜éœ€è¦æ”¹
 	 * 
 	 * @param adv
-	 *            »ñÈ¡µÄ¹ã¸æ
+	 *            è·å–çš„å¹¿å‘Š
 	 * @param src
-	 *            ´Ósrc´¦»ñÈ¡µÄ¹ã¸æ
+	 *            ä»srcå¤„è·å–çš„å¹¿å‘Š
 	 * @param delay
-	 *            Ê±¼äÑÓ³Ù
+	 *            æ—¶é—´å»¶è¿Ÿ
 	 */
 	@Override
 	public void addRow(Advertisement adv, Object src, long delay) {
 		/**
-		 * Èç¹ûÒÑ¾­Ìí¼Ó¹ı»òÕßÊÇ×Ô¼ºµÄadv, ¾Í²»Ìí¼Ó, Ö±½Ó·µ»Ø
-		 * ÔİÊ±castÎªPeerAdvÀàĞÍ
+		 * å¦‚æœå·²ç»æ·»åŠ è¿‡æˆ–è€…æ˜¯è‡ªå·±çš„adv, å°±ä¸æ·»åŠ , ç›´æ¥è¿”å›
+		 * æš‚æ—¶castä¸ºPeerAdvç±»å‹
 		 */
 		if(adv instanceof PeerGroupAdvertisement)
 			;
@@ -69,7 +69,7 @@ public class GroupAdvTable extends AdvTable{
 
 		model.addRow(advitem);
 		/**
-		 * Í¬²½¹ã¸æÏòÁ¿
+		 * åŒæ­¥å¹¿å‘Šå‘é‡
 		 */
 		advVector.add(adv);
 		//System.out.println("Add a Adv to the vector:" + advVector.size());

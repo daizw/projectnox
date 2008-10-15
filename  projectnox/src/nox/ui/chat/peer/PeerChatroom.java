@@ -28,22 +28,22 @@ import nox.xml.NoxFileUnit;
 @SuppressWarnings("serial")
 public class PeerChatroom extends Chatroom {
 	/**
-	 * Á¬½Ó¶Ô·½Ê±ÏÔÊ¾µÄÄ£ºı½ø¶ÈÖ¸Ê¾Æ÷
+	 * è¿æ¥å¯¹æ–¹æ—¶æ˜¾ç¤ºçš„æ¨¡ç³Šè¿›åº¦æŒ‡ç¤ºå™¨
 	 */
 	private InfiniteProgressPanel glassPane;
 	private PeerConnectionHandler handler;
 	/**
-	 * ×îÖÕÓ¦¸Ã´ÓÖ÷´°¿Ú¼Ì³ĞÑÕÉ«, Í¸Ã÷¶È ¿¼ÂÇÊµÏÖ:Ö÷´°¿ÚºÍ´ÓÊô´°¿ÚÍ¬²½µ÷½ÚÑÕÉ«ºÍÍ¸Ã÷¶È.
-	 * ÔÚÊµÀı»¯´ÓÊô´°¿ÚµÄÊ±ºò½«ÒıÓÃ±£´æÔÚÒ»¸öVectorÖĞ,
-	 * µ÷½ÚÑÕÉ«¼°Í¸Ã÷¶ÈÊ±¶Ô VectorÖĞÊµÀıÒÀ´Îµ÷ÓÃµ÷½Úº¯Êı.
+	 * æœ€ç»ˆåº”è¯¥ä»ä¸»çª—å£ç»§æ‰¿é¢œè‰², é€æ˜åº¦ è€ƒè™‘å®ç°:ä¸»çª—å£å’Œä»å±çª—å£åŒæ­¥è°ƒèŠ‚é¢œè‰²å’Œé€æ˜åº¦.
+	 * åœ¨å®ä¾‹åŒ–ä»å±çª—å£çš„æ—¶å€™å°†å¼•ç”¨ä¿å­˜åœ¨ä¸€ä¸ªVectorä¸­,
+	 * è°ƒèŠ‚é¢œè‰²åŠé€æ˜åº¦æ—¶å¯¹ Vectorä¸­å®ä¾‹ä¾æ¬¡è°ƒç”¨è°ƒèŠ‚å‡½æ•°.
 	 * 
-	 * <li>¹¹Ôìº¯Êı.</li>
-	 * <li>ÓÃ»§Ë«»÷ºÃÓÑÍ¼±êÊ±, Èç¹û²»´æÔÚ¶ÔÓ¦µÄchatroom, Ôò</li>
+	 * <li>æ„é€ å‡½æ•°.</li>
+	 * <li>ç”¨æˆ·åŒå‡»å¥½å‹å›¾æ ‡æ—¶, å¦‚æœä¸å­˜åœ¨å¯¹åº”çš„chatroom, åˆ™</li>
 	 * <ol>
-	 * <li>½¨Á¢ĞÂµÄchatroom;</li>
-	 * <li>×Ô¶¯³¢ÊÔÁ¬½Ó.</li>
+	 * <li>å»ºç«‹æ–°çš„chatroom;</li>
+	 * <li>è‡ªåŠ¨å°è¯•è¿æ¥.</li>
 	 * </ol>
-	 * @param friend ´ú±íºÃÓÑµÄPeerItem
+	 * @param friend ä»£è¡¨å¥½å‹çš„PeerItem
 	 * @see PeerItem
 	 */
 	public PeerChatroom(final PeerItem friend, PeerConnectionHandler handler) {
@@ -53,7 +53,7 @@ public class PeerChatroom extends Chatroom {
 				+ "chat_green_48.png", false);
 		
 		this.handler = handler;
-		//roomID ËÆºõÎ´ÓÃµ½
+		//roomID ä¼¼ä¹æœªç”¨åˆ°
 		roomID = friend.getUUID();
 		roomname = friend.getName();
 
@@ -63,7 +63,7 @@ public class PeerChatroom extends Chatroom {
 		rootpane.add(portraits);
 		rootpane.add(chatroompane);
 		
-		glassPane = new InfiniteProgressPanel("Á¬½ÓÖĞ, ÇëÉÔºò...", 12);
+		glassPane = new InfiniteProgressPanel("è¿æ¥ä¸­, è¯·ç¨å€™...", 12);
 		glassPane.setBounds(0, -NoxFrame.TITLE_HEIGHT, WIDTH_PREF, HEIGHT_PREF
 				- NoxFrame.TITLE_HEIGHT * 2);
 
@@ -115,7 +115,7 @@ public class PeerChatroom extends Chatroom {
 			byte[] fileDataBytes = incomingFile.getData();
 			
 			JFileChooser chooser=new JFileChooser(".");
-			chooser.setDialogTitle("±£´æ-ÇëÊäÈëÎÄ¼şÃû");
+			chooser.setDialogTitle("ä¿å­˜-è¯·è¾“å…¥æ–‡ä»¶å");
 			chooser.setSelectedFile( new File(filename) );
 			int returnVal = chooser.showSaveDialog(PeerChatroom.this);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {

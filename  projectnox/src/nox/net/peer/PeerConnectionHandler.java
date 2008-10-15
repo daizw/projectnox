@@ -93,12 +93,12 @@ import nox.xml.XmlMsgFormat;
  */
 public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeMsgListener {
 	/**
-	 * Êµ¼ÊÉÏÊÇË«Ïò¹ÜµÀ, ¼´¼È¿ÉÒÔÊÕÒ²¿ÉÒÔ·¢.
-	 * ÕâÀïµÄÃüÃûÖ»ÊÇÎªÁËÇ¿µ÷·¢.
+	 * å®é™…ä¸Šæ˜¯åŒå‘ç®¡é“, å³æ—¢å¯ä»¥æ”¶ä¹Ÿå¯ä»¥å‘.
+	 * è¿™é‡Œçš„å‘½ååªæ˜¯ä¸ºäº†å¼ºè°ƒå‘.
 	 */
 	private JxtaBiDiPipe outbidipipe;
 	/**
-	 * ¶ÔÓ¦µÄChatroom
+	 * å¯¹åº”çš„Chatroom
 	 */
 	private PeerChatroom room = null;
 	/*private String roomname = "";
@@ -111,25 +111,25 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 	private PublicKey bobPubKey = null;
 	
 	/**
-	 * ¹¹Ôìº¯Êı, ¸ù¾İµÚ¶ş¸ö²ÎÊı¾ö¶¨ÊÇ·ñÊµÀı»¯ÁÄÌì´°¿Ú<br>
+	 * æ„é€ å‡½æ•°, æ ¹æ®ç¬¬äºŒä¸ªå‚æ•°å†³å®šæ˜¯å¦å®ä¾‹åŒ–èŠå¤©çª—å£<br>
 	 * <ol>
-	 * <li>Èç¹ûÁ¢¿ÌÊµÀı»¯´°¿Ú, ÔòÁ¬½Ó¹ı³ÌÔÚµ¥¶ÀÒ»¸öÏß³ÌÖĞÔËĞĞ(Òì²½)</li>
-	 * <li>Èç¹û²»Á¢¿ÌÊµÀı»¯´°¿Ú, ÔòÁ¬½Ó¹ı³Ì×èÈûÔËĞĞ(Í¬²½)</li>
+	 * <li>å¦‚æœç«‹åˆ»å®ä¾‹åŒ–çª—å£, åˆ™è¿æ¥è¿‡ç¨‹åœ¨å•ç‹¬ä¸€ä¸ªçº¿ç¨‹ä¸­è¿è¡Œ(å¼‚æ­¥)</li>
+	 * <li>å¦‚æœä¸ç«‹åˆ»å®ä¾‹åŒ–çª—å£, åˆ™è¿æ¥è¿‡ç¨‹é˜»å¡è¿è¡Œ(åŒæ­¥)</li>
 	 * </ol>
-	 * @param friend ÁĞ±íÖĞ¶Ô·½µÄPeerItem
-	 * @param showChatroom ÊÇ·ñÁ¢¿ÌÊµÀı»¯´°¿Ú
-	 * @throws Exception µÚÒ»¸ö²ÎÊıÎª¿ÕÒì³£
+	 * @param friend åˆ—è¡¨ä¸­å¯¹æ–¹çš„PeerItem
+	 * @param showChatroom æ˜¯å¦ç«‹åˆ»å®ä¾‹åŒ–çª—å£
+	 * @throws Exception ç¬¬ä¸€ä¸ªå‚æ•°ä¸ºç©ºå¼‚å¸¸
 	 */
 	public PeerConnectionHandler(final PeerItem friend, boolean showChatroom) throws Exception{
 		if(friend == null){
-			throw new Exception("PeerConnectionHandler ³õÊ¼»¯PeerItem²ÎÊıÎª¿Õ.");
+			throw new Exception("PeerConnectionHandler åˆå§‹åŒ–PeerItemå‚æ•°ä¸ºç©º.");
 		}
 		this.friend = friend;
 		
 		if(showChatroom){
-			//ÏÔÊ¾ÁÄÌìÊÒ´°¿Ú, Á¬½Ó.
-			//³É¹¦: ×¢²á²¢¼àÌı
-			//³¬Ê±(²»³É¹¦):ÌáÊ¾ÓÃ»§Á¬½Ó³¬Ê±, ÊÇ·ñÖØÊÔ!
+			//æ˜¾ç¤ºèŠå¤©å®¤çª—å£, è¿æ¥.
+			//æˆåŠŸ: æ³¨å†Œå¹¶ç›‘å¬
+			//è¶…æ—¶(ä¸æˆåŠŸ):æç¤ºç”¨æˆ·è¿æ¥è¶…æ—¶, æ˜¯å¦é‡è¯•!
 			room = new PeerChatroom(friend, PeerConnectionHandler.this);
 			room.setVisible(true);
 			Thread connector = new Thread(new Runnable(){
@@ -141,8 +141,8 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 						if(outbidipipe == null){
 							retry = room.showTimeOutMsg();
 						} else {
-							System.out.println("Á¬½Ó³É¹¦!!");
-							//TryToConnect()ÒÑ×Ô¶¯×¢²áID-connectionHandler²¢¼àÌı
+							System.out.println("è¿æ¥æˆåŠŸ!!");
+							//TryToConnect()å·²è‡ªåŠ¨æ³¨å†ŒID-connectionHandlerå¹¶ç›‘å¬
 							room.setVisible(false);
 							room.removeMask();
 							room.setVisible(true);
@@ -153,16 +153,16 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 			});
 			connector.start();
 		} else {
-			//²»ÏÔÊ¾ÁÄÌìÊÒ´°¿Ú, Ö»Á¬½Ó.
-			//³É¹¦: ×¢²á²¢¼àÌı
+			//ä¸æ˜¾ç¤ºèŠå¤©å®¤çª—å£, åªè¿æ¥.
+			//æˆåŠŸ: æ³¨å†Œå¹¶ç›‘å¬
 			TryToConnect(LANTimeLimit.UNIT_TIME * LANTimeLimit.CONNECT_MAXRETRIES);
 		}
 	}
 	/**
-	 * ¹¹Ôìº¯Êı, µ±ÓÃ»§Ë«»÷Ö÷½çÃæºÃÓÑÁĞ±íÊ±µ÷ÓÃ´Ë¹¹Ôìº¯Êı.<br>
-	 * Ö±½ÓÏÔÊ¾ÁÄÌì´°¿Ú, ²¢ÊÔÍ¼Á¬½Ó<br>
-	 * @param friend ÁĞ±íÖĞ¶Ô·½µÄPeerItem
-	 * @throws Exception ²ÎÊıÎª¿ÕÒì³£
+	 * æ„é€ å‡½æ•°, å½“ç”¨æˆ·åŒå‡»ä¸»ç•Œé¢å¥½å‹åˆ—è¡¨æ—¶è°ƒç”¨æ­¤æ„é€ å‡½æ•°.<br>
+	 * ç›´æ¥æ˜¾ç¤ºèŠå¤©çª—å£, å¹¶è¯•å›¾è¿æ¥<br>
+	 * @param friend åˆ—è¡¨ä¸­å¯¹æ–¹çš„PeerItem
+	 * @throws Exception å‚æ•°ä¸ºç©ºå¼‚å¸¸
 	 */
 	public PeerConnectionHandler(final PeerItem friend) throws Exception {
 		this(friend, true);
@@ -176,15 +176,15 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 	 * <li>register the outbidipipe;</li>
 	 * <li>set the message listener.</li>
 	 * </ol>
-	 * <li>¸Ã¹¹Ôìº¯ÊıÓÉÏµÍ³¼ì²âµ½ÍâÀ´Á¬½ÓÊ±µ÷ÓÃ.×¢²á²¢¼àÌı¸Ãpipe, µ«²¢²»ÊµÀı»¯chatroom</li>
-	 * <li>ÔÚ´ËÖ®ºó, Èç¹û¼àÌıµ½ÓĞÏûÏ¢µ½´ï, ÔòÑ°ÕÒ/½¨Á¢¶ÔÓ¦µÄchatroom, ²¢½«ÏûÏ¢´«µİ¸øchatroom</li>
+	 * <li>è¯¥æ„é€ å‡½æ•°ç”±ç³»ç»Ÿæ£€æµ‹åˆ°å¤–æ¥è¿æ¥æ—¶è°ƒç”¨.æ³¨å†Œå¹¶ç›‘å¬è¯¥pipe, ä½†å¹¶ä¸å®ä¾‹åŒ–chatroom</li>
+	 * <li>åœ¨æ­¤ä¹‹å, å¦‚æœç›‘å¬åˆ°æœ‰æ¶ˆæ¯åˆ°è¾¾, åˆ™å¯»æ‰¾/å»ºç«‹å¯¹åº”çš„chatroom, å¹¶å°†æ¶ˆæ¯ä¼ é€’ç»™chatroom</li>
 	 * </ol>
 	 * @param pipe
 	 *            message pipe
 	 */
 	public PeerConnectionHandler(JxtaBiDiPipe pipe)  throws Exception{
 		if(pipe == null){
-			throw new Exception("PeerConnectionHandler ³õÊ¼»¯JxtaBiDiPipe²ÎÊıÎª¿Õ.");
+			throw new Exception("PeerConnectionHandler åˆå§‹åŒ–JxtaBiDiPipeå‚æ•°ä¸ºç©º.");
 		}
 		this.outbidipipe = pipe;
 		outbidipipe.setMessageListener(this);
@@ -195,21 +195,21 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 		if(NoxToolkit.forceRegisterPeerConnectionHandler((PeerID) friend.getUUID(), this))
 			return;
 		else {
-			System.out.println("Ê¹ÓÃ¸ÃbidipipeÎ´»ñÈ¡µ½peerID");
-			throw new Exception("PeerConnectionHandler ³õÊ¼»¯Ê¹ÓÃ²ÎÊıJxtaBiDiPipeÎ´»ñÈ¡µ½¶Ô·½PeerID");
+			System.out.println("ä½¿ç”¨è¯¥bidipipeæœªè·å–åˆ°peerID");
+			throw new Exception("PeerConnectionHandler åˆå§‹åŒ–ä½¿ç”¨å‚æ•°JxtaBiDiPipeæœªè·å–åˆ°å¯¹æ–¹PeerID");
 		}
 	}
 	public boolean isConnected(){
 		return outbidipipe != null;
 	}
 	/**
-	 * Óë¸Ãpeer½¨Á¢Á¬½Ó:
-	 * ³É¹¦: ×¢²á²¢¼àÌı;
-	 * ²»³É¹¦: ²»×¢²á
-	 * @Fixme »ñÈ¡¹ã¸æ·½Ê½, ×îºÃ¸ÄÎªÔÚÒ»¶¨Ê±¼ä¶ÎÄÚ»ñÈ¡±¾µØºÍÔ¶³ÌµÄ¹ã¸æ, È»ºóÈ¡³ö×îĞÂµÄ.
+	 * ä¸è¯¥peerå»ºç«‹è¿æ¥:
+	 * æˆåŠŸ: æ³¨å†Œå¹¶ç›‘å¬;
+	 * ä¸æˆåŠŸ: ä¸æ³¨å†Œ
+	 * @Fixme è·å–å¹¿å‘Šæ–¹å¼, æœ€å¥½æ”¹ä¸ºåœ¨ä¸€å®šæ—¶é—´æ®µå†…è·å–æœ¬åœ°å’Œè¿œç¨‹çš„å¹¿å‘Š, ç„¶åå–å‡ºæœ€æ–°çš„.
 	 */
 	private void TryToConnect(long waittime) {
-		// Èç¹ûÒÑ¾­ÓĞÁËoutbidipipe, Ôò²»ĞèÒªÖØĞÂÁ¬½Ó
+		// å¦‚æœå·²ç»æœ‰äº†outbidipipe, åˆ™ä¸éœ€è¦é‡æ–°è¿æ¥
 		if (outbidipipe != null) {
 			System.out
 					.println("["
@@ -227,11 +227,11 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 				.println("[" + Thread.currentThread().getName()
 						+ "] Fetching remote pipe adv to peer/group:"
 						+ friend.getUUID());
-		// Èç¹û·¢ÏÖ¶ÔÓ¦µÄpipe»áĞŞ¸ÄnewOutBidipipeAdv
+		// å¦‚æœå‘ç°å¯¹åº”çš„pipeä¼šä¿®æ”¹newOutBidipipeAdv
 		
-		//²éÕÒ¹ÜµÀ¹ã¸æÊ±¼ä, ¹Ì¶¨: 2s : Ó¦¸ù¾İÍøÂç×´¿öµ÷Õû
-		//¾¡Á¿Ê¹ÓÃÒÑÓĞ¹ã¸æ, µ±ĞèÒªÊ±²ÅÖØ½¨¹ÜµÀ.
-		//»ñÈ¡"×îĞÂ"¹ã¸æËùÓÃÊ±¼ä(¹Ì¶¨)
+		//æŸ¥æ‰¾ç®¡é“å¹¿å‘Šæ—¶é—´, å›ºå®š: 2s : åº”æ ¹æ®ç½‘ç»œçŠ¶å†µè°ƒæ•´
+		//å°½é‡ä½¿ç”¨å·²æœ‰å¹¿å‘Š, å½“éœ€è¦æ—¶æ‰é‡å»ºç®¡é“.
+		//è·å–"æœ€æ–°"å¹¿å‘Šæ‰€ç”¨æ—¶é—´(å›ºå®š)
 		int fetchRemotePipeAdvTimeCount = LANTimeLimit.FETCH_PIPEADV_MAXRETRIES/2;
 		PipeAdvertisement newOutPipeAdv = null;
 		/**
@@ -240,23 +240,23 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 		while (fetchRemotePipeAdvTimeCount-- > 0 && outbidipipe == null) {
 			newOutPipeAdv = PipeUtil.findNewestPipeAdv(group, friend.getUUID().toString(), LANTimeLimit.UNIT_TIME*2);
 		}		
-		// 1: µÃµ½ÁËpipe adv;
+		// 1: å¾—åˆ°äº†pipe adv;
 		// 2: timecount <= 0;
-		// 3: outbidipipe != null: ËÑË÷¹ı³ÌÖĞ¶Ô·½Á¬½Ó¹ıÀ´,
-		// ÓÚÊÇConnectionHandlerĞŞ¸ÄÁËoutbidipipe.
+		// 3: outbidipipe != null: æœç´¢è¿‡ç¨‹ä¸­å¯¹æ–¹è¿æ¥è¿‡æ¥,
+		// äºæ˜¯ConnectionHandlerä¿®æ”¹äº†outbidipipe.
 		if (outbidipipe == null) {
-			// ²»ÊÇµÚÈıÖÖÇé¿ö
-			// ÓĞÁ½ÖÖ¿ÉÄÜ:
-			// 1: µÃµ½ÁËpipe adv;
-			// 2: ³¬Ê±
+			// ä¸æ˜¯ç¬¬ä¸‰ç§æƒ…å†µ
+			// æœ‰ä¸¤ç§å¯èƒ½:
+			// 1: å¾—åˆ°äº†pipe adv;
+			// 2: è¶…æ—¶
 			if (newOutPipeAdv == null) {
-				// 2: ³¬Ê±, ·µ»Ø
+				// 2: è¶…æ—¶, è¿”å›
 				System.out
 						.println("Failed to fetch a pipe adv: newOutBidipipeAdv == null.");
 				return;
 			}
 			
-			// 1: µÃµ½pipe adv
+			// 1: å¾—åˆ°pipe adv
 			long timecount = waittime / LANTimeLimit.UNIT_TIME;
 			System.out.println("I have got the latest pipe adv.");
 			System.out.println("[" + Thread.currentThread().getName()
@@ -268,12 +268,12 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 			while (outbidipipe == null && timecount > 0) {
 				// Try again and again
 				try {
-					// ÓÃËÄ¸öµ¥Î»µÄÊ±¼ä×÷Îª³¬Ê±Ê±¼ä//timecount -= 4;
+					// ç”¨å››ä¸ªå•ä½çš„æ—¶é—´ä½œä¸ºè¶…æ—¶æ—¶é—´//timecount -= 4;
 					timecount -= 2;
 					outbidipipe = new JxtaBiDiPipe(group, newOutPipeAdv,
 							(int) LANTimeLimit.UNIT_TIME * 4, this, true);
 					if (outbidipipe == null) {
-						// Õâ¸öifËÆºõÃ»±ØÒª
+						// è¿™ä¸ªifä¼¼ä¹æ²¡å¿…è¦
 						throw new IOException(
 								" tryToConnect() failed: outbidipipe == null.");
 					}
@@ -293,10 +293,10 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 			System.out.println("[" + Thread.currentThread().getName()
 					+ "] Pipe name	: " + newOutPipeAdv.getName());
 		}
-		// 3: outbidipipe != null: ËÑË÷¹ı³ÌÖĞ¶Ô·½Á¬½Ó¹ıÀ´,
-		// ÓÚÊÇConnectionHandlerĞŞ¸ÄÁËoutbidipipe.
-		// »òÕß¾­¹ıÒÔÉÏ¹ı³ÌµÃµ½ÁËĞÂµÄpipe
-		//×¢²á
+		// 3: outbidipipe != null: æœç´¢è¿‡ç¨‹ä¸­å¯¹æ–¹è¿æ¥è¿‡æ¥,
+		// äºæ˜¯ConnectionHandlerä¿®æ”¹äº†outbidipipe.
+		// æˆ–è€…ç»è¿‡ä»¥ä¸Šè¿‡ç¨‹å¾—åˆ°äº†æ–°çš„pipe
+		//æ³¨å†Œ
 		outbidipipe.setMessageListener(this);
 		NoxToolkit.forceRegisterPeerConnectionHandler((PeerID) friend.getUUID(), PeerConnectionHandler.this);
 		//say hello
@@ -304,14 +304,14 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 				+ "] Saying hello ...");
 		String hellomsg = "Hello [F:100] from "
 				+ NoxToolkit.getNetworkConfigurator().getName();
-		//ÒÔ·ÀÍòÒ»...·ÀÖ¹outbidipipeÎª¿ÕÊ±µ¼ÖÂµİ¹éµ÷ÓÃtrytoconnect();
+		//ä»¥é˜²ä¸‡ä¸€...é˜²æ­¢outbidipipeä¸ºç©ºæ—¶å¯¼è‡´é€’å½’è°ƒç”¨trytoconnect();
 		if(outbidipipe != null){
 			/**
-			 * ½»»»×´Ì¬ĞÅÏ¢
+			 * äº¤æ¢çŠ¶æ€ä¿¡æ¯
 			 */
 			sendFullPingMsg();
 			/**
-			 * @Fixme µÚ¶ş¸ö²ÎÊı...........
+			 * @Fixme ç¬¬äºŒä¸ªå‚æ•°...........
 			 */
 			SendMsg(hellomsg, true);
 		}
@@ -340,14 +340,14 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 	@Override
 	public boolean SendMsg(BufferedImage bufImg, boolean encrypt) {
 		/**
-		 * ½«Í¼Æ¬»òÕßImageIcon×ªÎªbyte[]
-		 *  TODO imageio.write()µÄµÚ¶ş¸ö²ÎÊı.............
+		 * å°†å›¾ç‰‡æˆ–è€…ImageIconè½¬ä¸ºbyte[]
+		 *  TODO imageio.write()çš„ç¬¬äºŒä¸ªå‚æ•°.............
 		 */
 		ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
 		try {
 			javax.imageio.ImageIO.write(bufImg, "PNG", byteArrayOS);
 		} catch (IOException e) {
-			System.out.println("ImageIO.write(bufImg, \"PNG\", byteArrayOS)³ö´í!");
+			System.out.println("ImageIO.write(bufImg, \"PNG\", byteArrayOS)å‡ºé”™!");
 			e.printStackTrace();
 			return false;
 		}finally{
@@ -374,7 +374,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 	@Override
 	public boolean SendMsg(File file, boolean encrypt) {
 		/**
-		 * ½«ÎÄ¼ş×ªÎªbyte[]
+		 * å°†æ–‡ä»¶è½¬ä¸ºbyte[]
 		 */
 		byte[] fileBytes = null;
 		byte[] fileData = null;
@@ -401,7 +401,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 		}
 	}
 	/**
-	 * ·¢ËÍpingÏûÏ¢
+	 * å‘é€pingæ¶ˆæ¯
 	 */
 	public void sendPingMsg() {
 		NoxPeerStatusUnit status = NoxToolkit.getCheyenne().getStatusUnit();
@@ -414,7 +414,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 		SendMsg(XmlMsgFormat.PINGMSG_NAMESPACE_NAME, statBytes, false);
 	}
 	/**
-	 * ·¢ËÍpongÏûÏ¢
+	 * å‘é€pongæ¶ˆæ¯
 	 */
 	private void sendPongMsg() {
 		NoxPeerStatusUnit status = NoxToolkit.getCheyenne().getStatusUnit();
@@ -427,7 +427,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 		SendMsg(XmlMsgFormat.PONGMSG_NAMESPACE_NAME, statBytes, false);
 	}
 	/**
-	 * ·¢ËÍÍêÕûµÄpongÏûÏ¢(º¬Í·Ïñ)
+	 * å‘é€å®Œæ•´çš„pongæ¶ˆæ¯(å«å¤´åƒ)
 	 */
 	private void sendFullPingMsg() {
 		NoxPeerStatusUnit status = NoxToolkit.getCheyenne().getFullStatusUnit();
@@ -460,23 +460,23 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 		Message msg = null;
 		
 		if(encrypt){
-			//TODO Éú³ÉDESÃÜÔ¿, ÓÃÆä¼ÓÃÜÊı¾İ(CBCÄ£Ê½), ²úÉúÏàÓ¦´ø²ÎÊıµÄÏûÏ¢
+			//TODO ç”ŸæˆDESå¯†é’¥, ç”¨å…¶åŠ å¯†æ•°æ®(CBCæ¨¡å¼), äº§ç”Ÿç›¸åº”å¸¦å‚æ•°çš„æ¶ˆæ¯
 			if(DESKey == null){
 				Security.addProvider(new com.sun.crypto.provider.SunJCE());
-				//±êÃ÷µ±Ç°×´Ì¬
+				//æ ‡æ˜å½“å‰çŠ¶æ€
 				exchangingPubKeys = true;
 				try {
 					/**
-					 * aliceÉú³ÉDH¶Ô, È»ºó½«¹«Ô¿±àÂëºó·¢¸øbob
+					 * aliceç”ŸæˆDHå¯¹, ç„¶åå°†å…¬é’¥ç¼–ç åå‘ç»™bob
 					 */
-					System.out.println("ALICE: ²úÉú DH ¶Ô ...");
+					System.out.println("ALICE: äº§ç”Ÿ DH å¯¹ ...");
 					KeyPairGenerator aliceKpairGen;
 					aliceKpairGen = KeyPairGenerator.getInstance("DH");
 					
 					aliceKpairGen.initialize(512);
-					KeyPair aliceKpair = aliceKpairGen.generateKeyPair(); // Éú³ÉÊ±¼ä³¤
-					// ÀîËÄ(Alice)Éú³É¹«¹²ÃÜÔ¿ alicePubKeyEnc ²¢·¢ËÍ¸øÕÅÈı(Bob) ,
-					// ±ÈÈçÓÃÎÄ¼ş·½Ê½,socket.....
+					KeyPair aliceKpair = aliceKpairGen.generateKeyPair(); // ç”Ÿæˆæ—¶é—´é•¿
+					// æå››(Alice)ç”Ÿæˆå…¬å…±å¯†é’¥ alicePubKeyEnc å¹¶å‘é€ç»™å¼ ä¸‰(Bob) ,
+					// æ¯”å¦‚ç”¨æ–‡ä»¶æ–¹å¼,socket.....
 					byte[] alicePubKeyEnc = aliceKpair.getPublic().getEncoded();
 					
 					// Alice creates and initializes her DH KeyAgreement object
@@ -492,7 +492,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 					outbidipipe.sendMessage(msg);
 					waiting4PubKey2 = true;
 					int i = 0;
-					//µÈ´ı¶Ô·½(bob)·µ»Øpublic key
+					//ç­‰å¾…å¯¹æ–¹(bob)è¿”å›public key
 					while(waiting4PubKey2 && i++ < LANTimeLimit.CONNECT_MAXRETRIES*2){
 						try {
 							Thread.sleep(LANTimeLimit.UNIT_TIME);
@@ -504,7 +504,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 						}
 					}
 					if(waiting4PubKey2){
-						System.out.println("½»»»¹«Ô¿³¬Ê±, ·¢ËÍ¼ÓÃÜÏûÏ¢Ê§°Ü, ÇëÖØÊÔ.");
+						System.out.println("äº¤æ¢å…¬é’¥è¶…æ—¶, å‘é€åŠ å¯†æ¶ˆæ¯å¤±è´¥, è¯·é‡è¯•.");
 						waiting4PubKey2 = false;
 						exchangingPubKeys = false;
 						return false;
@@ -570,13 +570,13 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 					e.printStackTrace();
 				}
 			} else {
-				System.out.println("²úÉúDESÃÜÔ¿Ê§°Ü!");
+				System.out.println("äº§ç”ŸDESå¯†é’¥å¤±è´¥!");
 				waiting4PubKey2 = false;
 				exchangingPubKeys = false;
 				return false;
 			}
 		} else {
-			//²»¼ÓÃÜ
+			//ä¸åŠ å¯†
 			msg = NoxMsgUtil.generateMsg(namespace,
 					NoxToolkit.getNetworkConfigurator().getName(),
 					NoxToolkit.getNetworkConfigurator().getPeerID().toString(),
@@ -603,41 +603,41 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 	 */
 	public void pipeMsgEvent(PipeMsgEvent event) {
 		System.out.println("===Begin ConnectionHandler PipeMsgEvent()===");
-		// ´¦ÀíÏûÏ¢
+		// å¤„ç†æ¶ˆæ¯
 		// grab the message from the event
 		Message msg = event.getMessage();
 		System.out.println("Incoming call: " + msg.toString());
 		System.out.println("Trying to setup a chatroom...");
 		
-		//´¦ÀíÊÕµ½µÄÏûÏ¢
+		//å¤„ç†æ”¶åˆ°çš„æ¶ˆæ¯
 		processIncomingMsg(msg, false);
 		
 		System.out.println("===End ConnectionHandler PipeMsgEvent()===");
 	}
 
 	/**
-	 * ÏûÏ¢´¦Àíº¯Êı, ÌáÊ¾ÊÕµ½ÏûÏ¢
+	 * æ¶ˆæ¯å¤„ç†å‡½æ•°, æç¤ºæ”¶åˆ°æ¶ˆæ¯
 	 * <ol>
-	 * <li>Èç¹ûÁÄÌìÊÒ¿É¼û, Ö±½ÓÏÔÊ¾</li>
-	 * <li>TODO Èç¹û²»¿É¼û, ÔòÌáÊ¾ÓÃ»§ÓĞĞÂÏûÏ¢µ½´ï, ÓÉÓÃ»§¾ö¶¨ÊÇ·ñÏÔÊ¾</li>
+	 * <li>å¦‚æœèŠå¤©å®¤å¯è§, ç›´æ¥æ˜¾ç¤º</li>
+	 * <li>TODO å¦‚æœä¸å¯è§, åˆ™æç¤ºç”¨æˆ·æœ‰æ–°æ¶ˆæ¯åˆ°è¾¾, ç”±ç”¨æˆ·å†³å®šæ˜¯å¦æ˜¾ç¤º</li>
 	 * <ol>
-	 * <li>ºÃÓÑ: ÌáÊ¾ºÃÓÑÏûÏ¢</li>
-	 * <li>Ä°ÉúÈË, ÌáÊ¾Ä°ÉúÈËÏûÏ¢.</li>
+	 * <li>å¥½å‹: æç¤ºå¥½å‹æ¶ˆæ¯</li>
+	 * <li>é™Œç”Ÿäºº, æç¤ºé™Œç”Ÿäººæ¶ˆæ¯.</li>
 	 * </ol>
 	 * </ol>
-	 * @param sender ·¢ËÍÕßêÇ³Æ
-	 * @param time Ê±¼ä´Á
-	 * @param msgdata ÊÕµ½µÄÏûÏ¢
+	 * @param sender å‘é€è€…æ˜µç§°
+	 * @param time æ—¶é—´æˆ³
+	 * @param msgdata æ”¶åˆ°çš„æ¶ˆæ¯
 	 */
 	private void promptIncomingMsg(final String sender, final String time, final Object msgdata) {
 		/**
-		 * ½«ÏûÏ¢Êä³öµ½ÁÄÌì´°¿Ú
+		 * å°†æ¶ˆæ¯è¾“å‡ºåˆ°èŠå¤©çª—å£
 		 */
 		System.out.println("Have put the message to the Chatroom window...");
 		System.out.println("Did you see the message?");
-		//Èç¹û´°¿Ú²»´æÔÚ»òÕß²»¿É¼û
+		//å¦‚æœçª—å£ä¸å­˜åœ¨æˆ–è€…ä¸å¯è§
 		if(room == null || !room.isVisible()){
-			//TODO Ó¦¸ÃÊÇÌáÊ¾ÓĞÏûÏ¢, ¶ø²»ÊÇÇ¿ĞĞÏÔÊ¾´°¿Ú
+			//TODO åº”è¯¥æ˜¯æç¤ºæœ‰æ¶ˆæ¯, è€Œä¸æ˜¯å¼ºè¡Œæ˜¾ç¤ºçª—å£
 			/*this.setVisible(true);*/
 			System.out.println("The window is null or not visible , I make it be!");
 			Icon infoIcon = UIManager.getIcon ("OptionPane.informationIcon");
@@ -670,7 +670,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 					playAudio();
 				}
 				/**
-				 * ½ÓÊÕÏûÏ¢Ê±²¥·ÅÌáÊ¾Òô
+				 * æ¥æ”¶æ¶ˆæ¯æ—¶æ’­æ”¾æç¤ºéŸ³
 				 */
 				private void playAudio() {
 					
@@ -694,7 +694,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 				@Override
 				public void actionPerformed(ActionEvent arg0){
 					/*if(room == null){
-						// ĞÂ½¨chatroom, ÏÔÊ¾ÏûÏ¢
+						// æ–°å»ºchatroom, æ˜¾ç¤ºæ¶ˆæ¯
 						room = new PeerChatroom(friend, PeerConnectionHandler.this);
 						room.removeMask();
 					}
@@ -719,11 +719,11 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 	/**
 	 * Process the incoming message
 	 * <ol>
-	 * <li>ºÚÃûµ¥, ºöÂÔÖ®</li>
-	 * <li>·ñÔò, ½øĞĞ´¦Àí</li>
+	 * <li>é»‘åå•, å¿½ç•¥ä¹‹</li>
+	 * <li>å¦åˆ™, è¿›è¡Œå¤„ç†</li>
 	 * <ol>
-	 * <li>Èç¹ûÊÇÏµÍ³ping/pongÏûÏ¢, Ôò½øĞĞÏàÓ¦´¦Àí</li>
-	 * <li>Èç¹ûÊÇÓÃ»§ÏûÏ¢, Ôò½»¸øpromptIncomingMsg¸ù¾İÁÄÌìÊÒ´°¿Ú×´Ì¬½øĞĞÏàÓ¦´¦Àí</li>
+	 * <li>å¦‚æœæ˜¯ç³»ç»Ÿping/pongæ¶ˆæ¯, åˆ™è¿›è¡Œç›¸åº”å¤„ç†</li>
+	 * <li>å¦‚æœæ˜¯ç”¨æˆ·æ¶ˆæ¯, åˆ™äº¤ç»™promptIncomingMsgæ ¹æ®èŠå¤©å®¤çª—å£çŠ¶æ€è¿›è¡Œç›¸åº”å¤„ç†</li>
 	 * </ol>
 	 * </ol>
 	 * @param msg
@@ -795,11 +795,11 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 				System.out.println("Incoming call: ToID: " + receiverIDEle.toString());
 				System.out.println("Incoming call: At: " + timeEle.toString());
 				/**
-				 * @Fixme ´«ËÍ´óÁ¿Êı¾İµÄÊ±ºòÈç¹û´òÓ¡³öÀ´»á½µµÍËÙ¶È
+				 * @Fixme ä¼ é€å¤§é‡æ•°æ®çš„æ—¶å€™å¦‚æœæ‰“å°å‡ºæ¥ä¼šé™ä½é€Ÿåº¦
 				 */
 				System.out.println("Incoming call: Msg(Length): " + dataEle.getByteLength());
 				
-				//ÑéÖ¤ÏûÏ¢ÖĞÊÕ·¢ÕßIDÊÇ·ñ"Õı³£"
+				//éªŒè¯æ¶ˆæ¯ä¸­æ”¶å‘è€…IDæ˜¯å¦"æ­£å¸¸"
 				String whoami = NoxToolkit.getNetworkConfigurator().getPeerID().toString();
 				String receiverID = receiverIDEle.toString();
 				if(!whoami.equals(receiverID)){
@@ -813,7 +813,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 				}
 				
 				/**
-				 * TODO ÅĞ¶ÏÊÇ·ñÔÚºÚÃûµ¥ÖĞ, ÊÇÔòºöÂÔÖ®
+				 * TODO åˆ¤æ–­æ˜¯å¦åœ¨é»‘åå•ä¸­, æ˜¯åˆ™å¿½ç•¥ä¹‹
 				 */
 				
 				if(dataEle == null){
@@ -824,15 +824,15 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 				incomingMsg += dataEle.toString();
 				
 				if(curNamespace.equals(XmlMsgFormat.MESSAGE_NAMESPACE_NAME)){
-					//TODO ´¦ÀístringÏûÏ¢
+					//TODO å¤„ç†stringæ¶ˆæ¯
 					String strmsg = null;
 					
 					if(paramEle != null){
-						//TODO ½âÃÜ
+						//TODO è§£å¯†
 						if(DESKey == null){
-							// ´ÓÎÄ¼şµ¼ÈëÃÜÔ¿DES
-							// TODO Ó¦¸ÃÏÔÊ¾ÌáÊ¾´°¿Ú, ¶ø²»ÊÇÖ±½Ó´ò¿ª¶Ô»°¿ò...
-							// ²»¹ıÕâ¶Î´úÂëÖ´ĞĞµÄ»ú»á²»¶à(¼«ÉÙ)...
+							// ä»æ–‡ä»¶å¯¼å…¥å¯†é’¥DES
+							// TODO åº”è¯¥æ˜¾ç¤ºæç¤ºçª—å£, è€Œä¸æ˜¯ç›´æ¥æ‰“å¼€å¯¹è¯æ¡†...
+							// ä¸è¿‡è¿™æ®µä»£ç æ‰§è¡Œçš„æœºä¼šä¸å¤š(æå°‘)...
 							importDESKey();
 							if(DESKey == null){
 								System.out.println("You have no DES key to decrypt this message, " +
@@ -853,18 +853,18 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 				        byte[] recoveredData = aliceCipher.doFinal(dataEle.getBytes());
 				        strmsg = new String(recoveredData);
 					} else {
-						//ÎŞĞè½âÃÜ
+						//æ— éœ€è§£å¯†
 						strmsg = new String(dataEle.getBytes());
 					}
 					promptIncomingMsg(friend.getName(), timeEle.toString(), strmsg);
 				} else if(curNamespace.equals(XmlMsgFormat.PICTUREMSG_NAMESPACE_NAME)){
-					//TODO ´¦ÀíÍ¼Æ¬ÏûÏ¢
+					//TODO å¤„ç†å›¾ç‰‡æ¶ˆæ¯
 					ImageIcon incomingPic = null;
 					byte[] picBytes = null;
 					if(paramEle != null){
-						//TODO ½âÃÜ
+						//TODO è§£å¯†
 						if(DESKey == null){
-							// ´ÓÎÄ¼şµ¼ÈëÃÜÔ¿DES
+							// ä»æ–‡ä»¶å¯¼å…¥å¯†é’¥DES
 							importDESKey();
 							if(DESKey == null){
 								System.out.println("You have no DES key to decrypt this message, " +
@@ -884,10 +884,10 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 				        aliceCipher.init(Cipher.DECRYPT_MODE, DESKey, params);
 				        picBytes = aliceCipher.doFinal(dataEle.getBytes());
 					} else {
-						//ÎŞĞè½âÃÜ
+						//æ— éœ€è§£å¯†
 						picBytes = dataEle.getBytes();
 					}
-					// ½«byte[]×ª»¯ÎªÍ¼Æ¬ĞÎÊ½
+					// å°†byte[]è½¬åŒ–ä¸ºå›¾ç‰‡å½¢å¼
 					try {
 						ByteArrayInputStream byteArrayIS = new ByteArrayInputStream(picBytes);
 						BufferedImage bufImg = javax.imageio.ImageIO.read(byteArrayIS);
@@ -897,13 +897,13 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 					}
 					promptIncomingMsg(friend.getName(), timeEle.toString(), incomingPic);
 				} else if(curNamespace.equals(XmlMsgFormat.FILEMSG_NAMESPACE_NAME)){
-					//TODO ´¦ÀíÎÄ¼şÏûÏ¢
+					//TODO å¤„ç†æ–‡ä»¶æ¶ˆæ¯
 					NoxFileUnit incomingFile = null;
 					byte[] fileBytes = null;
 					if(paramEle != null){
-						//TODO ½âÃÜ
+						//TODO è§£å¯†
 						if(DESKey == null){
-							// ´ÓÎÄ¼şµ¼ÈëÃÜÔ¿DES
+							// ä»æ–‡ä»¶å¯¼å…¥å¯†é’¥DES
 							importDESKey();
 							if(DESKey == null){
 								System.out.println("You have no DES key to decrypt this message, " +
@@ -923,7 +923,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 				        aliceCipher.init(Cipher.DECRYPT_MODE, DESKey, params);
 				        fileBytes = aliceCipher.doFinal(dataEle.getBytes());
 					} else {
-						//ÎŞĞè½âÃÜ
+						//æ— éœ€è§£å¯†
 						fileBytes = dataEle.getBytes();
 					}
 					/*promptIncomingMsg(roomname, timeEle.toString(),
@@ -932,26 +932,26 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 					incomingFile = (NoxFileUnit)NoxMsgUtil.getObjectFromBytes(fileBytes);
 					promptIncomingMsg(friend.getName(), timeEle.toString(), incomingFile);
 				} else if(curNamespace.equals(XmlMsgFormat.PINGMSG_NAMESPACE_NAME)){
-					//TODO ´¦ÀípingÏûÏ¢
+					//TODO å¤„ç†pingæ¶ˆæ¯
 					byte[] statBytes = dataEle.getBytes();
 					NoxPeerStatusUnit stat = (NoxPeerStatusUnit) NoxMsgUtil.getObjectFromBytes(statBytes);
 					refreshStatus(stat);
 					sendPongMsg();
 				} else if(curNamespace.equals(XmlMsgFormat.PONGMSG_NAMESPACE_NAME)){
-					//TODO ´¦ÀípongÏûÏ¢
+					//TODO å¤„ç†pongæ¶ˆæ¯
 					//how about doing nothing?
 					byte[] statBytes = dataEle.getBytes();
 					NoxPeerStatusUnit stat = (NoxPeerStatusUnit) NoxMsgUtil.getObjectFromBytes(statBytes);
 					refreshStatus(stat);
 				} else if(curNamespace.equals(XmlMsgFormat.PUBLICKEYENC_NAMESPACE_NAME)){
-					//TODO ´¦Àípublickey
+					//TODO å¤„ç†publickey
 					if(exchangingPubKeys && waiting4PubKey2){
 						//do nothing
-						//ÒòÎªµ±Ç°ÒÑ¾­Ö÷¶¯·¢ËÍpubkey, ÔÚµÈpubkey2»òÕıÔÚÏìÓ¦Ö®Ç°µÄÇëÇó-Éú³Épubkey2
+						//å› ä¸ºå½“å‰å·²ç»ä¸»åŠ¨å‘é€pubkey, åœ¨ç­‰pubkey2æˆ–æ­£åœ¨å“åº”ä¹‹å‰çš„è¯·æ±‚-ç”Ÿæˆpubkey2
 						System.out.println("received a public key. but I'm exchangingPubKeys && waiting4PubKey2, cancelling...");
 						continue;
 					}
-					//·ñÔò
+					//å¦åˆ™
 					exchangingPubKeys = true;
 					/*
 			         * Let's turn over to Bob. Bob has received Alice's public key
@@ -1001,7 +1001,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 			        bobKeyAgree.doPhase(alicePubKey, true);
 			        DESKey = bobKeyAgree.generateSecret("DES");
 				} else if(curNamespace.equals(XmlMsgFormat.PUBLICKEYENC2_NAMESPACE_NAME)){
-					//TODO ´¦Àípublickey2
+					//TODO å¤„ç†publickey2
 					/*
 			         * Alice uses Bob's public key for the first (and only) phase
 			         * of her version of the DH
@@ -1015,7 +1015,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 			        bobPubKey = aliceKeyFac.generatePublic(x509KeySpec);
 			        waiting4PubKey2 = false;
 				} else {
-					System.out.println("¸ÃÏûÏ¢¸ñÊ½²»±»´Ë°æ±¾Ö§³Ö.");
+					System.out.println("è¯¥æ¶ˆæ¯æ ¼å¼ä¸è¢«æ­¤ç‰ˆæœ¬æ”¯æŒ.");
 					return;
 				}
 			}
@@ -1038,7 +1038,7 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 			}
 		};
 		chooser.setFileFilter(filter);
-		chooser.setDialogTitle("ÊÕµ½Ò»Ìõ¼ÓÃÜÏûÏ¢, ÇëÑ¡Ôñ½âÃÜËùÓÃµÄDES KeyÎÄ¼ş, Ã»ÓĞÔòµã»÷È¡Ïû.");
+		chooser.setDialogTitle("æ”¶åˆ°ä¸€æ¡åŠ å¯†æ¶ˆæ¯, è¯·é€‰æ‹©è§£å¯†æ‰€ç”¨çš„DES Keyæ–‡ä»¶, æ²¡æœ‰åˆ™ç‚¹å‡»å–æ¶ˆ.");
 		int returnVal = chooser.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			// getJtf_pic().setText(chooser.getSelectedFile().getPath());
@@ -1084,6 +1084,13 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 		if(room != null)
 			room.dispose();
 	}
+	public PeerChatroom getRoom() {
+		return room;
+	}
+	public void setRoom(PeerChatroom room) {
+		if(room != null)
+			this.room = room;
+	}
 	/**
 	 * {@inheritDoc}
 	 */
@@ -1106,11 +1113,11 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 		return friend.getName();
 	}
 	/**
-	 * ÏÔÊ¾ÁÄÌì´°¿Ú, Èç¹ûÉĞÎ´ÊµÀı»¯, ÔòÊµÀı»¯Ö®<br>
-	 * Èç¹ûĞèÒªÊµÀı»¯Ôò²»ÏÔÊ¾Á¬½ÓÄ£ºı½ø¶ÈÖ¸Ê¾Æ÷<br>
-	 * µ÷ÓÃ´Ëº¯ÊıµÄÇ°ÌáÊÇÔÚ¹şÏ£±íÖĞÕÒµ½PeerID¶ÔÓ¦µÄhandler,
-	 * È»ºóÍ¨¹ıhandlerÀ´ÏÔÊ¾chatroom. ËùÒÔ¶ÔÓ¦µÄpipe¿Ï¶¨´æÔÚ,
-	 * ²»È»²»»á×¢²áµ½¹şÏ£±íÖĞ.
+	 * æ˜¾ç¤ºèŠå¤©çª—å£, å¦‚æœå°šæœªå®ä¾‹åŒ–, åˆ™å®ä¾‹åŒ–ä¹‹<br>
+	 * å¦‚æœéœ€è¦å®ä¾‹åŒ–åˆ™ä¸æ˜¾ç¤ºè¿æ¥æ¨¡ç³Šè¿›åº¦æŒ‡ç¤ºå™¨<br>
+	 * è°ƒç”¨æ­¤å‡½æ•°çš„å‰ææ˜¯åœ¨å“ˆå¸Œè¡¨ä¸­æ‰¾åˆ°PeerIDå¯¹åº”çš„handler,
+	 * ç„¶åé€šè¿‡handleræ¥æ˜¾ç¤ºchatroom. æ‰€ä»¥å¯¹åº”çš„pipeè‚¯å®šå­˜åœ¨,
+	 * ä¸ç„¶ä¸ä¼šæ³¨å†Œåˆ°å“ˆå¸Œè¡¨ä¸­.
 	 */
 	public void showChatroom() {
 		if(room == null){
@@ -1120,7 +1127,23 @@ public class PeerConnectionHandler implements ConnectionHandler, Runnable, PipeM
 		
 		room.setVisible(true);
 	}
+	/**
+	 * æ›´æ–°bidipipe, åº”è¯¥è€ƒè™‘åˆ°æ­¤æ—¶åœ¨ç­‰å¾…å¯¹æ–¹è¿”å›å…¬é’¥çš„æƒ…å†µã€‚
+	 * æ­¤æƒ…å†µä¸‹ä¸èƒ½å¼ºè¡Œæ›´æ–°ã€‚
+	 * @param outbidipipe\
+	 * @deprecated
+	 */
 	public void setBiDiPipe(JxtaBiDiPipe outbidipipe) {
+		int countdown = 0;
+		while(waiting4PubKey2 && countdown++ < LANTimeLimit.CONNECT_MAXRETRIES*2){
+			try {
+				Thread.sleep(LANTimeLimit.UNIT_TIME);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(waiting4PubKey2)
+			System.out.println("æ›´æ–°bidipipeæ—¶ç­‰å€™ç”Ÿæˆå¯†é’¥è¶…æ—¶ã€‚ã€‚ã€‚");
 		this.outbidipipe = outbidipipe;
 	}
 }

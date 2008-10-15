@@ -7,7 +7,7 @@ import net.jxta.exception.PeerGroupException;
 import net.jxta.peergroup.PeerGroup;
 
 /**
- * 用于加入组时输入密码?
+ * 鐢ㄤ簬鍔犲叆缁勬椂杈撳叆瀵嗙爜?
  * @author shinysky
  *
  */

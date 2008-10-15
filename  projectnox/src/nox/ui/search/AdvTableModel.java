@@ -21,7 +21,7 @@ public class AdvTableModel extends DefaultTableModel {
 	// public int getRowCount() { return 10; }
 
 	/**
-	 * 单元格是否可编辑
+	 * 鍗曞厓鏍兼槸鍚﹀彲缂栬緫
 	 */
 	public boolean isCellEditable(int row, int col) {
 		return false;
@@ -31,7 +31,7 @@ public class AdvTableModel extends DefaultTableModel {
 	 * public int getColumns(){ return 3; }
 	 */
 	/**
-	 * 列类
+	 * 鍒楃被
 	 */
 	public Class<?> getColumnClass(int column) {
 		Vector<?> v = (Vector<?>) dataVector.elementAt(0);

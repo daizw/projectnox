@@ -9,15 +9,15 @@ import net.jxta.id.ID;
 
 public abstract class NoxJListItem implements Serializable{
 	protected ImageIcon portrait;
-	//±¾À´´òËã±£´æ¹ã¸æ, µ«ÊÇÔÚ´æ´¢µ½Êı¾İ¿âÊ±·¢ÏÖXMLÎÄµµ²»ÄÜĞòÁĞ»¯!
-	//Ö»ºÃÔÙ¸Ä»ØÀ´, Ö»±£´æÒ»Ğ©±ØÒªĞÅÏ¢.
+	//æœ¬æ¥æ‰“ç®—ä¿å­˜å¹¿å‘Š, ä½†æ˜¯åœ¨å­˜å‚¨åˆ°æ•°æ®åº“æ—¶å‘ç°XMLæ–‡æ¡£ä¸èƒ½åºåˆ—åŒ–!
+	//åªå¥½å†æ”¹å›æ¥, åªä¿å­˜ä¸€äº›å¿…è¦ä¿¡æ¯.
 	//Holy shit!
 	//protected Advertisement adv;
 	protected String name;
 	protected String discription;
 	protected ID id;
 	/**
-	 * ÔÚÏß×´Ì¬ĞÅÏ¢²»ĞèÒª±£´æ
+	 * åœ¨çº¿çŠ¶æ€ä¿¡æ¯ä¸éœ€è¦ä¿å­˜
 	 */
 	protected transient ItemStatus stat;
 	protected Long timeStamp;
@@ -31,65 +31,65 @@ public abstract class NoxJListItem implements Serializable{
 		updateTimeStamp();
 	}
 	/**
-	 * »ñÈ¡Í·Ïñ
+	 * è·å–å¤´åƒ
 	 * 
-	 * @return Í·ÏñImageIcon
+	 * @return å¤´åƒImageIcon
 	 */
 	public ImageIcon getPortrait() {
 		return portrait;
 	}
 
 	/**
-	 * »ñÈ¡Ãû×Ö(êÇ³Æ)
+	 * è·å–åå­—(æ˜µç§°)
 	 * 
-	 * @return êÇ³ÆText
+	 * @return æ˜µç§°Text
 	 */
 	public String getName(){
 		return name;
 	}
 	/**
-	 * »ñÈ¡Ç©Ãûµµ(ÃèÊö)
+	 * è·å–ç­¾åæ¡£(æè¿°)
 	 * 
-	 * @return Ç©Ãûµµ(ÃèÊö)Text
+	 * @return ç­¾åæ¡£(æè¿°)Text
 	 */
 	public String getDesc(){
 		return discription;
 	}
 	/**
-	 * »ñÈ¡¸ÃItemµÄID
+	 * è·å–è¯¥Itemçš„ID
 	 * 
-	 * @return ×éµÄPeerGroupID,»òÕßPeerµÄPeerID
+	 * @return ç»„çš„PeerGroupID,æˆ–è€…Peerçš„PeerID
 	 */
 	public ID getUUID() {
 		return id;
 	}
 	/**
-	 * »ñÈ¡×´Ì¬
+	 * è·å–çŠ¶æ€
 	 * 
-	 * @return µ±Ç°(ÔÚÏß)×´Ì¬
+	 * @return å½“å‰(åœ¨çº¿)çŠ¶æ€
 	 */
 	public ItemStatus getOnlineStatus(){
 		return stat;
 	}
 
 	/**
-	 * »ñÈ¡Ê±¼ä´Á
+	 * è·å–æ—¶é—´æˆ³
 	 * 
-	 * @return Ê±¼ä´Á
+	 * @return æ—¶é—´æˆ³
 	 */
 	public Long getTimeStamp() {
 		return this.timeStamp;
 	}
 
 	/**
-	 * ½«Ê±¼ä´Á¸üĞÂÎªµ±Ç°Ê±¼ä
+	 * å°†æ—¶é—´æˆ³æ›´æ–°ä¸ºå½“å‰æ—¶é—´
 	 */
 	public void updateTimeStamp() {
 		this.timeStamp = new Date().getTime();
 	}
 	
 	/**
-	 * ÉèÖÃÍ·Ïñ
+	 * è®¾ç½®å¤´åƒ
 	 */
 	public void setPortrait(ImageIcon portr) {
 		portrait = portr;
@@ -97,24 +97,24 @@ public abstract class NoxJListItem implements Serializable{
 	}
 
 	/**
-	 * ÉèÖÃÃû×Ö(êÇ³Æ)
+	 * è®¾ç½®åå­—(æ˜µç§°)
 	 */
 	public void setName(String n){
 		name = n;
 		updateTimeStamp();
 	}
 	/**
-	 * ÉèÖÃÇ©Ãûµµ(ÃèÊö)
+	 * è®¾ç½®ç­¾åæ¡£(æè¿°)
 	 */
 	public void setDesc(String desc){
 		discription = desc;
 		updateTimeStamp();
 	}
 	/**
-	 * ÉèÖÃ×´Ì¬
+	 * è®¾ç½®çŠ¶æ€
 	 * 
 	 * @param adv
-	 *            ¸ù¾İ¸Ã¹ã¸æÖĞÄ³ÔªËØÉèÖÃ?
+	 *            æ ¹æ®è¯¥å¹¿å‘Šä¸­æŸå…ƒç´ è®¾ç½®?
 	 */
 	public void setOnlineStatus(ItemStatus st) {
 		stat = st;

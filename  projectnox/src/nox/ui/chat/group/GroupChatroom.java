@@ -29,21 +29,21 @@ import nox.xml.NoxFileUnit;
 @SuppressWarnings("serial")
 public class GroupChatroom extends Chatroom {
 	/**
-	 * Á¬½Ó¶Ô·½Ê±ÏÔÊ¾µÄÄ£ºı½ø¶ÈÖ¸Ê¾Æ÷
+	 * è¿æ¥å¯¹æ–¹æ—¶æ˜¾ç¤ºçš„æ¨¡ç³Šè¿›åº¦æŒ‡ç¤ºå™¨
 	 */
 	private InfiniteProgressPanel glassPane;
 	private GroupConnectionHandler handler;
 	/**
-	 * ×îÖÕÓ¦¸Ã´ÓÖ÷´°¿Ú¼Ì³ĞÑÕÉ«, Í¸Ã÷¶È ¿¼ÂÇÊµÏÖ:Ö÷´°¿ÚºÍ´ÓÊô´°¿ÚÍ¬²½µ÷½ÚÑÕÉ«ºÍÍ¸Ã÷¶È.
-	 * ÔÚÊµÀı»¯´ÓÊô´°¿ÚµÄÊ±ºò½«ÒıÓÃ±£´æÔÚÒ»¸öVectorÖĞ,
-	 * µ÷½ÚÑÕÉ«¼°Í¸Ã÷¶ÈÊ±¶Ô VectorÖĞÊµÀıÒÀ´Îµ÷ÓÃµ÷½Úº¯Êı.
-	 * <li>¹¹Ôìº¯Êı.</li>
-	 * <li>ÓÃ»§Ë«»÷ºÃÓÑÍ¼±êÊ±, Èç¹û²»´æÔÚ¶ÔÓ¦µÄchatroom, Ôò</li>
+	 * æœ€ç»ˆåº”è¯¥ä»ä¸»çª—å£ç»§æ‰¿é¢œè‰², é€æ˜åº¦ è€ƒè™‘å®ç°:ä¸»çª—å£å’Œä»å±çª—å£åŒæ­¥è°ƒèŠ‚é¢œè‰²å’Œé€æ˜åº¦.
+	 * åœ¨å®ä¾‹åŒ–ä»å±çª—å£çš„æ—¶å€™å°†å¼•ç”¨ä¿å­˜åœ¨ä¸€ä¸ªVectorä¸­,
+	 * è°ƒèŠ‚é¢œè‰²åŠé€æ˜åº¦æ—¶å¯¹ Vectorä¸­å®ä¾‹ä¾æ¬¡è°ƒç”¨è°ƒèŠ‚å‡½æ•°.
+	 * <li>æ„é€ å‡½æ•°.</li>
+	 * <li>ç”¨æˆ·åŒå‡»å¥½å‹å›¾æ ‡æ—¶, å¦‚æœä¸å­˜åœ¨å¯¹åº”çš„chatroom, åˆ™</li>
 	 * <ol>
-	 * <li>½¨Á¢ĞÂµÄchatroom;</li>
-	 * <li>×Ô¶¯³¢ÊÔÁ¬½Ó.</li>
+	 * <li>å»ºç«‹æ–°çš„chatroom;</li>
+	 * <li>è‡ªåŠ¨å°è¯•è¿æ¥.</li>
 	 * </ol>
-	 * @param group ´ú±íºÃÓÑµÄPeerItem
+	 * @param group ä»£è¡¨å¥½å‹çš„PeerItem
 	 * @see PeerItem
 	 */
 	public GroupChatroom(final GroupItem group, GroupConnectionHandler handler) {
@@ -61,7 +61,7 @@ public class GroupChatroom extends Chatroom {
 		rootpane.add(gcsp);
 		rootpane.add(chatroompane);
 		
-		glassPane = new InfiniteProgressPanel("Á¬½ÓÖĞ, ÇëÉÔºò...", 12);
+		glassPane = new InfiniteProgressPanel("è¿æ¥ä¸­, è¯·ç¨å€™...", 12);
 		glassPane.setBounds(0, -NoxFrame.TITLE_HEIGHT, WIDTH_PREF, HEIGHT_PREF
 				- NoxFrame.TITLE_HEIGHT * 2);
 
@@ -111,7 +111,7 @@ public class GroupChatroom extends Chatroom {
 				+ "groupChat_48.png", false);
 		
 		*//**
-		 * ³õÊ¼»¯peergroup, ¹©ËÑË÷×éÔ±Ê¹ÓÃ
+		 * åˆå§‹åŒ–peergroup, ä¾›æœç´¢ç»„å‘˜ä½¿ç”¨
 		 *//*
 		PeerGroup parentgroup = NoxToolkit.getNetworkManager().getNetPeerGroup();
 
@@ -124,7 +124,7 @@ public class GroupChatroom extends Chatroom {
 		}
 		
 		*//**
-		 * TODO ÒÆ³ıÔ­À´µÄ¹ÜµÀ¼àÌıÆ÷
+		 * TODO ç§»é™¤åŸæ¥çš„ç®¡é“ç›‘å¬å™¨
 		 *//*
 		roomID = pga.getPeerGroupID();
 		
@@ -152,7 +152,7 @@ public class GroupChatroom extends Chatroom {
 			byte[] fileDataBytes = incomingFile.getData();
 			
 			JFileChooser chooser=new JFileChooser(".");
-			chooser.setDialogTitle("±£´æ:ÇëÊäÈëÎÄ¼şÃû");
+			chooser.setDialogTitle("ä¿å­˜:è¯·è¾“å…¥æ–‡ä»¶å");
 			chooser.setSelectedFile( new File(filename) );
 			int returnVal = chooser.showSaveDialog(GroupChatroom.this);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -219,7 +219,7 @@ public class GroupChatroom extends Chatroom {
 			}
 		};
 		chooser.setFileFilter(filter);
-		chooser.setDialogTitle("ÇëÑ¡Ôñ¼Ó½âÃÜËùÓÃµÄDES KeyÎÄ¼ş");
+		chooser.setDialogTitle("è¯·é€‰æ‹©åŠ è§£å¯†æ‰€ç”¨çš„DES Keyæ–‡ä»¶");
 		int returnVal = chooser.showOpenDialog(GroupChatroom.this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			// getJtf_pic().setText(chooser.getSelectedFile().getPath());

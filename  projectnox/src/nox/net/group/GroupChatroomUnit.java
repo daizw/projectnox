@@ -35,27 +35,27 @@ public class GroupChatroomUnit implements ChatroomUnit{
 		return outpipe;
 	}
 	/**
-	 * 设置ChatroomUnit的inpipe, TODO 同步更新Chatroom(如果存在)的inpipe
+	 * 璁剧疆ChatroomUnit鐨刬npipe, TODO 鍚屾鏇存柊Chatroom(濡傛灉瀛樺湪)鐨刬npipe
 	 * @param pipe
 	 */
 	public void setInPipe(InputPipe pipe){
 		inpipe = pipe;
-		//同步room的outpipe
+		//鍚屾room鐨刼utpipe
 		/*if(room != null)
 			room.setOutPipe(pipe);*/
 	}
 	/**
-	 * 设置ChatroomUnit的outpipe, TODO 同步更新Chatroom(如果存在)的outpipe
+	 * 璁剧疆ChatroomUnit鐨刼utpipe, TODO 鍚屾鏇存柊Chatroom(濡傛灉瀛樺湪)鐨刼utpipe
 	 * @param pipe
 	 */
 	public void setOutPipe(OutputPipe pipe){
 		outpipe = pipe;
-		//同步room的outpipe
+		//鍚屾room鐨刼utpipe
 		/*if(room != null)
 			room.setOutPipe(pipe);*/
 	}
 	/**
-	 * 设置I/O pipe
+	 * 璁剧疆I/O pipe
 	 * @param ipipe inputpipe
 	 * @param opipe outputpipe
 	 */

@@ -39,8 +39,8 @@ public class CreateNewGroupDialog extends JDialog{
 	public CreateNewGroupDialog(JFrame parent){
 		super(parent, "Create New Group", true);
 		this.parent = parent;
-		//Èç¹ûextends JDialog, ÔòÉèÖÃ´óÍ¼±êÃ»ÓĞÒâÒå.
-		//extends JFrameÊ±²Å¿ÉÒÔÏÔÊ¾´óÍ¼±ê.
+		//å¦‚æœextends JDialog, åˆ™è®¾ç½®å¤§å›¾æ ‡æ²¡æœ‰æ„ä¹‰.
+		//extends JFrameæ—¶æ‰å¯ä»¥æ˜¾ç¤ºå¤§å›¾æ ‡.
 		tk = Toolkit.getDefaultToolkit();
 		img_logo = tk.getImage(SystemPath.ICONS_RESOURCE_PATH + "new_group_20.png");
 		img_logo_big = tk.getImage(SystemPath.ICONS_RESOURCE_PATH + "new_group_48.png");
@@ -107,8 +107,8 @@ class CreateNewGroupPane extends JPanel{
 		pwdPwdFd.setText("password");
 		verifyPwdPwdFd.setText("password");
 		
-		pwdPwdFd.setEchoChar('¡ñ');
-		verifyPwdPwdFd.setEchoChar('¡ñ');
+		pwdPwdFd.setEchoChar('â—');
+		verifyPwdPwdFd.setEchoChar('â—');
 		
 		pwdPwdFd.setEnabled(false);
 		verifyPwdPwdFd.setEnabled(false);
@@ -138,14 +138,14 @@ class CreateNewGroupPane extends JPanel{
 		doCreateBtn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				//TODO ´´½¨ĞÂ×é
+				//TODO åˆ›å»ºæ–°ç»„
 				String pwdStr = new String(pwdPwdFd.getPassword());
 				String vPwdStr = new String(verifyPwdPwdFd.getPassword());
 				
 				if(privateChkBox.isSelected() && ! pwdStr.equals(vPwdStr)){
-					System.out.println("Á½´ÎÊäÈëµÄÃÜÂë²»Ïà·û,Çë¼ì²éÊäÈë.	" + pwdStr + ":" + vPwdStr);
+					System.out.println("ä¸¤æ¬¡è¾“å…¥çš„å¯†ç ä¸ç›¸ç¬¦,è¯·æ£€æŸ¥è¾“å…¥.	" + pwdStr + ":" + vPwdStr);
 					JOptionPane.showMessageDialog((Component) null,
-							"Á½´ÎÊäÈëµÄÃÜÂë²»Ïà·û,Çë¼ì²éÊäÈë!", "ERROR!",
+							"ä¸¤æ¬¡è¾“å…¥çš„å¯†ç ä¸ç›¸ç¬¦,è¯·æ£€æŸ¥è¾“å…¥!", "ERROR!",
 							JOptionPane.ERROR_MESSAGE);
 				}else {
 					if(doCreatNewGroup())
@@ -209,7 +209,7 @@ class CreateNewGroupPane extends JPanel{
 
             if (pga != null) {
                 PeerGroup pg = null;
-                System.out.println("ĞÂ×éËùÓÃµÄ¹ã¸æ: \n" + pga);
+                System.out.println("æ–°ç»„æ‰€ç”¨çš„å¹¿å‘Š: \n" + pga);
                 // Create the group itself
                 try {
                     pg = ppg.newGroup(pga);
@@ -219,8 +219,8 @@ class CreateNewGroupPane extends JPanel{
 
                 // if the group was successfully created join it
                 if (pg != null) {
-                	System.out.println("³É¹¦´´½¨×é, ÕıÔÚ´´½¨¸Ã×éËùÓÃ¹ÜµÀ¹ã¸æ...");
-                	//´´½¨¶ÔÓ¦µÄ¹ÜµÀ¹ã¸æ, ²¢·¢²¼Ö®
+                	System.out.println("æˆåŠŸåˆ›å»ºç»„, æ­£åœ¨åˆ›å»ºè¯¥ç»„æ‰€ç”¨ç®¡é“å¹¿å‘Š...");
+                	//åˆ›å»ºå¯¹åº”çš„ç®¡é“å¹¿å‘Š, å¹¶å‘å¸ƒä¹‹
                 	PipeAdvertisement pia = PipeUtil.createAdv(pg, pg.getPeerGroupID().toString(), PipeService.PropagateType, null);
                 	try {
 						pg.getDiscoveryService().publish(pia);
@@ -233,22 +233,22 @@ class CreateNewGroupPane extends JPanel{
                 	
                 	if(joined){
                 		JOptionPane.showMessageDialog((Component) null,
-        					"³É¹¦´´½¨×é, ÄúÒÑ×Ô¶¯¼ÓÈë¸Ã×é. ¿ÉÔÚ×éÁĞ±íÖĞ²é¿´.", "Succeed!",
+        					"æˆåŠŸåˆ›å»ºç»„, æ‚¨å·²è‡ªåŠ¨åŠ å…¥è¯¥ç»„. å¯åœ¨ç»„åˆ—è¡¨ä¸­æŸ¥çœ‹.", "Succeed!",
         					JOptionPane.INFORMATION_MESSAGE);
                 		if(parent.add2GrouList(pga)){
-                			System.out.println("¼ÓÈë³É¹¦, µ«ÊÇÃ»ÓĞ³É¹¦Ìí¼Óµ½×éÁĞ±í, it's weird!");
+                			System.out.println("åŠ å…¥æˆåŠŸ, ä½†æ˜¯æ²¡æœ‰æˆåŠŸæ·»åŠ åˆ°ç»„åˆ—è¡¨, it's weird!");
                 		}
                 	}
                 	else
                 		JOptionPane.showMessageDialog((Component) null,
-            					"³É¹¦´´½¨×é, µ«ÊÇÎ´ÄÜ³É¹¦¼ÓÈë¸Ã×é, it's weird!", "Information",
+            					"æˆåŠŸåˆ›å»ºç»„, ä½†æ˜¯æœªèƒ½æˆåŠŸåŠ å…¥è¯¥ç»„, it's weird!", "Information",
             					JOptionPane.INFORMATION_MESSAGE);
         			return true;
                 } else {
                     System.out.println("Error: failed to create new group");
-                    System.out.println("´´½¨×éÊ§°Ü");
+                    System.out.println("åˆ›å»ºç»„å¤±è´¥");
         			JOptionPane.showMessageDialog((Component) null,
-        					"´´½¨×éÊ§°Ü", "Phew~",
+        					"åˆ›å»ºç»„å¤±è´¥", "Phew~",
         					JOptionPane.WARNING_MESSAGE);
         			return false;
                 }

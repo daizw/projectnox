@@ -40,7 +40,7 @@ import nox.xml.NoxPeerStatusUnit;
 
 public class ObjectList extends JList {
 	/**
-	 * ºÃÓÑÁĞ±í
+	 * å¥½å‹åˆ—è¡¨
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -53,7 +53,7 @@ public class ObjectList extends JList {
 	private String tablename;
 
 	/**
-	 * Èç¹û±äÁ¿ÎªrenderÀàÄÚ²¿±äÁ¿, Ôò»á³öÏÖÁĞ±íÔªËØ±»Ìí¼Óµ½Í¬Ò»ĞĞ, ²¢ÇÒ¸ÃĞĞÖØ¸´N´ÎµÄÇé¿ö
+	 * å¦‚æœå˜é‡ä¸ºrenderç±»å†…éƒ¨å˜é‡, åˆ™ä¼šå‡ºç°åˆ—è¡¨å…ƒç´ è¢«æ·»åŠ åˆ°åŒä¸€è¡Œ, å¹¶ä¸”è¯¥è¡Œé‡å¤Næ¬¡çš„æƒ…å†µ
 	 */
 	JLabel portrait;
 	JLabel nick;
@@ -62,10 +62,10 @@ public class ObjectList extends JList {
 	Dimension portraitsize = new Dimension(40, 40);
 
 	/**
-	 * ¾ßÓĞ×Ô¶¨ÒåÁĞ±íÔªËØºÍ¹ıÂË¹¦ÄÜµÄÁĞ±í
+	 * å…·æœ‰è‡ªå®šä¹‰åˆ—è¡¨å…ƒç´ å’Œè¿‡æ»¤åŠŸèƒ½çš„åˆ—è¡¨
 	 * 
 	 * @param objs
-	 *            ÁĞ±íÔªËØ(FriendItemÀàĞÍ)Êı×é
+	 *            åˆ—è¡¨å…ƒç´ (FriendItemç±»å‹)æ•°ç»„
 	 */
 	public ObjectList(Connection sqlconn, String tablename, boolean isGood) {
 		// super(objs);
@@ -120,7 +120,7 @@ public class ObjectList extends JList {
 			public void mouseClicked(MouseEvent me) {
 				if (me.getButton() == MouseEvent.BUTTON3) {
 					/*
-					 * ÊµÏÖÓÒ¼ü¿ÉÑ¡È¡JListItem
+					 * å®ç°å³é”®å¯é€‰å–JListItem
 					 */
 					int index = ObjectList.this.locationToIndex(me.getPoint());
 					ObjectList.this.setSelectedIndex(index);
@@ -128,7 +128,7 @@ public class ObjectList extends JList {
 			}
 			@Override
 			public void mouseEntered(MouseEvent menter) {
-				// TODO ×Ô¶¯¸Ä±ä±³¾°É«
+				// TODO è‡ªåŠ¨æ”¹å˜èƒŒæ™¯è‰²
 				// int index =
 				// ObjectList.this.locationToIndex(menter.getPoint());
 				// ObjectList.this.set
@@ -145,9 +145,9 @@ public class ObjectList extends JList {
 		});
 	}
 	/**
-	 * ÅĞ¶ÏÊÇ·ñÁĞ±íÖĞÒÑ´æÔÚIDÎªidµÄ±íÏî
-	 * @param id Òª²éÕÒµÄID
-	 * @return ÊÇ·ñ´æÔÚ
+	 * åˆ¤æ–­æ˜¯å¦åˆ—è¡¨ä¸­å·²å­˜åœ¨IDä¸ºidçš„è¡¨é¡¹
+	 * @param id è¦æŸ¥æ‰¾çš„ID
+	 * @return æ˜¯å¦å­˜åœ¨
 	 */
 	public boolean isExist(ID id){
 		int size =  fmod.getRealSize();
@@ -158,9 +158,9 @@ public class ObjectList extends JList {
 		return false;
 	}
 	/**
-	 * ·µ»ØÁĞ±íÏîÖĞËùÓĞID-password¶Ô.
-	 * Ö»ÄÜµ±±íÏîÊÇGroupItem¶ÔÏóÊ±²ÅÄÜµ÷ÓÃ.
-	 * @return ËùÓĞ¹ã¸æ
+	 * è¿”å›åˆ—è¡¨é¡¹ä¸­æ‰€æœ‰ID-passwordå¯¹.
+	 * åªèƒ½å½“è¡¨é¡¹æ˜¯GroupItemå¯¹è±¡æ—¶æ‰èƒ½è°ƒç”¨.
+	 * @return æ‰€æœ‰å¹¿å‘Š
 	 */
 	public Map<ID, String> getGroupIDPwds(){
 		Map<ID, String> idpwds = new HashMap<ID, String>();
@@ -185,12 +185,12 @@ public class ObjectList extends JList {
 		return deleteItem(sqlconn, tablename, isGood, index);
 	}
 	/**
-	 * ´ÓListÖĞÉ¾³ıÄ³Ïî
-	 * @param sqlconn Êı¾İ¿âÁ¬½Ó
-	 * @param tablename ±íÃû
-	 * @param isGood ºÃÓÑ/ºÚÃûµ¥³ÉÔ± (Õâ¸ö²ÎÊıÆäÊµ²»±ØÒª, ÒòÎªpeerÒªÃ´ÊôÓÚºÃÓÑÁĞ±í, ÒªÃ´ÊôÓÚºÚÃûµ¥)
-	 * @param index (ÁĞ±íË÷ÒıÖµ)
-	 * @return ±»É¾³ıµÄÏî
+	 * ä»Listä¸­åˆ é™¤æŸé¡¹
+	 * @param sqlconn æ•°æ®åº“è¿æ¥
+	 * @param tablename è¡¨å
+	 * @param isGood å¥½å‹/é»‘åå•æˆå‘˜ (è¿™ä¸ªå‚æ•°å…¶å®ä¸å¿…è¦, å› ä¸ºpeerè¦ä¹ˆå±äºå¥½å‹åˆ—è¡¨, è¦ä¹ˆå±äºé»‘åå•)
+	 * @param index (åˆ—è¡¨ç´¢å¼•å€¼)
+	 * @return è¢«åˆ é™¤çš„é¡¹
 	 */
 	public Object deleteItem(Connection sqlconn, String tablename, boolean isGood, int index){
 		System.out.println("removing the item from this list: " + index + "/" + fmod.getRealSize());
@@ -218,7 +218,7 @@ public class ObjectList extends JList {
 		super.setModel(m);
 	}
 	/**
-	 * ÏµÍ³³õÊ¼»¯Ê±µ÷ÓÃ, ÓÃÓÚ½«Êı¾İ¿âÖĞÊı¾İÌí¼Óµ½ÁĞ±í
+	 * ç³»ç»Ÿåˆå§‹åŒ–æ—¶è°ƒç”¨, ç”¨äºå°†æ•°æ®åº“ä¸­æ•°æ®æ·»åŠ åˆ°åˆ—è¡¨
 	 * @param o
 	 * @return
 	 */
@@ -226,10 +226,10 @@ public class ObjectList extends JList {
 		int size =  fmod.getRealSize();
 		NoxJListItem newItem = (NoxJListItem)o;
 		for(int index = 0; index <  size; index++){
-			//Èç¹ûÒÑ¾­ÓĞÁË, Ôò·µ»Ø.
+			//å¦‚æœå·²ç»æœ‰äº†, åˆ™è¿”å›.
 			NoxJListItem curItem = (NoxJListItem)(fmod.getRealElementAt(index));
 			if(newItem.getUUID().equals(curItem.getUUID())){
-				//Èç¹ûµ±Ç°µÄ¸üĞÂ, Ôò¸üĞÂ
+				//å¦‚æœå½“å‰çš„æ›´æ–°, åˆ™æ›´æ–°
 				if(newItem.getTimeStamp() > curItem.getTimeStamp()){
 					curItem = newItem;
 				}
@@ -241,35 +241,35 @@ public class ObjectList extends JList {
 	}
 
 	/**
-	 * ÓÃÓÚÍâ²¿¶ÔÏóµ÷ÓÃ, ÏòÁĞ±íÖĞÌí¼ÓÏî.
-	 * @param object ÒªÌí¼ÓµÄÏî
-	 * @param sqlconn Êı¾İ¿âÁ¬½Ó
-	 * @param tablename ±íÃû
-	 * @param isGood true: ºÃÓÑ; false: ºÚÃûµ¥³ÉÔ±
-	 * @return ÒÑÌí¼ÓµÄÏî, »òÔ­À´µÄ¸üĞÂµÄÏî
+	 * ç”¨äºå¤–éƒ¨å¯¹è±¡è°ƒç”¨, å‘åˆ—è¡¨ä¸­æ·»åŠ é¡¹.
+	 * @param object è¦æ·»åŠ çš„é¡¹
+	 * @param sqlconn æ•°æ®åº“è¿æ¥
+	 * @param tablename è¡¨å
+	 * @param isGood true: å¥½å‹; false: é»‘åå•æˆå‘˜
+	 * @return å·²æ·»åŠ çš„é¡¹, æˆ–åŸæ¥çš„æ›´æ–°çš„é¡¹
 	 * @throws SQLException
 	 * @throws IOException
 	 */
 	public Object addItem(Object object) throws SQLException, IOException {
-		//TODO ¼ÓÖ®Ç°Ó¦¸ÃÏÈÅĞ¶ÏÊÇ·ñÒÑÓĞ!!
+		//TODO åŠ ä¹‹å‰åº”è¯¥å…ˆåˆ¤æ–­æ˜¯å¦å·²æœ‰!!
 		Statement stmt = sqlconn.createStatement();
 		
 		System.out.println("Items before adding: " + fmod.getRealSize());
 		
 		int size =  fmod.getRealSize();
 		for(int index = 0; index <  size; index++){
-			//Èç¹ûÒÑ¾­ÓĞÁË, Ôò·µ»Ø.
+			//å¦‚æœå·²ç»æœ‰äº†, åˆ™è¿”å›.
 			NoxJListItem newItem = (NoxJListItem)object;
 			NoxJListItem curItem = (NoxJListItem)fmod.getRealElementAt(index);
 			if(newItem.getUUID().equals(curItem.getUUID())){
-				//Èç¹ûµ±Ç°µÄ¸üĞÂ, Ôò¸üĞÂ
+				//å¦‚æœå½“å‰çš„æ›´æ–°, åˆ™æ›´æ–°
 				if(newItem.getTimeStamp() > curItem.getTimeStamp()){
 					System.out.println("Got a newer item");
 					curItem = newItem;
-					//É¾³ıÊı¾İ¿âÖĞ¸ÃID
+					//åˆ é™¤æ•°æ®åº“ä¸­è¯¥ID
 					stmt.execute("delete from "+
 						tablename + " where ID = '" + curItem.getUUID().toString() + "'");
-					//Ìí¼Óµ½Êı¾İ¿â
+					//æ·»åŠ åˆ°æ•°æ®åº“
 					PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
 							tablename + " values (?, ?, ?)");
 					pstmt.setString(1, newItem.getUUID().toString());
@@ -290,12 +290,12 @@ public class ObjectList extends JList {
 			}
 		}
 		fmod.addElement((NoxJListItem) object);
-		//É¾³ıÊı¾İ¿âÖĞ¸ÃID
+		//åˆ é™¤æ•°æ®åº“ä¸­è¯¥ID
 		System.out.println("stmt.execute:delete from "+
 			tablename + " where ID = '" + ((NoxJListItem) object).getUUID().toString() + "'");
 		stmt.execute("delete from "+
 			tablename + " where ID = '" + ((NoxJListItem) object).getUUID().toString() + "'");
-		//Ìí¼Óµ½Êı¾İ¿â
+		//æ·»åŠ åˆ°æ•°æ®åº“
 		PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
 				tablename + " values (?, ?, ?)");
 		pstmt.setString(1, ((NoxJListItem) object).getUUID().toString());
@@ -314,34 +314,34 @@ public class ObjectList extends JList {
 		return object;
 	}
 	/**
-	 * ¸üĞÂ×´Ì¬(êÇ³Æ/Ç©Ãûµµ/Í·Ïñ/ÔÚÏß×´Ì¬)
-	 * @param id Ä¿±êµÄID
-	 * @param stat º¬×´Ì¬ĞÅÏ¢µÄÊı¾İ½á¹¹, statÎªnullÔò±íÊ¾ÀëÏß...
+	 * æ›´æ–°çŠ¶æ€(æ˜µç§°/ç­¾åæ¡£/å¤´åƒ/åœ¨çº¿çŠ¶æ€)
+	 * @param id ç›®æ ‡çš„ID
+	 * @param stat å«çŠ¶æ€ä¿¡æ¯çš„æ•°æ®ç»“æ„, statä¸ºnullåˆ™è¡¨ç¤ºç¦»çº¿...
 	 */
 	public void setStatus(ID id, NoxPeerStatusUnit stat) throws SQLException, IOException{
-		//×¢Òâ!!!!!!!!ÒòÎªºÃÓÑÖ®¼ä²Å»á»¥ping, ËùÒÔÈç¹û³öÏÖÔÚºÃÓÑÁĞ±íÖĞÕÒ²»µ½idÊÇ²»Õı³£µÄ.
-		//Í¬Ê±, ×îºÃÄÜ¸üĞÂÊı¾İ¿âÖĞêÇ³ÆºÍÇ©ÃûµµĞÅÏ¢
+		//æ³¨æ„!!!!!!!!å› ä¸ºå¥½å‹ä¹‹é—´æ‰ä¼šäº’ping, æ‰€ä»¥å¦‚æœå‡ºç°åœ¨å¥½å‹åˆ—è¡¨ä¸­æ‰¾ä¸åˆ°idæ˜¯ä¸æ­£å¸¸çš„.
+		//åŒæ—¶, æœ€å¥½èƒ½æ›´æ–°æ•°æ®åº“ä¸­æ˜µç§°å’Œç­¾åæ¡£ä¿¡æ¯
 		int size =  fmod.getRealSize();
 		for(int index = 0; index <  size; index++){
-			//Èç¹ûÒÑ¾­ÓĞÁË, Ôò·µ»Ø.
+			//å¦‚æœå·²ç»æœ‰äº†, åˆ™è¿”å›.
 			NoxJListItem curItem = (NoxJListItem)fmod.getRealElementAt(index);
 			if(id.equals(curItem.getUUID())){
-				//¸üĞÂ
+				//æ›´æ–°
 				if(stat == null){
-					//ÀëÏß
-					System.out.println("¸ÃÓÃ»§²»ÔÚÏß");
+					//ç¦»çº¿
+					System.out.println("è¯¥ç”¨æˆ·ä¸åœ¨çº¿");
 					curItem.setOnlineStatus(ItemStatus.OFFLINE);
 				}else{
 					/**
-					 * @Fixme ÕâÑùĞŞ¸ÄÓĞÓÃÂğ? curItemÊÇÒıÓÃÂğ?
-					 * ÊÇÒıÓÃ...
+					 * @Fixme è¿™æ ·ä¿®æ”¹æœ‰ç”¨å—? curItemæ˜¯å¼•ç”¨å—?
+					 * æ˜¯å¼•ç”¨...
 					 */
-					//Èç¹ûÃ»ÓĞĞŞ¸Ä, Ôò·µ»Ø, ¿ÉÒÔ±ÜÃâÆµ·±µÄÊı¾İ¿â¶ÁĞ´²Ù×÷
+					//å¦‚æœæ²¡æœ‰ä¿®æ”¹, åˆ™è¿”å›, å¯ä»¥é¿å…é¢‘ç¹çš„æ•°æ®åº“è¯»å†™æ“ä½œ
 					if(curItem.getName() != null && curItem.getName().equals(stat.getNickName())
 							&& curItem.getDesc() != null && curItem.getDesc().equals(stat.getSign())
 							&& curItem.getPortrait() != null && curItem.getPortrait().equals(stat.getPortrait())
 							&& curItem.getOnlineStatus() != null && curItem.getOnlineStatus().equals(stat.getOnlineStatus())){
-						System.out.println("×´Ì¬Î´±ä, È¡ÏûĞŞ¸Ä...");
+						System.out.println("çŠ¶æ€æœªå˜, å–æ¶ˆä¿®æ”¹...");
 						curItem.updateTimeStamp();
 						this.repaint();
 						return;
@@ -355,10 +355,10 @@ public class ObjectList extends JList {
 					curItem.setOnlineStatus(stat.getOnlineStatus());
 					
 					Statement stmt = sqlconn.createStatement();
-					//É¾³ıÊı¾İ¿âÖĞ¸ÃID
+					//åˆ é™¤æ•°æ®åº“ä¸­è¯¥ID
 					stmt.execute("delete from "+
 						tablename + " where ID = '" + id.toString() + "'");
-					//Ìí¼Óµ½Êı¾İ¿â
+					//æ·»åŠ åˆ°æ•°æ®åº“
 					PreparedStatement pstmt = sqlconn.prepareStatement("insert into " +
 							tablename + " values (?, ?, ?)");
 					pstmt.setString(1, id.toString());
@@ -372,19 +372,19 @@ public class ObjectList extends JList {
 					pstmt.executeUpdate();
 					pstmt.close();
 					stmt.close();
-					System.out.println("Ë¢ĞÂ×´Ì¬Íê±Ï");
+					System.out.println("åˆ·æ–°çŠ¶æ€å®Œæ¯•");
 				}
 				this.repaint();
 				return;
 			}
 		}
-		System.out.println("ºÃÓÑÖĞÎ´·¢ÏÖ¸ÃID, ºÃ¹îÒì~");
+		System.out.println("å¥½å‹ä¸­æœªå‘ç°è¯¥ID, å¥½è¯¡å¼‚~");
 		return;
 	}
 
 	public class NoxJListCellRender extends JPanel implements ListCellRenderer {
 		/**
-		 * JListµ¥Ôª¸ñäÖÈ¾Æ÷
+		 * JListå•å…ƒæ ¼æ¸²æŸ“å™¨
 		 */
 		private static final long serialVersionUID = 1L;
 
@@ -452,7 +452,7 @@ public class ObjectList extends JList {
 			 * .getForeground());
 			 */
 			/**
-			 * ÔİÊ±Ö»ÄÜÓÃ¾ø¶ÔÂ·¾¶, ²¢ÇÒĞèÒª°ÑÍ·Ïñ´æ´¢µ½±¾µØ
+			 * æš‚æ—¶åªèƒ½ç”¨ç»å¯¹è·¯å¾„, å¹¶ä¸”éœ€è¦æŠŠå¤´åƒå­˜å‚¨åˆ°æœ¬åœ°
 			 */
 			//System.out.println(item.getClass().toString().endsWith("PeerItem"));
 			if (item.getClass().toString().endsWith("PeerItem")) {
@@ -463,16 +463,16 @@ public class ObjectList extends JList {
 								+ System.getProperty("file.separator")
 								+ SystemPath.PORTRAIT_RESOURCE_PATH
 								+"chat.png\"><br>"
-								+ "<Font color=black>êÇ³Æ:</Font> <Font color=blue>"
+								+ "<Font color=black>æ˜µç§°:</Font> <Font color=blue>"
 								+ item.getName()
 								+ "<br></Font>"
-								+ "<Font color=black>Ç©Ãûµµ:</Font> <Font color=blue>"
+								+ "<Font color=black>ç­¾åæ¡£:</Font> <Font color=blue>"
 								+ item.getDesc()
 								+ "<br></Font>"
-								+ "<Font color=black>ÁªÏµ·½Ê½:</Font> <Font color=blue>"
+								+ "<Font color=black>è”ç³»æ–¹å¼:</Font> <Font color=blue>"
 								+ "110, 119, 120, 114, 117"
 								+ "<br></Font>"
-								+ "<Font color=black>¸öÈËËµÃ÷:</Font> <Font color=blue>"
+								+ "<Font color=black>ä¸ªäººè¯´æ˜:</Font> <Font color=blue>"
 								+ item.getName()
 								+ " owns me so much MONEY!! "
 								+ "<br></Font>"
@@ -486,13 +486,13 @@ public class ObjectList extends JList {
 								+ System.getProperty("file.separator")
 								+ SystemPath.PORTRAIT_RESOURCE_PATH
 								+ "chat.png\"><br>"
-								+ "<Font color=black>×éÃû:</Font> <Font color=blue>"
+								+ "<Font color=black>ç»„å:</Font> <Font color=blue>"
 								+ item.getName()
 								+ "<br></Font>"
-								+ "<Font color=black>¹«¸æ:</Font> <Font color=blue>"
+								+ "<Font color=black>å…¬å‘Š:</Font> <Font color=blue>"
 								+ item.getDesc()
 								+ "<br></Font>"
-								+ "<Font color=black>³ÉÔ±ÊıÁ¿:</Font> <Font color=blue>"
+								+ "<Font color=black>æˆå‘˜æ•°é‡:</Font> <Font color=blue>"
 								+ "110, 119, 120, 114, 117"
 								+ "<br></Font>"
 								+ "<Font color=black>UUID:</Font> <Font color=blue>"
@@ -563,7 +563,7 @@ public class ObjectList extends JList {
 		}
 		
 		public Object deleteElementAt(int index){
-			//ÕæÕıÉ¾³ıÖ®
+			//çœŸæ­£åˆ é™¤ä¹‹
 			NoxJListItem ob = items.remove((int)indexes.elementAt(index));
 			refilter();
 			
@@ -596,7 +596,7 @@ public class ObjectList extends JList {
 
 		public FilterField(int width) {
 			super(width);
-			this.setToolTipText(getHtmlText("ÊäÈë¹Ø¼ü×ÖÒÔËÑË÷ÁĞ±í"));
+			this.setToolTipText(getHtmlText("è¾“å…¥å…³é”®å­—ä»¥æœç´¢åˆ—è¡¨"));
 			getDocument().addDocumentListener(this);
 		}
 

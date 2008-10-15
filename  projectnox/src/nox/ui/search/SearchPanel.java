@@ -26,6 +26,7 @@ import net.jxta.document.Advertisement;
 import net.jxta.peer.PeerID;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PeerGroupAdvertisement;
+import nox.net.common.LANTimeLimit;
 import nox.net.common.NoxToolkit;
 import nox.net.peer.PeerConnectionHandler;
 import nox.ui.common.InfiniteProgressPanel;
@@ -82,7 +83,7 @@ public abstract class SearchPanel extends JPanel {
 	protected Container buildInfinitePanel() {
 		JPanel pane = new JPanel(new BorderLayout());
 
-		glassPane = new InfiniteProgressPanel("ËÑË÷ÖĞ, ÇëÉÔºò...", 12);
+		glassPane = new InfiniteProgressPanel("æœç´¢ä¸­, è¯·ç¨å€™...", 12);
 		glassPane.setScale(0.2d);
 		Dimension size = new Dimension(100, 100);
 		glassPane.setSize(size);
@@ -100,7 +101,7 @@ public abstract class SearchPanel extends JPanel {
 				if (searchPeersBtn.getText() == "Search") {
 					glassPane.start();
 					/**
-					 * ËÑË÷½ø¶ÈÖ¸Ê¾Æ÷
+					 * æœç´¢è¿›åº¦æŒ‡ç¤ºå™¨
 					 */
 					Thread indicating = new Thread(new Runnable() {
 						public void run() {
@@ -119,27 +120,28 @@ public abstract class SearchPanel extends JPanel {
 							// DiscoveryListener listener)
 							// MyLogin.GoHunting(null, advType, null, null, 100,
 							// listener);
-							// ±¾µØºÍÔ¶³ÌËÑË÷¹ã¸æ
+							// æœ¬åœ°å’Œè¿œç¨‹æœç´¢å¹¿å‘Š
 							DiscoveryService ds = NoxToolkit
 									.getNetworkManager().getNetPeerGroup()
 									.getDiscoveryService();
 							Enumeration<Advertisement> result = null;
 							while (searchPeersBtn.getText() == "Stop") {
-								// »ñÈ¡Ô¶³Ì¹ã¸æµ½±¾µØ
+								// è·å–è¿œç¨‹å¹¿å‘Šåˆ°æœ¬åœ°
 								ds.getRemoteAdvertisements(null, advType, null,
 										null, 65535);
-								// »ñÈ¡±¾µØ¹ã¸æ
+								// è·å–æœ¬åœ°å¹¿å‘Š
 								try {
 									result = ds.getLocalAdvertisements(advType,
 											null, null);
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
-								// ´¦ÀíµÃµ½µÄ¹ã¸æ
+								// å¤„ç†å¾—åˆ°çš„å¹¿å‘Š
 								processDiscoveryResults(result);
-								// Ïß³ÌÔİÍ£5s
+								// çº¿ç¨‹æš‚åœ1s
+								//åº”æ ¹æ®ç½‘ç»œçŠ¶å†µè°ƒæ•´
 								try {
-									Thread.sleep(5 * 1000);
+									Thread.sleep(LANTimeLimit.UNIT_TIME *2);
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
@@ -178,7 +180,7 @@ class PeerSearchPanel extends SearchPanel {
 	}
 
 	/**
-	 * (ÔÚ½ÚµãËÑË÷ÁĞ±íË«»÷½ÚµãÊ±±»µ÷ÓÃ)µ¯³öÁÄÌì´°¿Ú.
+	 * (åœ¨èŠ‚ç‚¹æœç´¢åˆ—è¡¨åŒå‡»èŠ‚ç‚¹æ—¶è¢«è°ƒç”¨)å¼¹å‡ºèŠå¤©çª—å£.
 	 * 
 	 * @param listItem
 	 */
@@ -189,7 +191,7 @@ class PeerSearchPanel extends SearchPanel {
 		if (handler != null) {
 			handler.showChatroom();
 		} else {
-			// ²»´æÔÚ¶ÔÓ¦µÄhandler, ĞèÒªÁ¬½ÓÈ»ºó×¢²áhandler
+			// ä¸å­˜åœ¨å¯¹åº”çš„handler, éœ€è¦è¿æ¥ç„¶åæ³¨å†Œhandler
 			try {
 				handler = new PeerConnectionHandler(listItem, true);
 			} catch (Exception e) {
@@ -206,7 +208,7 @@ class PeerSearchPanel extends SearchPanel {
 				JPopupMenu ResultOprMenu = new JPopupMenu();
 				if (me.getButton() == MouseEvent.BUTTON3) {
 					/*
-					 * TODO ÊµÏÖÓÒ¼ü¿ÉÑ¡È¡JTable µÄĞĞ ÓĞÈ±Ïİ: ÔÚÒÑÑ¡ÔñÄ³ĞĞµÄÇé¿öÏÂ²Å¿ÉÓÃ;·ñÔòÎŞĞ§
+					 * TODO å®ç°å³é”®å¯é€‰å–JTable çš„è¡Œ æœ‰ç¼ºé™·: åœ¨å·²é€‰æ‹©æŸè¡Œçš„æƒ…å†µä¸‹æ‰å¯ç”¨;å¦åˆ™æ— æ•ˆ
 					 */
 					searchResultTable.getVisibleRect();
 					int row = me.getY() / searchResultTable.getRowHeight();
@@ -216,14 +218,14 @@ class PeerSearchPanel extends SearchPanel {
 					ResultOprMenu.add(new AbstractAction(
 							"Add to my friend list") {
 						public void actionPerformed(ActionEvent e) {
-							// TODO Ìí¼Óµ½ºÃÓÑÁĞ±í
+							// TODO æ·»åŠ åˆ°å¥½å‹åˆ—è¡¨
 							int[] selected = searchResultTable
 									.getSelectedRows();
 							for (int i = 0; i < selected.length; i++) {
 								Advertisement adv = (Advertisement) searchResultTable
 										.getAdvAt(selected[i]);
 								// System.out.println(adv);
-								// TODO ¸ù¾İ¹ã¸æ±êÇ©È·¶¨Ìí¼ÓºÃÓÑÊÇ·ñĞèÒªÑéÖ¤; ÔİÊ±Ö±½ÓÌí¼Ó
+								// TODO æ ¹æ®å¹¿å‘Šæ ‡ç­¾ç¡®å®šæ·»åŠ å¥½å‹æ˜¯å¦éœ€è¦éªŒè¯; æš‚æ—¶ç›´æ¥æ·»åŠ 
 								// adv.getID();
 								parent.add2PeerList((PeerAdvertisement) adv,
 										true);
@@ -232,7 +234,7 @@ class PeerSearchPanel extends SearchPanel {
 					});
 					ResultOprMenu.add(new AbstractAction("Talk to him/her") {
 						public void actionPerformed(ActionEvent e) {
-							//´ò¿ªÁÄÌì´°¿Ú
+							//æ‰“å¼€èŠå¤©çª—å£
 							int[] selected = searchResultTable.getSelectedRows();
 							for (int i = 0; i < selected.length; i++) {
 								Advertisement adv = (Advertisement) searchResultTable
@@ -294,7 +296,7 @@ class GroupSearchPanel extends SearchPanel {
 				JPopupMenu ResultOprMenu = new JPopupMenu();
 				if (me.getButton() == MouseEvent.BUTTON3) {
 					/*
-					 * TODO ÊµÏÖÓÒ¼ü¿ÉÑ¡È¡JTable µÄĞĞ ÓĞÈ±Ïİ: ÔÚÒÑÑ¡ÔñÄ³ĞĞµÄÇé¿öÏÂ²Å¿ÉÓÃ;·ñÔòÎŞĞ§
+					 * TODO å®ç°å³é”®å¯é€‰å–JTable çš„è¡Œ æœ‰ç¼ºé™·: åœ¨å·²é€‰æ‹©æŸè¡Œçš„æƒ…å†µä¸‹æ‰å¯ç”¨;å¦åˆ™æ— æ•ˆ
 					 */
 					searchResultTable.getVisibleRect();
 					int row = me.getY() / searchResultTable.getRowHeight();
@@ -303,7 +305,7 @@ class GroupSearchPanel extends SearchPanel {
 
 					ResultOprMenu.add(new AbstractAction("Join this group") {
 						public void actionPerformed(ActionEvent e) {
-							// TODO Ìí¼Óµ½×éÁĞ±í
+							// TODO æ·»åŠ åˆ°ç»„åˆ—è¡¨
 							int[] selected = searchResultTable
 									.getSelectedRows();
 							for (int i = 0; i < selected.length; i++) {

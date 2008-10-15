@@ -28,89 +28,89 @@ public class TestDHKey {
 		Security.addProvider(new com.sun.crypto.provider.SunJCE());
 		
 		/**
-		 * aliceÉú³ÉDH¶Ô, È»ºó½«¹«Ô¿±àÂëºó·¢¸øbob
+		 * aliceç”ŸæˆDHå¯¹, ç„¶åå°†å…¬é’¥ç¼–ç åå‘ç»™bob
 		 */
-		System.out.println("ALICE: ²úÉú DH ¶Ô ...");
+		System.out.println("ALICE: äº§ç”Ÿ DH å¯¹ ...");
 		KeyPairGenerator aliceKpairGen = KeyPairGenerator.getInstance("DH");
 		aliceKpairGen.initialize(512);
-		KeyPair aliceKpair = aliceKpairGen.generateKeyPair(); // Éú³ÉÊ±¼ä³¤
-		// ÀîËÄ(Alice)Éú³É¹«¹²ÃÜÔ¿ alicePubKeyEnc ²¢·¢ËÍ¸øÕÅÈı(Bob) ,
-		// ±ÈÈçÓÃÎÄ¼ş·½Ê½,socket.....
+		KeyPair aliceKpair = aliceKpairGen.generateKeyPair(); // ç”Ÿæˆæ—¶é—´é•¿
+		// æå››(Alice)ç”Ÿæˆå…¬å…±å¯†é’¥ alicePubKeyEnc å¹¶å‘é€ç»™å¼ ä¸‰(Bob) ,
+		// æ¯”å¦‚ç”¨æ–‡ä»¶æ–¹å¼,socket.....
 		byte[] alicePubKeyEnc = aliceKpair.getPublic().getEncoded();
 		
 		/**
-		 * bob½ÓÊÕµ½aliceµÄ±àÂëºóµÄ¹«Ô¿,½«Æä½âÂë
+		 * bobæ¥æ”¶åˆ°aliceçš„ç¼–ç åçš„å…¬é’¥,å°†å…¶è§£ç 
 		 */
 		KeyFactory bobKeyFac = KeyFactory.getInstance("DH");
 		X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(alicePubKeyEnc);
 		PublicKey alicePubKey = bobKeyFac.generatePublic(x509KeySpec);
-		System.out.println("alice¹«Ô¿bob½âÂë³É¹¦");
+		System.out.println("aliceå…¬é’¥bobè§£ç æˆåŠŸ");
 		
 		/**
-		 * bob´Óalice·¢À´µÄ¹«Ô¿ÖĞÌáÈ¡Alice³õÊ¼»¯ÆäDH¶ÔÊ±µÄ³õÊ¼»¯²ÎÊı,
-		 * ÓÃÒÔ³õÊ¼»¯bob×Ô¼ºµÄDH¶Ô.
+		 * bobä»aliceå‘æ¥çš„å…¬é’¥ä¸­æå–Aliceåˆå§‹åŒ–å…¶DHå¯¹æ—¶çš„åˆå§‹åŒ–å‚æ•°,
+		 * ç”¨ä»¥åˆå§‹åŒ–bobè‡ªå·±çš„DHå¯¹.
 		 */
-		// bob±ØĞëÓÃÏàÍ¬µÄ²ÎÊı³õÊ¼»¯µÄËûµÄDH KEY¶Ô,ËùÒÔÒª´ÓAlice·¢¸øËûµÄ¹«¿ªÃÜÔ¿,
-		// ÖĞ¶Á³ö²ÎÊı,ÔÙÓÃÕâ¸ö²ÎÊı³õÊ¼»¯ËûµÄ DH key¶Ô
-		// ´ÓalicePubKyeÖĞÈ¡alice³õÊ¼»¯Ê±ÓÃµÄ²ÎÊı
+		// bobå¿…é¡»ç”¨ç›¸åŒçš„å‚æ•°åˆå§‹åŒ–çš„ä»–çš„DH KEYå¯¹,æ‰€ä»¥è¦ä»Aliceå‘ç»™ä»–çš„å…¬å¼€å¯†é’¥,
+		// ä¸­è¯»å‡ºå‚æ•°,å†ç”¨è¿™ä¸ªå‚æ•°åˆå§‹åŒ–ä»–çš„ DH keyå¯¹
+		// ä»alicePubKyeä¸­å–aliceåˆå§‹åŒ–æ—¶ç”¨çš„å‚æ•°
 		DHParameterSpec dhParamSpec = ((DHPublicKey) alicePubKey).getParams();
 		KeyPairGenerator bobKpairGen = KeyPairGenerator.getInstance("DH");
 		bobKpairGen.initialize(dhParamSpec);
 		KeyPair bobKpair = bobKpairGen.generateKeyPair();
-		System.out.println("BOB: Éú³É DH key ¶Ô³É¹¦");
+		System.out.println("BOB: ç”Ÿæˆ DH key å¯¹æˆåŠŸ");
 		
 		/**
-		 * bob¸ù¾İAliceµÄ¹«Ô¿Éú³É±¾µØDESÃÜÔ¿
+		 * bobæ ¹æ®Aliceçš„å…¬é’¥ç”Ÿæˆæœ¬åœ°DESå¯†é’¥
 		 */
 		KeyAgreement bobKeyAgree = KeyAgreement.getInstance("DH");
 		bobKeyAgree.init(bobKpair.getPrivate());
-		System.out.println("BOB: ³õÊ¼»¯±¾µØkey³É¹¦");
-		// ÕÅÈı(bob) Éú³É±¾µØµÄÃÜÔ¿ bobDesKey
+		System.out.println("BOB: åˆå§‹åŒ–æœ¬åœ°keyæˆåŠŸ");
+		// å¼ ä¸‰(bob) ç”Ÿæˆæœ¬åœ°çš„å¯†é’¥ bobDesKey
 		bobKeyAgree.doPhase(alicePubKey, true);
 		SecretKey bobDesKey = bobKeyAgree.generateSecret("DES");
-		System.out.println("BOB: ÓÃaliceµÄ¹«Ô¿¶¨Î»±¾µØkey,Éú³É±¾µØDESÃÜÔ¿³É¹¦");
-		// BobÉú³É¹«¹²ÃÜÔ¿ bobPubKeyEnc ²¢·¢ËÍ¸øAlice,
-		// ±ÈÈçÓÃÎÄ¼ş·½Ê½,socket.....,Ê¹ÆäÉú³É±¾µØÃÜÔ¿
+		System.out.println("BOB: ç”¨aliceçš„å…¬é’¥å®šä½æœ¬åœ°key,ç”Ÿæˆæœ¬åœ°DESå¯†é’¥æˆåŠŸ");
+		// Bobç”Ÿæˆå…¬å…±å¯†é’¥ bobPubKeyEnc å¹¶å‘é€ç»™Alice,
+		// æ¯”å¦‚ç”¨æ–‡ä»¶æ–¹å¼,socket.....,ä½¿å…¶ç”Ÿæˆæœ¬åœ°å¯†é’¥
 		byte[] bobPubKeyEnc = bobKpair.getPublic().getEncoded();
-		System.out.println("BOBÏòALICE·¢ËÍ¹«Ô¿");
+		System.out.println("BOBå‘ALICEå‘é€å…¬é’¥");
 		
-		// alice½ÓÊÕµ½ bobPubKeyEncºóÉú³ÉbobPubKey
-		// ÔÙ½øĞĞ¶¨Î»,Ê¹aliceKeyAgree¶¨Î»ÔÚbobPubKey
+		// aliceæ¥æ”¶åˆ° bobPubKeyEncåç”ŸæˆbobPubKey
+		// å†è¿›è¡Œå®šä½,ä½¿aliceKeyAgreeå®šä½åœ¨bobPubKey
 		KeyFactory aliceKeyFac = KeyFactory.getInstance("DH");
 		x509KeySpec = new X509EncodedKeySpec(bobPubKeyEnc);
 		PublicKey bobPubKey = aliceKeyFac.generatePublic(x509KeySpec);
-		System.out.println("ALICE½ÓÊÕBOB¹«Ô¿²¢½âÂë³É¹¦");
+		System.out.println("ALICEæ¥æ”¶BOBå…¬é’¥å¹¶è§£ç æˆåŠŸ");
 		
 		KeyAgreement aliceKeyAgree = KeyAgreement.getInstance("DH");
 		aliceKeyAgree.init(aliceKpair.getPrivate());
-		System.out.println("ALICE: ³õÊ¼»¯±¾µØkey³É¹¦");
+		System.out.println("ALICE: åˆå§‹åŒ–æœ¬åœ°keyæˆåŠŸ");
 		aliceKeyAgree.doPhase(bobPubKey, true);
-		// ÀîËÄ(alice) Éú³É±¾µØµÄÃÜÔ¿ aliceDesKey
+		// æå››(alice) ç”Ÿæˆæœ¬åœ°çš„å¯†é’¥ aliceDesKey
 		SecretKey aliceDesKey = aliceKeyAgree.generateSecret("DES");
-		System.out.println("ALICE: ÓÃbobµÄ¹«Ô¿¶¨Î»±¾µØkey,²¢Éú³É±¾µØDESÃÜÔ¿");
+		System.out.println("ALICE: ç”¨bobçš„å…¬é’¥å®šä½æœ¬åœ°key,å¹¶ç”Ÿæˆæœ¬åœ°DESå¯†é’¥");
 		
 		if (aliceDesKey.equals(bobDesKey))
-			System.out.println("ÀîËÄºÍÕÅÈıµÄÃÜÔ¿ÏàÍ¬");
-		// ÏÖÔÚÀîËÄºÍÕÅÈıµÄ±¾µØµÄdeskeyÊÇÏàÍ¬µÄËùÒÔ,ÍêÈ«¿ÉÒÔ½øĞĞ·¢ËÍ¼ÓÃÜ,½ÓÊÕºó½âÃÜ,´ïµ½
-		// °²È«Í¨µÀµÄµÄÄ¿µÄ
+			System.out.println("æå››å’Œå¼ ä¸‰çš„å¯†é’¥ç›¸åŒ");
+		// ç°åœ¨æå››å’Œå¼ ä¸‰çš„æœ¬åœ°çš„deskeyæ˜¯ç›¸åŒçš„æ‰€ä»¥,å®Œå…¨å¯ä»¥è¿›è¡Œå‘é€åŠ å¯†,æ¥æ”¶åè§£å¯†,è¾¾åˆ°
+		// å®‰å…¨é€šé“çš„çš„ç›®çš„
 		/**
-		 * bobÓÃbobDesKeyÃÜÔ¿¼ÓÃÜĞÅÏ¢
+		 * bobç”¨bobDesKeyå¯†é’¥åŠ å¯†ä¿¡æ¯
 		 */
 		Cipher bobCipher = Cipher.getInstance("DES");
 		bobCipher.init(Cipher.ENCRYPT_MODE, bobDesKey);
-		String bobinfo = "ÕâÊÇÕÅÈıµÄ»úÃÜĞÅÏ¢";
-		System.out.println("ÕÅÈı¼ÓÃÜÇ°Ô­ÎÄ:" + bobinfo);
+		String bobinfo = "è¿™æ˜¯å¼ ä¸‰çš„æœºå¯†ä¿¡æ¯";
+		System.out.println("å¼ ä¸‰åŠ å¯†å‰åŸæ–‡:" + bobinfo);
 		byte[] cleartext = bobinfo.getBytes();
 		byte[] ciphertext = bobCipher.doFinal(cleartext);
 		/**
-		 * aliceÓÃaliceDesKeyÃÜÔ¿½âÃÜ
+		 * aliceç”¨aliceDesKeyå¯†é’¥è§£å¯†
 		 */
 		Cipher aliceCipher = Cipher.getInstance("DES");
 		aliceCipher.init(Cipher.DECRYPT_MODE, aliceDesKey);
 		byte[] recovered = aliceCipher.doFinal(ciphertext);
-		System.out.println("alice½âÃÜbobµÄĞÅÏ¢:" + (new String(recovered)));
+		System.out.println("aliceè§£å¯†bobçš„ä¿¡æ¯:" + (new String(recovered)));
 		if (!java.util.Arrays.equals(cleartext, recovered))
-			throw new Exception("½âÃÜºóÓëÔ­ÎÄĞÅÏ¢²»Í¬");
-		System.out.println("½âÃÜºóÏàÍ¬");
+			throw new Exception("è§£å¯†åä¸åŸæ–‡ä¿¡æ¯ä¸åŒ");
+		System.out.println("è§£å¯†åç›¸åŒ");
 	}
 }

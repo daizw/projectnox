@@ -39,14 +39,14 @@ public class MiniProfilePane extends JPanel {
 	String lastSignStr = "";
 
 	/**
-	 * mini profile ×é¼ş
+	 * mini profile ç»„ä»¶
 	 * 
 	 * @param path_portrait
-	 *            Í·ÏñÍ¼Æ¬Â·¾¶
+	 *            å¤´åƒå›¾ç‰‡è·¯å¾„
 	 * @param nickname
-	 *            êÇ³Æ
+	 *            æ˜µç§°
 	 * @param sign
-	 *            Ç©Ãûµµ
+	 *            ç­¾åæ¡£
 	 */
 	public MiniProfilePane(final Cheyenne parent, ImageIcon portrait, String nickname, String sign) {
 		lastPortrait = portrait;
@@ -180,7 +180,7 @@ public class MiniProfilePane extends JPanel {
 		
 		ImageIcon curPortrait = null;
 		if(lastPortrait.equals((ImageIcon) myPortrait.getIcon())){
-			//Í·ÏñÎŞ±ä»¯
+			//å¤´åƒæ— å˜åŒ–
 			curPortrait = null;
 		}else{
 			curPortrait = (ImageIcon) myPortrait.getIcon();
@@ -192,7 +192,7 @@ public class MiniProfilePane extends JPanel {
 				curPortrait); 
 	}
 	/**
-	 * ¹¦ÄÜÓëgetStatusUnitÀàËÆ, Î¨Ò»²»Í¬ÔÚÓÚÎŞÂÛÓĞÃ»ÓĞĞŞ¸ÄÍ·Ïñ, ¶¼»á·µ»ØÍ·Ïñ.
+	 * åŠŸèƒ½ä¸getStatusUnitç±»ä¼¼, å”¯ä¸€ä¸åŒåœ¨äºæ— è®ºæœ‰æ²¡æœ‰ä¿®æ”¹å¤´åƒ, éƒ½ä¼šè¿”å›å¤´åƒ.
 	 * @return
 	 */
 	public NoxPeerStatusUnit getFullStatusUnit(){
@@ -218,16 +218,16 @@ public class MiniProfilePane extends JPanel {
 		myPortrait.setIcon(icon);
 	}
 	/**
-	 * ÉèÖÃêÇ³Æ
+	 * è®¾ç½®æ˜µç§°
 	 * @param name
 	 */
 	public void setNickName(String name){
 		myNick.setText(name);
 	}
 	/**
-	 * ÉèÖÃÇ©Ãûµµ
+	 * è®¾ç½®ç­¾åæ¡£
 	 * @param sign
-	 * @deprecated »¹ÊÇÖ±½ÓÔÚÖ÷½çÃæÉèÖÃ°É!
+	 * @deprecated è¿˜æ˜¯ç›´æ¥åœ¨ä¸»ç•Œé¢è®¾ç½®å§!
 	 */
 	public void setSign(String sign){
 		mySign.setText(sign);
@@ -237,7 +237,7 @@ public class MiniProfilePane extends JPanel {
 		mySign.setForeground(color);
 	}
 	/**
-	 * ·µ»ØTooltipTxtµÄhtmlĞÎÊ½
+	 * è¿”å›TooltipTxtçš„htmlå½¢å¼
 	 * @param text
 	 * @return
 	 */

@@ -2,7 +2,7 @@ package nox.net.common;
 
 import net.jxta.document.Advertisement;
 /**
- * ·¢ÏÖÊÂ¼ş´¦Àí´¿ĞéÀà, ÓÃÓÚ¼Ì³Ğ
+ * å‘ç°äº‹ä»¶å¤„ç†çº¯è™šç±», ç”¨äºç»§æ‰¿
  * @author shinysky
  *
  */

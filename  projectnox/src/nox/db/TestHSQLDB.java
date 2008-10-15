@@ -42,7 +42,7 @@ public class TestHSQLDB {
 						DBTableName.PEER_SQLTABLE_NAME  +
 						" (Good BOOLEAN, Object OTHER)");
 			} catch(SQLException e) {
-				System.out.println("Êı¾İ¿âÒÑ´æÔÚ");
+				System.out.println("æ•°æ®åº“å·²å­˜åœ¨");
 				e.printStackTrace();
 			}
 			PreparedStatement pstmt = con.prepareStatement("insert into " +
@@ -119,7 +119,7 @@ public class TestHSQLDB {
 			stmt.execute("SHUTDOWN");
 			stmt.close();
 		} catch (SQLException e) {
-			System.out.println("Êı¾İ¿âÒì³£");
+			System.out.println("æ•°æ®åº“å¼‚å¸¸");
 			e.printStackTrace();
 		} catch (InstantiationException e) {
 			e.printStackTrace();
@@ -151,29 +151,29 @@ class TestItem implements Serializable{
 	}
 	
 	/**
-	 * »ñÈ¡Í·Ïñ
-	 * @return Í·ÏñImageIcon
+	 * è·å–å¤´åƒ
+	 * @return å¤´åƒImageIcon
 	 */
 	protected ImageIcon getPortrait() {
 		return portrait;
 	}
 	/**
-	 * »ñÈ¡êÇ³Æ
-	 * @return êÇ³ÆText
+	 * è·å–æ˜µç§°
+	 * @return æ˜µç§°Text
 	 */
 	protected String getNick() {
 		return nickname;
 	}
 	/**
-	 * »ñÈ¡Ç©Ãûµµ
-	 * @return Ç©ÃûµµText
+	 * è·å–ç­¾åæ¡£
+	 * @return ç­¾åæ¡£Text
 	 */
 	protected String getSign() {
 		return sign;
 	}
 	/**
-	 * »ñÈ¡¸ÃItemµÄID
-	 * @return ×éµÄPeerGroupID,»òÕßPeerµÄPeerID
+	 * è·å–è¯¥Itemçš„ID
+	 * @return ç»„çš„PeerGroupID,æˆ–è€…Peerçš„PeerID
 	 */
 	protected String getUUID(){
 		return UUID;

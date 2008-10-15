@@ -35,16 +35,16 @@ public class EncryptUtil {
 		try {
 			KeyPairGenerator keygen = java.security.KeyPairGenerator.getInstance("DSA");
 			// SecureRandom secrand=new SecureRandom();
-			// secrand.setSeed("tttt".getBytes()); //³õÊ¼»¯Ëæ»ú²úÉúÆ÷
-			// keygen.initialize(576,secrand); //³õÊ¼»¯ÃÜÔ¿Éú³ÉÆ÷
+			// secrand.setSeed("tttt".getBytes()); //åˆå§‹åŒ–éšæœºäº§ç”Ÿå™¨
+			// keygen.initialize(576,secrand); //åˆå§‹åŒ–å¯†é’¥ç”Ÿæˆå™¨
 			keygen.initialize(512);
 			KeyPair keys = keygen.genKeyPair();
-			// KeyPair keys=keygen.generateKeyPair(); //Éú³ÉÃÜÔ¿×é
-			System.out.println("Éú³ÉÃÜÔ¿¶Ô³É¹¦");
+			// KeyPair keys=keygen.generateKeyPair(); //ç”Ÿæˆå¯†é’¥ç»„
+			System.out.println("ç”Ÿæˆå¯†é’¥å¯¹æˆåŠŸ");
 			return keys;
 		} catch (java.lang.Exception e) {
 			e.printStackTrace();
-			System.out.println("Éú³ÉÃÜÔ¿¶ÔÊ§°Ü");
+			System.out.println("ç”Ÿæˆå¯†é’¥å¯¹å¤±è´¥");
 			return null;
 		}
 	}
@@ -56,29 +56,29 @@ public class EncryptUtil {
 
 	public void testDigest() {
 		try {
-			String myinfo = "ÎÒµÄ²âÊÔĞÅÏ¢";
+			String myinfo = "æˆ‘çš„æµ‹è¯•ä¿¡æ¯";
 			// java.security.MessageDigest
 			// alg=java.security.MessageDigest.getInstance("MD5");
 			MessageDigest alga = MessageDigest
 					.getInstance("SHA-1");
 			alga.update(myinfo.getBytes());
 			byte[] digesta = alga.digest();
-			System.out.println("±¾ĞÅÏ¢ÕªÒªÊÇ:" + byte2hex(digesta));
-			// Í¨¹ıÄ³ÖĞ·½Ê½´«¸øÆäËûÈËÄãµÄĞÅÏ¢(myinfo)ºÍÕªÒª(digesta) ¶Ô·½¿ÉÒÔÅĞ¶ÏÊÇ·ñ¸ü¸Ä»ò´«ÊäÕı³£
+			System.out.println("æœ¬ä¿¡æ¯æ‘˜è¦æ˜¯:" + byte2hex(digesta));
+			// é€šè¿‡æŸä¸­æ–¹å¼ä¼ ç»™å…¶ä»–äººä½ çš„ä¿¡æ¯(myinfo)å’Œæ‘˜è¦(digesta) å¯¹æ–¹å¯ä»¥åˆ¤æ–­æ˜¯å¦æ›´æ”¹æˆ–ä¼ è¾“æ­£å¸¸
 			MessageDigest algb = MessageDigest
 					.getInstance("SHA-1");
 			algb.update(myinfo.getBytes());
 			if (MessageDigest.isEqual(digesta, algb.digest())) {
-				System.out.println("ĞÅÏ¢¼ì²éÕı³£");
+				System.out.println("ä¿¡æ¯æ£€æŸ¥æ­£å¸¸");
 			} else {
-				System.out.println("ÕªÒª²»ÏàÍ¬");
+				System.out.println("æ‘˜è¦ä¸ç›¸åŒ");
 			}
 		} catch (NoSuchAlgorithmException ex) {
-			System.out.println("·Ç·¨ÕªÒªËã·¨");
+			System.out.println("éæ³•æ‘˜è¦ç®—æ³•");
 		}
 	}
 
-	public static String byte2hex(byte[] b) // ¶şĞĞÖÆ×ª×Ö·û´®
+	public static String byte2hex(byte[] b) // äºŒè¡Œåˆ¶è½¬å­—ç¬¦ä¸²
 	{
 		String hs = "";
 		String stmp = "";

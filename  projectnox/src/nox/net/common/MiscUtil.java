@@ -4,7 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 public class MiscUtil {
-	/** ÔÚ»ñÈ¡±¾»úIPµØÖ··¢ÉúÒì³£Ê±·µ»Ø¸ÃÖµ */
+	/** åœ¨è·å–æœ¬æœºIPåœ°å€å‘ç”Ÿå¼‚å¸¸æ—¶è¿”å›è¯¥å€¼ */
 	public static final String IPADDRESS = "0.0.0.0";
 	
     public static String getIPAddress() {
@@ -41,9 +41,9 @@ public class MiscUtil {
     }
     
     /**
-     * ÓÉÓÚDataOutputStream.writeUTFÃ¿´Î×î¶à´«Êä65535×Ö½ÚµÄÊı¾İ£¬Òò´Ë´óÓÚ65535×Ö½ÚµÄÊı¾İĞèÒªÊÖ¹¤²ğ·Ö
-     * @param str	½øĞĞ²ğ·ÖµÄ×Ö·û´®
-     * @return		×Ö·û´®Êı×é£¬Êı×éÖĞµÄÃ¿¸öÔªËØ¾ù¸ÕºÃĞ¡ÓÚ65535×Ö½Ú(×îºóÒ»¸öÔªËØ³ıÍâ)
+     * ç”±äºDataOutputStream.writeUTFæ¯æ¬¡æœ€å¤šä¼ è¾“65535å­—èŠ‚çš„æ•°æ®ï¼Œå› æ­¤å¤§äº65535å­—èŠ‚çš„æ•°æ®éœ€è¦æ‰‹å·¥æ‹†åˆ†
+     * @param str	è¿›è¡Œæ‹†åˆ†çš„å­—ç¬¦ä¸²
+     * @return		å­—ç¬¦ä¸²æ•°ç»„ï¼Œæ•°ç»„ä¸­çš„æ¯ä¸ªå…ƒç´ å‡åˆšå¥½å°äº65535å­—èŠ‚(æœ€åä¸€ä¸ªå…ƒç´ é™¤å¤–)
      * @see java.io.DataOutputStream.writeUTF
      */
     public static Object[] splitUTFString(String str) {
