@@ -42,7 +42,7 @@ public class NoxMsgUtil {
 		System.out.println("Generating message\n");
 		// create the message
 		msg = new Message();
-		Date date = new Date(System.currentTimeMillis());
+		long date = System.currentTimeMillis();
 		// add a string message element with the current date
 		StringMessageElement senderEle = new StringMessageElement(
 				XmlMsgFormat.SENDER_ELEMENT_NAME, sender, null);
@@ -53,7 +53,7 @@ public class NoxMsgUtil {
 		StringMessageElement receiverIDEle = new StringMessageElement(
 				XmlMsgFormat.RECEIVERID_ELEMENT_NAME, receiverID, null);
 		StringMessageElement timeEle = new StringMessageElement(
-				XmlMsgFormat.TIME_ELEMENT_NAME, date.toString(), null);
+				XmlMsgFormat.TIME_ELEMENT_NAME, ""+date, null);
 		/*StringMessageElement msgEle = new StringMessageElement(
 				XmlMsgFormat.MESSAGE_ELEMENT_NAME, strmsg, null);*/
 		ByteArrayMessageElement dataEle = new ByteArrayMessageElement(

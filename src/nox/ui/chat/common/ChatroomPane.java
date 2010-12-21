@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -102,7 +103,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 	/**
 	 * 插入表情JButton
 	 */
-	private JButton b_emotion;
+	private JButton b_emoticon;
 	/**
 	 * 表情选择对话框
 	 */
@@ -110,8 +111,8 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 	/**
 	 * 闪屏振动
 	 */
-	private JButton b_shake;
-	private static final String shakeMsg = "[F:999]"; 
+	private JButton b_nudge;
+	private static final String nudgeMsg = "[F:999]"; 
 	/**
 	 * 发送图片按钮
 	 */
@@ -346,15 +347,15 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 
 		Dimension buttonSize = new Dimension(26, 26);
 
-		b_emotion = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "emotion.png"));
-		b_emotion.setToolTipText(getHtmlText("Insert a emotion image"));
-		b_emotion.setActionCommand("Emotion");
-		b_emotion.addActionListener(this);
+		b_emoticon = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "emoticon.png"));
+		b_emoticon.setToolTipText(getHtmlText("Insert a emoticon"));
+		b_emoticon.setActionCommand("Emoticon");
+		b_emoticon.addActionListener(this);
 		// b_InsertImg.setContentAreaFilled(false);
-		b_emotion.setSize(buttonSize);
-		b_emotion.setPreferredSize(buttonSize);
-		b_emotion.setMaximumSize(buttonSize);
-		b_emotion.setMinimumSize(buttonSize);
+		b_emoticon.setSize(buttonSize);
+		b_emoticon.setPreferredSize(buttonSize);
+		b_emoticon.setMaximumSize(buttonSize);
+		b_emoticon.setMinimumSize(buttonSize);
 
 		/**
 		 * 如果不阻塞其他窗口的话, 会出现无法获取已选择的表情的情况.
@@ -366,14 +367,14 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 				* FaceDialog.FACEROWS + 30);// 30为b_cr_cancel的高度
 		selFace.pack();
 
-		b_shake = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "shake.png"));
-		b_shake.setToolTipText(getHtmlText("Rock and Roll !"));
-		b_shake.setActionCommand("Shake");
-		b_shake.addActionListener(this);
-		b_shake.setSize(buttonSize);
-		b_shake.setPreferredSize(buttonSize);
-		b_shake.setMaximumSize(buttonSize);
-		b_shake.setMinimumSize(buttonSize);
+		b_nudge = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "nudge.png"));
+		b_nudge.setToolTipText(getHtmlText("Rock and Roll !"));
+		b_nudge.setActionCommand("Nudge");
+		b_nudge.addActionListener(this);
+		b_nudge.setSize(buttonSize);
+		b_nudge.setPreferredSize(buttonSize);
+		b_nudge.setMaximumSize(buttonSize);
+		b_nudge.setMinimumSize(buttonSize);
 
 		b_sendPic = new JButton(new ImageIcon(SystemPath.ICONS_RESOURCE_PATH + "sendpic.png"));
 		b_sendPic.setToolTipText(getHtmlText("Send a picture"));
@@ -504,8 +505,8 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 
 		p_buttons.setOpaque(false);
 		p_buttons.setLayout(new BoxLayout(p_buttons, BoxLayout.X_AXIS));
-		p_buttons.add(b_emotion);
-		p_buttons.add(b_shake);
+		p_buttons.add(b_emoticon);
+		p_buttons.add(b_nudge);
 		p_buttons.add(b_sendPic);
 		p_buttons.add(b_sendFile);
 		p_buttons.add(b_snapshot);
@@ -585,8 +586,8 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		Thread playThd = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				if (strmsg != null && strmsg.equals(shakeMsg))
-					playShakeAudio();
+				if (strmsg != null && strmsg.equals(nudgeMsg))
+					playNudgeAudio();
 				else
 					playAudio();
 			}
@@ -596,7 +597,8 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		/**
 		 * 处理外部传来的消息字符串
 		 */
-		String label = "[" + sender + "@" + time + "]";
+		Date date = new Date(Long.parseLong(time));
+		String label = fmDate.format(date) + " " + sender + ":";
 		
 		StringBuffer strbuf_msg = null;
 		if(strmsg != null){
@@ -637,7 +639,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 	/**
 	 * 接收/发送闪屏时播放提示音
 	 */
-	public void playShakeAudio() {
+	public void playNudgeAudio() {
 		final AudioClip msgBeep;
 		try {
 			// AudioClip audioClip = Applet.newAudioClip(completeURL)
@@ -694,7 +696,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		/**
 		 * 是否是闪屏振动消息
 		 */
-		if (msg != null && msg.equals(shakeMsg)) {
+		if (msg != null && msg.equals(nudgeMsg)) {
 			// 使用灰色标签
 			labelStyle = gray;
 
@@ -708,7 +710,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 			tp_historymsg.setCaretPosition(styledDoc.getLength());// !!!
 			styledDoc.setLogicalStyle(tp_historymsg.getCaretPosition(), italic);
 			tp_historymsg
-					.replaceSelection("YOU JUST RECEIVED A SHAKE EMOTION\n");
+					.replaceSelection("YOU JUST RECEIVED A NUDGE\n");
 			tp_historymsg.setEditable(false);
 			return;
 		}
@@ -854,7 +856,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		 */
 		Date date = new Date();
 		// fmDate = new SimpleDateFormat("yyyy/MM/dd E HH:mm:ss");
-		String label = "I say@" + fmDate.format(date) + ":";
+		String label = fmDate.format(date) + " Me:";
 
 		appendToHMsg(label, tp_input.getText(), null, true, true);
 		/**
@@ -879,24 +881,23 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 		tp_input.setText("");// 输入框清空
 	}
 
-	private void sendAShakeEmotion() {
+	private void sendANudge() {
 		/**
 		 * 格式化日期
 		 */
 		Date date = new Date();
 		// fmDate = new SimpleDateFormat("yyyy/MM/dd E HH:mm:ss");
-		String label = "Sending a Shake Emotion to " + parent.getRoomName()
-				+ "@" + fmDate.format(date) + ":";
+		String label = fmDate.format(date) + " Nudging " + parent.getRoomName() + ":";
 
 		//appendToHMsg(label, tp_input.getText(), null, true, true);
 		appendToHMsg(label, null, null, true, true);
 		/**
 		 * 向对方发送消息 999:表示表情索引
 		 */
-		boolean succeed = parent.SendMsg(shakeMsg, tb_encrypt.isSelected());
+		boolean succeed = parent.SendMsg(nudgeMsg, tb_encrypt.isSelected());
 		if(!succeed){
 			//TODO tell user what happend.
-			showFailedSendingMsg("(It's a shake emotion actually.)");
+			showFailedSendingMsg("(It's a nudge actually.)");
 		}
 	}
 
@@ -1001,7 +1002,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 			System.out.println("You clicked the button : Send");
 			// insert(getText(), null);
 			sendMessage();
-		} else if (srcButton.getActionCommand().equals("Emotion")) {
+		} else if (srcButton.getActionCommand().equals("Emoticon")) {
 			/**
 			 * 插入表情: 目前只能插入到输入框中, 插入到历史消息框中还没有实现. 如果没有直接拷贝的方法, 那么只好用另外一个方法:
 			 * 就是把表情用字符表示,在插入到历史消息框中时进行字符过滤 不过这样比较麻烦
@@ -1010,7 +1011,7 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 			 */
 			System.out.println("You clicked the button : InsertImage");
 			// 显示表情选择窗口
-			selFace.setLocationRelativeTo(b_emotion);
+			selFace.setLocationRelativeTo(b_emoticon);
 			selFace.setVisible(true);
 
 			int selectedfaceIndex = selFace.getSelectedFaceIndex();
@@ -1025,15 +1026,15 @@ public class ChatroomPane extends JSplitPane implements ActionListener// ,MouseL
 			 * face : " + selectedfaceIndex + ".gif");
 			 * appendFaceToInputPane(selectedface); }
 			 */
-		} else if (srcButton.getActionCommand().equals("Shake")) {
+		} else if (srcButton.getActionCommand().equals("Nudge")) {
 			DialogEarthquakeCenter dec = new DialogEarthquakeCenter(parent);
 			dec.startShake();// 对话框必须setModal (false)才可以抖动, 否则不行
 			//TODO 这里应该播放声音, 调试时禁止, 防止重叠, 冲突.
-			// playShakeAudio();
+			playNudgeAudio();
 			/**
 			 * 发送一个闪屏振动
 			 */
-			sendAShakeEmotion();
+			sendANudge();
 		} else if (srcButton.getActionCommand().equals("SendPic")) {
 			JFileChooser chooser = new JFileChooser();
 			FileFilter filter = new FileFilter() {

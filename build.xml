@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="GB2312"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Created by DaiZW(shinysky) on Jul 6, 2005 8:30:22 PM-->
 
 <project name="project-NoX" default="ant-usage" basedir=".">
@@ -101,7 +101,7 @@
 	</target>
 
 	<target name="run" description="Run the NoX" depends="run-logging,run-default-logging" />
-	
+
 	<target name="nox" depends="build" description="Run the NoX UI" if="java.util.logging.config.file">
 		<java classname="nox.launcher.NoX" failonerror="yes" fork="yes">
 			<classpath>

@@ -5,7 +5,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.spec.ECFieldFp;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.EllipticCurve;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,8 +27,37 @@ import nox.net.common.NoxToolkit;
 import nox.ui.common.ObjectList;
 import nox.ui.me.Cheyenne;
 
+import org.bouncycastle.jce.ECPointUtil;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Hex;
+
 public class NoX {
-	public static void main(String args[]) {
+	public static final String ALGORITHM = "ECDH";
+	public static KeyPair MyKeyPair;
+	
+	private static final EllipticCurve curve = new EllipticCurve(
+			new ECFieldFp(
+					new BigInteger(
+							"883423532389192164791648750360308885314476597252960362792450860609699839")), // q
+			new BigInteger(
+					"7fffffffffffffffffffffff7fffffffffff8000000000007ffffffffffc",
+					16), // a
+			new BigInteger(
+					"6b016c3bdcf18941d0d654921475ca71a9db2fb27d1d37796185c2942c0a",
+					16)); // b
+
+	private static final ECParameterSpec ecSpec = new ECParameterSpec(
+			curve,
+			ECPointUtil
+					.decodePoint(
+							curve,
+							Hex
+									.decode("020ffa963cdca8816ccc33b8642bedf905c3d358573d3f27fbbd3b3cb9aaaf")), // G
+			new BigInteger(
+					"883423532389192164791648750360308884807550341691627752275345424702807307"), // n
+			1); // h
+
+	public static void main(String args[]) throws Exception {
 		System.setProperty("sun.java2d.noddraw", "true");// 为半透明做准备
 		System.setProperty("net.jxta.logging.Logging", "INFO");
 		System.setProperty("net.jxta.level", "INFO");
@@ -75,6 +111,7 @@ public class NoX {
 			}
 			// TODO 初始化(系统/个人)设置
 			// 读取公私钥
+			prepareKeyPair();
 			//initMyKeyPair(conn, DBTableName.ME_SQLTABLE_NAME);
 			initEcryption(conn, DBTableName.ME_SQLTABLE_NAME);
 			//或者由Cheyenne初始化
@@ -120,6 +157,14 @@ public class NoX {
 	private static void initMyStatus(Connection conn, String meSqltableName) {
 	}
 
+	private static void prepareKeyPair() throws Exception {
+		Security.addProvider(new BouncyCastleProvider());
+		KeyPairGenerator aliceKpairGen = KeyPairGenerator.getInstance(
+				ALGORITHM, "BC");
+		aliceKpairGen.initialize(ecSpec, new SecureRandom());
+
+		MyKeyPair = aliceKpairGen.generateKeyPair();
+	}
 	/**
 	 * 从数据库中读取密钥(SecretKey), 保存到EncryptUtil中.</p>
 	 * 如果没有则新建并保存到数据库中.</p>

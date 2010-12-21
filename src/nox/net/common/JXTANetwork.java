@@ -190,6 +190,16 @@ public class JXTANetwork {
 				
 				TheConfig.setTcpStartPort(9701);
 				TheConfig.setTcpEndPort(65530);
+				
+//	            String ip="tcp://219.223.192.186:9711";
+//	            URI seedingURI = URI.create(ip);
+//	            TheConfig.addSeedRelay(seedingURI);
+//	            TheConfig.addSeedRendezvous(seedingURI);
+//	            TheConfig.setUseOnlyRelaySeeds(true);
+//	            TheConfig.setUseOnlyRendezvousSeeds(true);
+//	            TheConfig.setTcpEnabled(true);
+//	            TheConfig.setTcpIncoming(true);
+//	            TheConfig.setTcpOutgoing(true);
 
 				System.out.println("Principal: " + TheConfig.getPrincipal());
 				System.out.println("Password : " + TheConfig.getPassword());

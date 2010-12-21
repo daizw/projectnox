@@ -204,7 +204,7 @@ public class LoginDialog extends JDialog implements ActionListener{
 	public boolean setRoundRecangle(){
 		RoundRectangle2D.Float mask = 
 			new RoundRectangle2D.Float(0, 0, 
-					LOGINDIALOGWIDTH, LOGINDIALOGHEIGHT , 60, 60);
+					LOGINDIALOGWIDTH, LOGINDIALOGHEIGHT , 20, 20);
 	    WindowUtils.setWindowMask(this, mask);
 	    return true;
 	}

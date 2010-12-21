@@ -1,0 +1,19 @@
+# use glob syntax.
+syntax: glob
+
+.cache
+.svn
+db
+*.apk
+*.dex
+*.class
+*.ap_
+*.pyc
+*~
+*.swp
+*.db
+*.db-journal
+*.ori
+*.log
+*.log.*
+*.pid
