@@ -47,6 +47,7 @@ import net.jxta.endpoint.WireFormatMessageFactory;
 import net.jxta.endpoint.Message.ElementIterator;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.id.ID;
+import net.jxta.peer.PeerID;
 import net.jxta.peergroup.PeerGroup;
 import net.jxta.peergroup.PeerGroupID;
 import net.jxta.pipe.InputPipe;
@@ -61,9 +62,12 @@ import nox.net.common.ConnectionHandler;
 import nox.net.common.LANTimeLimit;
 import nox.net.common.NoxToolkit;
 import nox.net.common.PipeUtil;
+import nox.net.peer.PeerConnectionHandler;
 import nox.ui.chat.common.SlideInNotification;
 import nox.ui.chat.group.GroupChatroom;
+import nox.ui.chat.group.GroupMemberList;
 import nox.ui.common.GroupItem;
+import nox.ui.common.PeerItem;
 import nox.ui.common.SystemPath;
 import nox.xml.NoxFileUnit;
 import nox.xml.NoxMsgUtil;
@@ -220,14 +224,14 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 		if(inpipe != null)
 			NoxToolkit.forceRegisterGroupConnectionHandler((PeerGroupID) groupItem.getUUID(), this);
 		
-		if (outpipe != null) {
-			//群发消息
-			System.out.println("[" + Thread.currentThread().getName()
-					+ "] Saying hello ...");
-			String hellomsg = "Hello [F:100] from "
-				+ NoxToolkit.getNetworkConfigurator().getName();
-			SendMsg(hellomsg, false);
-		}
+//		if (outpipe != null) {
+//			//群发消息
+//			System.out.println("[" + Thread.currentThread().getName()
+//					+ "] Saying hello ...");
+//			String hellomsg = "Hello [F:100] from "
+//				+ NoxToolkit.getNetworkConfigurator().getName();
+//			SendMsg(hellomsg, false);
+//		}
 		
 		System.out.println("[" + Thread.currentThread().getName()
 				+ "] Done!");
@@ -307,7 +311,11 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 			noxFile = new NoxFileUnit(file.getName(), fileData);
 			fileBytes = NoxMsgUtil.getBytesFromObject(noxFile);
 			System.out.println("Sending a file...");
-			boolean sent = SendMsg(XmlMsgFormat.FILEMSG_NAMESPACE_NAME, fileBytes, encrypt);
+			boolean sent = false;
+			if(encrypt)
+				sent = sendFileSecurely(fileBytes);
+			else
+				sent = SendMsg(XmlMsgFormat.FILEMSG_NAMESPACE_NAME, fileBytes, encrypt);
 			if(sent)
 				System.out.println("File sent");
 			else
@@ -323,7 +331,42 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 			return false;
 		}
 	}
-	
+	private boolean sendFileSecurely(byte[] data) {
+		boolean sent = false;
+		GroupMemberList ml = this.getGroupMemberList();
+		int size = ml.getModel().getSize();
+		for(int i = 0; i < size; i++) {
+			PeerItem item = (PeerItem)ml.getModel().getElementAt(i);
+			PeerConnectionHandler handler = setupConnection(item);
+			if(handler != null) {
+				sent = handler.SendMsg(XmlMsgFormat.FILEMSG_NAMESPACE_NAME, data, true);
+				if(sent)
+					System.out.println("File sent");
+				else
+					System.out.println("Failed to send file");
+			} else {
+				System.out.println("Failed to connect");
+			}
+		}
+		return sent;
+	}
+	/**
+	 * (在组成员列表双击组员时被调用)弹出聊天窗口.
+	 * @param listItem
+	 */
+	private PeerConnectionHandler setupConnection(PeerItem listItem) {
+		
+		PeerConnectionHandler handler = NoxToolkit.getPeerConnectionHandler((PeerID) listItem.getUUID());
+		if(handler == null){
+			//不存在对应的handler, 需要连接然后注册handler
+			try {
+				handler = new PeerConnectionHandler(listItem, false);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return handler;
+	}
 	/**
 	 * Send a greeting message over the pipe
 	 * 
@@ -360,7 +403,7 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 
 		Message msg = null;
 		
-		if(encrypt){
+		if(encrypt){//FIXME this is not needed any more, if we send file to each member separately.
 			//TODO 生成DES密钥, 用其加密数据(CBC模式), 产生相应带参数的消息
 			if(DESKey == null){
 				// 从文件导入密钥DES
@@ -861,5 +904,10 @@ public class GroupConnectionHandler implements ConnectionHandler, Runnable, Pipe
 			}
 		if(room != null)
 			room.dispose();
+	}
+	
+	public GroupMemberList getGroupMemberList()
+	{
+		return this.room.getGroupMemberList();
 	}
 }

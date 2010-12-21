@@ -33,6 +33,7 @@ public class GroupChatroom extends Chatroom {
 	 */
 	private InfiniteProgressPanel glassPane;
 	private GroupConnectionHandler handler;
+	private GroupChatroomSidePane gcsp;
 	/**
 	 * 最终应该从主窗口继承颜色, 透明度 考虑实现:主窗口和从属窗口同步调节颜色和透明度.
 	 * 在实例化从属窗口的时候将引用保存在一个Vector中,
@@ -56,7 +57,7 @@ public class GroupChatroom extends Chatroom {
 		roomID = group.getUUID();
 		roomname = group.getName();
 
-		GroupChatroomSidePane gcsp = new GroupChatroomSidePane(this, group
+		gcsp = new GroupChatroomSidePane(this, group
 				.getName(), new PeerItem[0]);
 		rootpane.add(gcsp);
 		rootpane.add(chatroompane);
@@ -241,4 +242,7 @@ public class GroupChatroom extends Chatroom {
 			}
 		}
 	}*/
+	public GroupMemberList getGroupMemberList() {
+		return this.gcsp.groupmemerlist;
+	}
 }
